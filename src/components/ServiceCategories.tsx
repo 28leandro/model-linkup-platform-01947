@@ -1,29 +1,32 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const ServiceCategories = () => {
+  const { t } = useLanguage();
+
   const categories = [
     {
-      name: "🚗 Veículos",
-      description: "Carros, motos, caminhões",
+      name: t('categories.vehicles'),
+      description: t('categories.vehicles.desc'),
       link: "/category/vehicles",
       type: "vehicles"
     },
     {
-      name: "🏠 Imóveis - Venda",
-      description: "Casas, apartamentos, terrenos",
+      name: t('categories.realEstateSale'),
+      description: t('categories.realEstateSale.desc'),
       link: "/category/real-estate-sale",
       type: "real-estate"
     },
     {
-      name: "🏘️ Imóveis - Aluguel",
-      description: "Aluguel de imóveis",
+      name: t('categories.realEstateRent'),
+      description: t('categories.realEstateRent.desc'),
       link: "/category/real-estate-rent",
       type: "real-estate"
     },
     {
-      name: "🛠️ Serviços Diversos",
-      description: "Prestação de serviços",
+      name: t('categories.services'),
+      description: t('categories.services.desc'),
       link: "/category/services",
       type: "services"
     }
@@ -31,7 +34,7 @@ const ServiceCategories = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-xl font-semibold mb-4">Categorias Principais</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('categories.title')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {categories.map((category) => (
           <Card key={category.name} className="hover:shadow-md transition-shadow bg-primary text-primary-foreground">

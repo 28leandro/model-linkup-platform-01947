@@ -1,15 +1,19 @@
 import { Link } from "react-router-dom";
 import { StarRating } from "@/components/StarRating";
 import { Listing } from "@/store/listingsStore";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface RecentListingsProps {
   listings: Listing[];
 }
 
+
 const RecentListings = ({ listings }: RecentListingsProps) => {
+  const { t } = useLanguage();
+
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-xl font-semibold mb-4">Anúncios Recentes</h2>
+      <h2 className="text-xl font-semibold mb-4">{t('listings.recent')}</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map((listing) => (
           <div key={listing.id} className="group hover:shadow-md transition-shadow bg-white">
@@ -23,7 +27,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    Pas d'image
+                    {t('listings.noImage')}
                   </div>
                 )}
               </div>

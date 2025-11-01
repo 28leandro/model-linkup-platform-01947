@@ -2,16 +2,20 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { StarRating } from "@/components/StarRating";
 import { Listing } from "@/store/listingsStore";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SearchResultsProps {
   listings: Listing[];
 }
 
+
 const SearchResults = ({ listings }: SearchResultsProps) => {
+  const { t } = useLanguage();
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-xl font-semibold mb-4">
-        {listings.length > 0 ? 'Résultats de recherche' : 'Aucun résultat trouvé'}
+        {listings.length > 0 ? t('listings.searchResults') : t('search.noResults')}
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map((listing) => (
@@ -26,7 +30,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                   />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-gray-400">
-                    Pas d'image
+                    {t('listings.noImage')}
                   </div>
                 )}
               </div>

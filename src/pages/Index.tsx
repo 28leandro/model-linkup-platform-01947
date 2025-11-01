@@ -8,8 +8,10 @@ import ServiceCategories from "@/components/ServiceCategories";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
+  const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const listings = useListingsStore((state) => state.listings);
   const [filteredListings, setFilteredListings] = useState(listings);
@@ -27,8 +29,8 @@ const Index = () => {
     if (!query) {
       setFilteredListings(listings);
       toast({
-        title: "Recherche vide",
-        description: "Veuillez entrer un terme de recherche",
+        title: t('search.emptyTitle'),
+        description: t('search.emptyDesc'),
         duration: 3000,
       });
       return;
@@ -47,14 +49,14 @@ const Index = () => {
 
     if (results.length === 0) {
       toast({
-        title: "Aucun résultat",
-        description: "Aucune annonce ne correspond à votre recherche",
+        title: t('search.noResults'),
+        description: t('search.noResultsDesc'),
         duration: 3000,
       });
     } else {
       toast({
-        title: `${results.length} résultat(s)`,
-        description: `${results.length} annonce(s) correspond(ent) à votre recherche`,
+        title: `${results.length} ${t('search.results')}`,
+        description: `${results.length} ${t('search.resultsDesc')}`,
         duration: 3000,
       });
     }
