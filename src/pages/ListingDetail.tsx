@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Phone, MapPin, ChevronLeft, ChevronRight, Edit } from "lucide-react";
+import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle } from "lucide-react";
 import { useListingsStore } from "@/store/listingsStore";
 import { StarRating } from "@/components/StarRating";
 import { useState } from "react";
@@ -116,6 +116,20 @@ const ListingDetail = () => {
               <Button className="flex-1">
                 <Phone className="w-4 h-4 mr-2" />
                 {listing.phone || 'Contactar vendedor'}
+              </Button>
+              <Button 
+                variant="secondary"
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                asChild
+              >
+                <a 
+                  href={`https://wa.me/${listing.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Me interesa tu anuncio: ${listing.title}`)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  WhatsApp
+                </a>
               </Button>
               <Button 
                 variant="outline" 
