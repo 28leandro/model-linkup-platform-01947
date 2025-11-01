@@ -5,8 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { ImagePlus, X } from "lucide-react";
 import { useListingsStore } from "@/store/listingsStore";
@@ -14,7 +14,10 @@ import LocationPicker from "@/components/LocationPicker";
 
 const PostAd = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const addListing = useListingsStore((state) => state.addListing);
+  const updateListing = useListingsStore((state) => state.updateListing);
+  const listings = useListingsStore((state) => state.listings);
   const [title, setTitle] = useState("");
   const [rating, setRating] = useState(5);
   const [description, setDescription] = useState("");
@@ -23,6 +26,25 @@ const PostAd = () => {
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [location, setLocation] = useState({ address: '', latitude: 0, longitude: 0 });
+
+  const isEditing = !!id;
+  const editingListing = isEditing ? listings.find(l => l.id === Number(id)) : null;
+
+  useEffect(() => {
+    if (editingListing) {
+      setTitle(editingListing.title);
+      setRating(editingListing.rating);
+      setDescription(editingListing.description || "");
+      setCategory(editingListing.type);
+      setPhone(editingListing.phone || "");
+      setPreviews(editingListing.images || []);
+      setLocation({
+        address: editingListing.location,
+        latitude: editingListing.latitude || 0,
+        longitude: editingListing.longitude || 0
+      });
+    }
+  }, [editingListing]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -51,10 +73,9 @@ const PostAd = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Simuler l'upload des images et obtenir les URLs
     const imageUrls = previews;
     
-    addListing({
+    const listingData = {
       title,
       rating,
       description,
@@ -65,15 +86,27 @@ const PostAd = () => {
       phone,
       latitude: location.latitude,
       longitude: location.longitude,
-    });
+    };
+
+    if (isEditing && editingListing) {
+      updateListing(editingListing.id, listingData);
+      toast({
+        title: "Anúncio atualizado!",
+        description: "Seu anúncio foi atualizado com sucesso.",
+      });
+    } else {
+      addListing(listingData);
+      toast({
+        title: "Anúncio publicado!",
+        description: "Seu anúncio foi publicado com sucesso.",
+      });
+    }
     
-    toast({
-      title: "Anúncio publicado!",
-      description: "Seu anúncio foi publicado com sucesso.",
+    previews.forEach(preview => {
+      if (preview.startsWith('blob:')) {
+        URL.revokeObjectURL(preview);
+      }
     });
-    
-    // Nettoyer les URLs des aperçus
-    previews.forEach(preview => URL.revokeObjectURL(preview));
     
     navigate("/");
   };
@@ -83,7 +116,9 @@ const PostAd = () => {
       <div className="container max-w-2xl">
         <Card className="border-none shadow-lg bg-white">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">Publicar Anúncio</CardTitle>
+            <CardTitle className="text-2xl font-bold">
+              {isEditing ? "Editar Anúncio" : "Publicar Anúncio"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -195,9 +230,16 @@ const PostAd = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2">
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => navigate(-1)}
+                >
+                  Cancelar
+                </Button>
                 <Button type="submit">
-                  Publicar anúncio
+                  {isEditing ? "Salvar alterações" : "Publicar anúncio"}
                 </Button>
               </div>
             </form>

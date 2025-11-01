@@ -1,7 +1,7 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Phone, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { Phone, MapPin, ChevronLeft, ChevronRight, Edit } from "lucide-react";
 import { useListingsStore } from "@/store/listingsStore";
 import { StarRating } from "@/components/StarRating";
 import { useState } from "react";
@@ -10,6 +10,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 const ListingDetail = () => {
   const { t } = useLanguage();
   const { id } = useParams();
+  const navigate = useNavigate();
   const listings = useListingsStore((state) => state.listings);
   const listing = listings.find(l => l.id === Number(id));
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -111,10 +112,19 @@ const ListingDetail = () => {
               <span>{listing.location}</span>
             </div>
 
-            <Button className="w-full mb-4">
-              <Phone className="w-4 h-4 mr-2" />
-              {listing.phone || 'Contactar vendedor'}
-            </Button>
+            <div className="flex gap-2 mb-4">
+              <Button className="flex-1">
+                <Phone className="w-4 h-4 mr-2" />
+                {listing.phone || 'Contactar vendedor'}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => navigate(`/post-ad/${listing.id}`)}
+              >
+                <Edit className="w-4 h-4" />
+              </Button>
+            </div>
 
             <div className="mt-6">
               <h2 className="text-xl font-semibold mb-3">Descripción</h2>

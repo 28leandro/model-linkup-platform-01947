@@ -13,6 +13,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/post-ad" element={<PostAd />} />
+        <Route path="/post-ad/:id" element={<PostAd />} />
         <Route path="/listing/:id" element={<ListingDetail />} />
         <Route path="/category/:id" element={<CategoryPage />} />
         <Route path="/favorites" element={<FavoriteThings />} />
