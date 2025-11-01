@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { StarRating } from "@/components/StarRating";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface RecentListingsProps {
   listings: Listing[];
@@ -18,11 +19,12 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
         {listings.map((listing) => (
           <div key={listing.id} className="group hover:shadow-md transition-shadow bg-white">
             <Link to={`/listing/${listing.id}`}>
-              <div className="aspect-video bg-white rounded-md mb-3 overflow-hidden">
+              <AspectRatio ratio={16 / 9} className="rounded-md mb-3 overflow-hidden">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
-                    alt={listing.title}
+                    alt={`${listing.title} - foto principal`}
+                    loading="lazy"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -30,7 +32,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                     {t('listings.noImage')}
                   </div>
                 )}
-              </div>
+              </AspectRatio>
               <h3 className="font-medium text-lg mb-1">{listing.title}</h3>
               <StarRating rating={listing.rating} />
               <p className="text-sm text-gray-500 mt-2">{listing.location}</p>
