@@ -200,13 +200,13 @@ const PostAd = () => {
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute -right-2 -top-2 rounded-full bg-white p-1 shadow-md"
+                        className="absolute -right-2 -top-2 rounded-full bg-red-500 text-white p-1 shadow-md hover:bg-red-600"
                       >
                         <X className="h-4 w-4" />
                       </button>
                     </div>
                   ))}
-                  {images.length < 5 && (
+                  {previews.length < 5 && (
                     <div className="aspect-square">
                       <Label
                         htmlFor="image-upload"
