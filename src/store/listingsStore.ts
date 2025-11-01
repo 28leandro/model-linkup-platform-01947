@@ -63,6 +63,7 @@ export const useListingsStore = create<ListingsState>((set) => ({
       type: "real-estate" as ListingType,
       category: "casa",
       images: [
+        "https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=800&q=80",
         "https://images.unsplash.com/photo-1568605114967-8130f3a36594?w=500&q=80",
         "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=500&q=80",
         "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=500&q=80",
