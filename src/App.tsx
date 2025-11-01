@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { BrowserRouter } from "react-router-dom";
 import Index from "./pages/Index";
 import PostAd from "./pages/PostAd";
 import ListingDetail from "./pages/ListingDetail";
@@ -10,7 +9,7 @@ import { Toaster } from "@/components/ui/toaster";
 
 function App() {
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/post-ad" element={<PostAd />} />
@@ -20,7 +19,7 @@ function App() {
         <Route path="/map" element={<MapView />} />
       </Routes>
       <Toaster />
-    </BrowserRouter>
+    </>
   );
 }
 
