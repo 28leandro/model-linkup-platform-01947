@@ -38,7 +38,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
             </Link>
           </Button>
           <Button 
-            variant="secondary" 
+            variant="default" 
             className="flex items-center gap-2"
             onClick={onLoginClick}
           >
