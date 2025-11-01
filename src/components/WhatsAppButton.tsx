@@ -2,12 +2,13 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 
 const WhatsAppButton = () => {
-  const phoneNumber = "+595981000000"; // Número do Paraguai
+  const phoneNumber = "+595981000000"; // Número do Paraguai (será sanitizado)
   const message = "Hola! Me interesa tu anuncio en la plataforma.";
   
   const handleWhatsAppClick = () => {
     const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    const sanitized = phoneNumber.replace(/\D/g, "");
+    const whatsappUrl = `https://wa.me/${sanitized}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
   };
 
