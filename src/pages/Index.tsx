@@ -7,7 +7,6 @@ import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
-import WhatsAppButton from "@/components/WhatsAppButton";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 const Index = () => {
@@ -78,9 +77,7 @@ const Index = () => {
 
       {!hasSearched && <RecentListings listings={filteredListings} />}
 
-      <WhatsAppButton />
-
-      <LoginDialog 
+      <LoginDialog
         open={loginDialogOpen} 
         onOpenChange={setLoginDialogOpen}
       />
