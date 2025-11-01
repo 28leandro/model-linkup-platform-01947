@@ -62,7 +62,13 @@ export const useListingsStore = create<ListingsState>((set) => ({
       location: "Fernando de la Mora, Paraguay",
       type: "real-estate" as ListingType,
       category: "casa",
-      images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36594?w=500&q=80"],
+      images: [
+        "https://images.unsplash.com/photo-1568605114967-8130f3a36594?w=500&q=80",
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=500&q=80",
+        "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=500&q=80",
+        "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=500&q=80",
+        "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=500&q=80"
+      ],
       price: 450000000,
       realEstateType: "sale" as RealEstateType,
       bedrooms: 3,
