@@ -65,7 +65,10 @@ const PostAd = () => {
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
     setPreviews(prev => {
-      URL.revokeObjectURL(prev[index]);
+      const url = prev[index];
+      if (url?.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
       return prev.filter((_, i) => i !== index);
     });
   };
@@ -102,11 +105,6 @@ const PostAd = () => {
       });
     }
     
-    previews.forEach(preview => {
-      if (preview.startsWith('blob:')) {
-        URL.revokeObjectURL(preview);
-      }
-    });
     
     navigate("/");
   };
@@ -200,7 +198,7 @@ const PostAd = () => {
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute -right-2 -top-2 rounded-full bg-red-500 text-white p-1 shadow-md hover:bg-red-600"
+                        className="absolute -right-2 -top-2 rounded-full bg-destructive text-destructive-foreground p-1 shadow-md hover:bg-destructive/90"
                       >
                         <X className="h-4 w-4" />
                       </button>
