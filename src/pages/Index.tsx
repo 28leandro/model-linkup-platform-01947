@@ -66,7 +66,28 @@ const Index = () => {
     <div className="min-h-screen">
       <Header onLoginClick={() => setLoginDialogOpen(true)} />
       
-      <SearchBar 
+      {/* Hero Section com Imagem */}
+      {!hasSearched && (
+        <div className="relative h-[400px] bg-gradient-to-r from-primary/10 to-primary/5 overflow-hidden">
+          <div className="absolute inset-0">
+            <img 
+              src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=80"
+              alt="Clasificados Paraguay"
+              className="w-full h-full object-cover opacity-20"
+            />
+          </div>
+          <div className="relative container mx-auto px-4 h-full flex flex-col justify-center items-center text-center">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              {t('categories.title')}
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground mb-6 max-w-2xl">
+              {t('search.placeholder')}
+            </p>
+          </div>
+        </div>
+      )}
+      
+      <SearchBar
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         onSearch={handleSearch}
