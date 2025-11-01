@@ -60,7 +60,7 @@ const PostAd = () => {
       description,
       category,
       type: category as any,
-      location: location.address || "São Paulo, SP",
+      location: location.address || "Asunción, Paraguay",
       images: imageUrls,
       phone,
       latitude: location.latitude,

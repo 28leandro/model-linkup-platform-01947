@@ -15,7 +15,7 @@ interface MapProps {
   zoom?: number;
 }
 
-const Map = ({ listings, onMarkerClick, center = [-46.6333, -23.5505], zoom = 4 }: MapProps) => {
+const Map = ({ listings, onMarkerClick, center = [-58.4438, -23.4425], zoom = 6 }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState<string>('');

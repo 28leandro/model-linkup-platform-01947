@@ -40,6 +40,8 @@ const MapView = () => {
             <Map 
               listings={listingsWithCoords}
               onMarkerClick={handleMarkerClick}
+              center={[-58.4438, -23.4425]}
+              zoom={6}
             />
           </div>
 
