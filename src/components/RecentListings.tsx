@@ -9,7 +9,7 @@ interface RecentListingsProps {
 const RecentListings = ({ listings }: RecentListingsProps) => {
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-xl font-semibold mb-4">Annonces récentes</h2>
+      <h2 className="text-xl font-semibold mb-4">Anúncios Recentes</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {listings.map((listing) => (
           <div key={listing.id} className="group hover:shadow-md transition-shadow bg-white">

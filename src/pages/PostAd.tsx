@@ -26,8 +26,8 @@ const PostAd = () => {
     const files = Array.from(e.target.files || []);
     if (files.length + images.length > 5) {
       toast({
-        title: "Erreur",
-        description: "Vous ne pouvez pas ajouter plus de 5 images",
+        title: "Erro",
+        description: "Você não pode adicionar mais de 5 imagens",
         variant: "destructive",
       });
       return;
@@ -57,14 +57,15 @@ const PostAd = () => {
       rating,
       description,
       category,
-      location: "Paris",
+      type: category as any,
+      location: "São Paulo, SP",
       images: imageUrls,
       phone,
     });
     
     toast({
-      title: "Annonce publiée !",
-      description: "Votre annonce a été publiée avec succès.",
+      title: "Anúncio publicado!",
+      description: "Seu anúncio foi publicado com sucesso.",
     });
     
     // Nettoyer les URLs des aperçus
@@ -78,38 +79,37 @@ const PostAd = () => {
       <div className="container max-w-2xl">
         <Card className="border-none shadow-lg bg-white">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold">Déposer une annonce</CardTitle>
+            <CardTitle className="text-2xl font-bold">Publicar Anúncio</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Titre de l'annonce</Label>
+                <Label htmlFor="title">Título do Anúncio</Label>
                 <Input
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Ex: iPhone 13 Pro Max - 256Go"
+                  placeholder="Ex: Toyota Corolla 2020"
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Catégorie</Label>
+                <Label htmlFor="category">Categoria</Label>
                 <Select value={category} onValueChange={setCategory} required>
                   <SelectTrigger className="bg-white">
-                    <SelectValue placeholder="Sélectionnez une catégorie" />
+                    <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
                   <SelectContent className="bg-white">
-                    <SelectItem value="vehicles">Véhicules</SelectItem>
-                    <SelectItem value="real-estate">Immobilier</SelectItem>
-                    <SelectItem value="multimedia">Multimédia</SelectItem>
-                    <SelectItem value="home">Maison</SelectItem>
+                    <SelectItem value="vehicles">🚗 Veículos</SelectItem>
+                    <SelectItem value="real-estate">🏠 Imóveis</SelectItem>
+                    <SelectItem value="services">🛠️ Serviços</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="rating">Évaluation (1 à 5 étoiles)</Label>
+                <Label htmlFor="rating">Avaliação (1 a 5 estrelas)</Label>
                 <Input
                   id="rating"
                   type="number"
@@ -122,31 +122,29 @@ const PostAd = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Numéro de téléphone</Label>
+                <Label htmlFor="phone">Telefone</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ex: 06 12 34 56 78"
-                  pattern="[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}[0-9]{2}"
-                  title="Format: 06 12 34 56 78"
+                  placeholder="Ex: (11) 98765-4321"
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Description</Label>
+                <Label htmlFor="description">Descrição</Label>
                 <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Décrivez votre article en détail..."
+                  placeholder="Descreva seu anúncio em detalhes..."
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="images">Photos (max 5)</Label>
+                <Label htmlFor="images">Fotos (máx 5)</Label>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {previews.map((preview, index) => (
                     <div key={index} className="relative aspect-square">
@@ -172,7 +170,7 @@ const PostAd = () => {
                       >
                         <ImagePlus className="h-8 w-8 text-gray-400" />
                         <span className="mt-2 text-sm text-gray-500">
-                          Ajouter une photo
+                          Adicionar foto
                         </span>
                       </Label>
                       <Input
@@ -190,7 +188,7 @@ const PostAd = () => {
 
               <div className="flex justify-end">
                 <Button type="submit">
-                  Publier l'annonce
+                  Publicar anúncio
                 </Button>
               </div>
             </form>

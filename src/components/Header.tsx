@@ -16,13 +16,13 @@ const Header = ({ onLoginClick }: HeaderProps) => {
           <Button asChild variant="ghost">
             <Link to="/favorites" className="flex items-center gap-2">
               <Heart className="w-4 h-4" color="#D43A42" fill="#D43A42" />
-              Coups de cœur
+              Favoritos
             </Link>
           </Button>
           <Button asChild>
             <Link to="/post-ad" className="flex items-center gap-2">
               <Plus className="w-4 h-4" />
-              Déposer une annonce
+              Publicar Anúncio
             </Link>
           </Button>
           <Button 
@@ -31,7 +31,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
             onClick={onLoginClick}
           >
             <LogIn className="w-4 h-4" />
-            Se connecter
+            Entrar
           </Button>
         </div>
       </div>
