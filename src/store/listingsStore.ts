@@ -14,6 +14,9 @@ export interface Listing {
   images: string[];
   phone?: string;
   price?: number;
+  // Geolocalização
+  latitude?: number;
+  longitude?: number;
   // Campos específicos para veículos
   year?: number;
   mileage?: number;
@@ -48,7 +51,9 @@ export const useListingsStore = create<ListingsState>((set) => ({
       mileage: 45000,
       brand: "Toyota",
       model: "Corolla",
-      description: "Veículo em excelente estado, único dono, revisões em dia"
+      description: "Veículo em excelente estado, único dono, revisões em dia",
+      latitude: -23.5505,
+      longitude: -46.6333
     },
     {
       id: 2,
@@ -63,7 +68,9 @@ export const useListingsStore = create<ListingsState>((set) => ({
       bedrooms: 2,
       bathrooms: 1,
       area: 65,
-      description: "Apartamento moderno com vista para a cidade"
+      description: "Apartamento moderno com vista para a cidade",
+      latitude: -22.9068,
+      longitude: -43.1729
     },
     {
       id: 3,
@@ -75,7 +82,9 @@ export const useListingsStore = create<ListingsState>((set) => ({
       images: ["https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=500&q=80"],
       price: 150,
       availability: "Segunda a Sábado",
-      description: "Serviços elétricos residenciais e comerciais"
+      description: "Serviços elétricos residenciais e comerciais",
+      latitude: -19.9167,
+      longitude: -43.9345
     },
     {
       id: 4,
@@ -84,13 +93,15 @@ export const useListingsStore = create<ListingsState>((set) => ({
       location: "Curitiba, PR",
       type: "real-estate" as ListingType,
       category: "casa",
-      images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=500&q=80"],
+      images: ["https://images.unsplash.com/photo-1568605114967-8130f3a36594?w=500&q=80"],
       price: 2500,
       realEstateType: "rent" as RealEstateType,
       bedrooms: 3,
       bathrooms: 2,
       area: 120,
-      description: "Casa espaçosa com quintal e garagem"
+      description: "Casa espaçosa com quintal e garagem",
+      latitude: -25.4284,
+      longitude: -49.2733
     }
   ],
   addListing: (newListing) => 

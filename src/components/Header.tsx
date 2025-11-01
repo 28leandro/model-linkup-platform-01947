@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, Heart } from "lucide-react";
+import { Plus, LogIn, Heart, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 
@@ -13,6 +13,12 @@ const Header = ({ onLoginClick }: HeaderProps) => {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Logo />
         <div className="flex items-center gap-4">
+          <Button asChild variant="ghost">
+            <Link to="/map" className="flex items-center gap-2">
+              <MapPin className="w-4 h-4" />
+              Mapa
+            </Link>
+          </Button>
           <Button asChild variant="ghost">
             <Link to="/favorites" className="flex items-center gap-2">
               <Heart className="w-4 h-4" color="#D43A42" fill="#D43A42" />

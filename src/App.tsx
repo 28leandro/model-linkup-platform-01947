@@ -5,6 +5,7 @@ import PostAd from "./pages/PostAd";
 import ListingDetail from "./pages/ListingDetail";
 import CategoryPage from "./pages/CategoryPage";
 import FavoriteThings from "./pages/FavoriteThings";
+import MapView from "./pages/MapView";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/listing/:id" element={<ListingDetail />} />
         <Route path="/category/:id" element={<CategoryPage />} />
         <Route path="/favorites" element={<FavoriteThings />} />
+        <Route path="/map" element={<MapView />} />
       </Routes>
       <Toaster />
     </BrowserRouter>

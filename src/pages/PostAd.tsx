@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { ImagePlus, X } from "lucide-react";
 import { useListingsStore } from "@/store/listingsStore";
+import LocationPicker from "@/components/LocationPicker";
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ const PostAd = () => {
   const [phone, setPhone] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [location, setLocation] = useState({ address: '', latitude: 0, longitude: 0 });
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -58,9 +60,11 @@ const PostAd = () => {
       description,
       category,
       type: category as any,
-      location: "São Paulo, SP",
+      location: location.address || "São Paulo, SP",
       images: imageUrls,
       phone,
+      latitude: location.latitude,
+      longitude: location.longitude,
     });
     
     toast({
@@ -120,6 +124,11 @@ const PostAd = () => {
                   required
                 />
               </div>
+
+              <LocationPicker
+                onLocationSelect={setLocation}
+                initialAddress={location.address}
+              />
 
               <div className="space-y-2">
                 <Label htmlFor="phone">Telefone</Label>
