@@ -78,7 +78,7 @@ const Index = () => {
 
       {!hasSearched && <RecentListings listings={filteredListings} />}
 
-      <WhatsAppButton />
+      <WhatsAppButton autoOpen />
 
       <LoginDialog 
         open={loginDialogOpen} 
