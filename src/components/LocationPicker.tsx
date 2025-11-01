@@ -14,6 +14,13 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
   const [address, setAddress] = useState(initialAddress);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
 
+  useEffect(() => {
+    // Auto-detect location on mount if no initial address
+    if (!initialAddress && navigator.geolocation) {
+      handleGetCurrentLocation();
+    }
+  }, []); // Only run once on mount
+
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) {
       toast({
