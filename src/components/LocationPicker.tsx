@@ -25,13 +25,32 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     if (!navigator.geolocation) {
       toast({
         title: "Geolocalização não suportada",
-        description: "Seu navegador não suporta geolocalização",
+        description: "Seu dispositivo não suporta geolocalização",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if running on HTTPS or localhost (required for geolocation on most browsers)
+    const isSecureContext = window.isSecureContext || window.location.hostname === 'localhost';
+    if (!isSecureContext) {
+      toast({
+        title: "Conexão insegura",
+        description: "A geolocalização requer uma conexão HTTPS segura",
         variant: "destructive",
       });
       return;
     }
 
     setIsGettingLocation(true);
+    
+    // Use higher accuracy for mobile devices
+    const options = {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
+    };
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
@@ -39,7 +58,12 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
         try {
           // Reverse geocoding usando Nominatim (OpenStreetMap)
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            {
+              headers: {
+                'User-Agent': 'LinkUpPlatform/1.0'
+              }
+            }
           );
           const data = await response.json();
           
@@ -56,10 +80,18 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
             description: "Sua localização foi detectada com sucesso",
           });
         } catch (error) {
+          // Even if reverse geocoding fails, use coordinates
+          const fallbackAddress = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+          setAddress(fallbackAddress);
+          onLocationSelect({
+            address: fallbackAddress,
+            latitude,
+            longitude,
+          });
+          
           toast({
-            title: "Erro ao obter endereço",
-            description: "Não foi possível obter o endereço da localização",
-            variant: "destructive",
+            title: "Localização obtida",
+            description: "Usando coordenadas como endereço",
           });
         } finally {
           setIsGettingLocation(false);
@@ -67,12 +99,27 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       },
       (error) => {
         setIsGettingLocation(false);
+        let errorMessage = "Não foi possível acessar sua localização.";
+        
+        switch(error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Você negou o acesso à localização. Permita nas configurações do navegador.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Localização indisponível no momento. Tente novamente.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Tempo esgotado ao buscar localização. Tente novamente.";
+            break;
+        }
+        
         toast({
           title: "Erro ao obter localização",
-          description: "Não foi possível acessar sua localização. Verifique as permissões do navegador.",
+          description: errorMessage,
           variant: "destructive",
         });
-      }
+      },
+      options
     );
   };
 
