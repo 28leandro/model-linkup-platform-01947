@@ -1,19 +1,43 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle } from "lucide-react";
+import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle, Trash2 } from "lucide-react";
 import { useListingsStore } from "@/store/listingsStore";
 import { StarRating } from "@/components/StarRating";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { toast } from "@/components/ui/use-toast";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const listings = useListingsStore((state) => state.listings);
+  const deleteListing = useListingsStore((state) => state.deleteListing);
   const listing = listings.find(l => l.id === Number(id));
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const handleDelete = () => {
+    if (listing) {
+      deleteListing(listing.id);
+      toast({
+        title: "Anúncio excluído",
+        description: "Seu anúncio foi removido com sucesso.",
+      });
+      navigate("/");
+    }
+  };
 
   if (!listing) {
     return (
@@ -138,6 +162,30 @@ const ListingDetail = () => {
               >
                 <Edit className="w-4 h-4" />
               </Button>
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button 
+                    variant="destructive" 
+                    size="icon"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Tem certeza que deseja excluir este anúncio? Esta ação não pode ser desfeita.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleDelete}>
+                      Excluir
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </div>
 
             <div className="mt-6">

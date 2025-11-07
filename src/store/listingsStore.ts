@@ -35,6 +35,7 @@ interface ListingsState {
   listings: Listing[];
   addListing: (listing: Omit<Listing, 'id'>) => void;
   updateListing: (id: number, listing: Partial<Omit<Listing, 'id'>>) => void;
+  deleteListing: (id: number) => void;
 }
 
 export const useListingsStore = create<ListingsState>((set) => ({
@@ -182,5 +183,9 @@ export const useListingsStore = create<ListingsState>((set) => ({
       listings: state.listings.map((listing) =>
         listing.id === id ? { ...listing, ...updatedData } : listing
       )
+    })),
+  deleteListing: (id) =>
+    set((state) => ({
+      listings: state.listings.filter((listing) => listing.id !== id)
     })),
 }));
