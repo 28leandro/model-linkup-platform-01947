@@ -9,12 +9,13 @@ const CategoryPage = () => {
   const listings = useListingsStore((state) => state.listings);
   
   const categoryMap: Record<string, { type: string, title: string }> = {
-    "1": { type: "vehicles", title: "Veículos" },
-    "2": { type: "real-estate", title: "Imóveis" },
-    "3": { type: "services", title: "Serviços" }
+    "vehicles": { type: "vehicles", title: "Veículos" },
+    "real-estate-sale": { type: "real-estate", title: "Imóveis à Venda" },
+    "real-estate-rent": { type: "real-estate", title: "Imóveis para Alugar" },
+    "services": { type: "services", title: "Serviços" }
   };
 
-  const category = categoryMap[id || "1"];
+  const category = categoryMap[id || "vehicles"];
   
   const categoryListings = listings.filter((listing) => 
     listing.type === category.type
