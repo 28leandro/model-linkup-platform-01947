@@ -6,7 +6,7 @@ const Logo = () => {
       <span className="text-[#632D48] tracking-tighter">N</span>
       <span className="text-[#EDA04E] tracking-tighter">E</span>
       <span className="text-[#4DC47F] tracking-tighter">O</span>
-      <span className="text-sm">.fr</span>
+      <span className="text-sm">.py</span>
     </Link>
   );
 };
