@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 export type ListingType = 'vehicles' | 'real-estate' | 'services';
 export type RealEstateType = 'sale' | 'rent';
@@ -38,7 +39,9 @@ interface ListingsState {
   deleteListing: (id: number) => void;
 }
 
-export const useListingsStore = create<ListingsState>((set) => ({
+export const useListingsStore = create<ListingsState>()(
+  persist(
+    (set) => ({
   listings: [
     {
       id: 1,
@@ -188,4 +191,9 @@ export const useListingsStore = create<ListingsState>((set) => ({
     set((state) => ({
       listings: state.listings.filter((listing) => listing.id !== id)
     })),
-}));
+}),
+    {
+      name: 'listings-storage',
+    }
+  )
+);
