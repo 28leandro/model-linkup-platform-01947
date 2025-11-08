@@ -23,7 +23,6 @@ const PostAd = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [phone, setPhone] = useState("");
-  const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
   const [location, setLocation] = useState({ address: '', latitude: 0, longitude: 0 });
 
@@ -46,9 +45,9 @@ const PostAd = () => {
     }
   }, [editingListing]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + images.length > 5) {
+    if (files.length + previews.length > 5) {
       toast({
         title: "Erro",
         description: "Você não pode adicionar mais de 5 imagens",
@@ -57,20 +56,22 @@ const PostAd = () => {
       return;
     }
 
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setPreviews(prev => [...prev, ...newPreviews]);
-    setImages(prev => [...prev, ...files]);
+    // Convert images to base64 for persistence
+    const base64Images = await Promise.all(
+      files.map(file => {
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(file);
+        });
+      })
+    );
+
+    setPreviews(prev => [...prev, ...base64Images]);
   };
 
   const removeImage = (index: number) => {
-    setImages(prev => prev.filter((_, i) => i !== index));
-    setPreviews(prev => {
-      const url = prev[index];
-      if (url?.startsWith('blob:')) {
-        URL.revokeObjectURL(url);
-      }
-      return prev.filter((_, i) => i !== index);
-    });
+    setPreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
