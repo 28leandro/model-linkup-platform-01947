@@ -72,9 +72,13 @@ const ListingDetail = () => {
             {/* Galeria de Fotos */}
             <div className="relative aspect-video bg-gray-200 rounded-lg mb-4 overflow-hidden group">
               <img
-                src={listing.images[currentImageIndex] || "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"}
+                src={listing.images && listing.images[currentImageIndex] ? listing.images[currentImageIndex] : "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"}
                 alt={`${listing.title} - Foto ${currentImageIndex + 1}`}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
+                }}
               />
               
               {/* Botões de navegação */}

@@ -19,16 +19,20 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
         {listings.map((listing) => (
           <div key={listing.id} className="group hover:shadow-md transition-shadow bg-white">
             <Link to={`/listing/${listing.id}`}>
-              <AspectRatio ratio={16 / 9} className="rounded-md mb-3 overflow-hidden">
+              <AspectRatio ratio={16 / 9} className="rounded-md mb-3 overflow-hidden bg-gray-100">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
                     alt={`${listing.title} - foto principal`}
                     loading="lazy"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80';
+                    }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
                     {t('listings.noImage')}
                   </div>
                 )}

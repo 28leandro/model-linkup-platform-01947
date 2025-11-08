@@ -21,15 +21,20 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
         {listings.map((listing) => (
           <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-white border-2">
             <Link to={`/listing/${listing.id}`}>
-              <div className="aspect-video bg-white rounded-t-md overflow-hidden">
+              <div className="aspect-video bg-gray-100 rounded-t-md overflow-hidden">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
                     alt={listing.title}
-                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80';
+                    }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
                     {t('listings.noImage')}
                   </div>
                 )}
