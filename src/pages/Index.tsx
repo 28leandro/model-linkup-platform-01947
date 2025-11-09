@@ -8,6 +8,7 @@ import ServiceCategories from "@/components/ServiceCategories";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -18,6 +19,34 @@ const Index = () => {
   const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
+    const fetchListings = async () => {
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching listings:', error);
+      } else if (data) {
+        // Convert backend data to match the Listing interface
+        const formattedListings = data.map((item: any) => ({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          type: item.type,
+          category: item.category || item.type,
+          rating: item.rating || 5,
+          location: item.location,
+          phone: item.phone,
+          images: item.images || [],
+          latitude: item.latitude,
+          longitude: item.longitude,
+        }));
+        setFilteredListings(formattedListings);
+      }
+    };
+    
+    fetchListings();
     setFilteredListings(listings);
   }, [listings]);
 

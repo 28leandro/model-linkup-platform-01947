@@ -11,6 +11,8 @@ import { toast } from "@/components/ui/use-toast";
 import { ImagePlus, X } from "lucide-react";
 import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
+import { useImageUpload } from "@/hooks/useImageUpload";
+import { supabase } from "@/integrations/supabase/client";
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -18,12 +20,14 @@ const PostAd = () => {
   const addListing = useListingsStore((state) => state.addListing);
   const updateListing = useListingsStore((state) => state.updateListing);
   const listings = useListingsStore((state) => state.listings);
+  const { uploadMultipleImages, uploading } = useImageUpload();
   const [title, setTitle] = useState("");
   const [rating, setRating] = useState(5);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [phone, setPhone] = useState("");
   const [previews, setPreviews] = useState<string[]>([]);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [location, setLocation] = useState({ address: '', latitude: 0, longitude: 0 });
 
   const isEditing = !!id;
@@ -45,43 +49,6 @@ const PostAd = () => {
     }
   }, [editingListing]);
 
-  const compressImage = (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1200;
-          const MAX_HEIGHT = 1200;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          resolve(canvas.toDataURL('image/jpeg', 0.8));
-        };
-        img.src = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length + previews.length > 5) {
@@ -93,27 +60,52 @@ const PostAd = () => {
       return;
     }
 
-    const compressedImages = await Promise.all(
-      files.map(file => compressImage(file))
-    );
-
-    setPreviews(prev => [...prev, ...compressedImages]);
+    // Generate preview URLs for immediate display
+    const newPreviews = files.map(file => URL.createObjectURL(file));
+    setPreviews(prev => [...prev, ...newPreviews]);
+    setImageFiles(prev => [...prev, ...files]);
     
     toast({
       title: "Imagens adicionadas!",
-      description: `${files.length} imagem(ns) adicionada(s) com sucesso.`,
+      description: `${files.length} imagem(ns) adicionada(s).`,
     });
   };
 
   const removeImage = (index: number) => {
     setPreviews(prev => prev.filter((_, i) => i !== index));
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const imageUrls = previews;
-    
+    if (uploading) {
+      toast({
+        title: "Aguarde",
+        description: "As imagens ainda estão sendo processadas.",
+      });
+      return;
+    }
+
+    // Upload new images to Cloud storage
+    let uploadedImageUrls: string[] = [];
+    if (imageFiles.length > 0) {
+      uploadedImageUrls = await uploadMultipleImages(imageFiles);
+      if (uploadedImageUrls.length === 0) {
+        toast({
+          title: "Erro",
+          description: "Falha ao enviar imagens. Tente novamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
+
+    // If editing, keep existing images that weren't removed
+    const finalImages = isEditing 
+      ? [...(editingListing?.images || []).filter(img => previews.includes(img)), ...uploadedImageUrls]
+      : uploadedImageUrls;
+
     const listingData = {
       title,
       rating,
@@ -121,28 +113,50 @@ const PostAd = () => {
       category,
       type: category as any,
       location: location.address || "Asunción, Paraguay",
-      images: imageUrls,
+      images: finalImages,
       phone,
       latitude: location.latitude,
       longitude: location.longitude,
     };
 
-    if (isEditing && editingListing) {
-      updateListing(editingListing.id, listingData);
+    // Save to backend database
+    try {
+      if (isEditing && editingListing) {
+        const { error } = await supabase
+          .from('listings')
+          .update(listingData)
+          .eq('id', String(editingListing.id));
+        
+        if (error) throw error;
+
+        updateListing(editingListing.id, listingData);
+        toast({
+          title: "Anúncio atualizado!",
+          description: "Seu anúncio foi atualizado com sucesso.",
+        });
+      } else {
+        const { error } = await supabase
+          .from('listings')
+          .insert([listingData]);
+        
+        if (error) throw error;
+
+        addListing(listingData);
+        toast({
+          title: "Anúncio publicado!",
+          description: "Seu anúncio foi publicado com sucesso.",
+        });
+      }
+      
+      navigate("/");
+    } catch (error: any) {
+      console.error('Error saving listing:', error);
       toast({
-        title: "Anúncio atualizado!",
-        description: "Seu anúncio foi atualizado com sucesso.",
-      });
-    } else {
-      addListing(listingData);
-      toast({
-        title: "Anúncio publicado!",
-        description: "Seu anúncio foi publicado com sucesso.",
+        title: "Erro ao salvar",
+        description: error.message || "Não foi possível salvar o anúncio.",
+        variant: "destructive",
       });
     }
-    
-    
-    navigate("/");
   };
 
   return (
@@ -272,8 +286,8 @@ const PostAd = () => {
                 >
                   Cancelar
                 </Button>
-                <Button type="submit">
-                  {isEditing ? "Salvar alterações" : "Publicar anúncio"}
+                <Button type="submit" disabled={uploading}>
+                  {uploading ? "Enviando..." : isEditing ? "Salvar alterações" : "Publicar anúncio"}
                 </Button>
               </div>
             </form>
