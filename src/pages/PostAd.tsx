@@ -13,10 +13,13 @@ import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
 import { useImageUpload } from "@/hooks/useImageUpload";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { listingSchema } from "@/lib/validations";
 
 const PostAd = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { user, loading } = useAuth();
   const addListing = useListingsStore((state) => state.addListing);
   const updateListing = useListingsStore((state) => state.updateListing);
   const listings = useListingsStore((state) => state.listings);
@@ -29,6 +32,18 @@ const PostAd = () => {
   const [previews, setPreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [location, setLocation] = useState({ address: '', latitude: 0, longitude: 0 });
+
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!loading && !user) {
+      toast({
+        title: "Autenticação necessária",
+        description: "Você precisa estar logado para publicar anúncios.",
+        variant: "destructive",
+      });
+      navigate("/");
+    }
+  }, [user, loading, navigate]);
 
   const isEditing = !!id;
   const editingListing = isEditing ? listings.find(l => l.id === Number(id)) : null;
@@ -79,10 +94,40 @@ const PostAd = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para publicar anúncios.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (uploading) {
       toast({
         title: "Aguarde",
         description: "As imagens ainda estão sendo processadas.",
+      });
+      return;
+    }
+
+    // Validate input data
+    try {
+      listingSchema.parse({
+        title,
+        description,
+        phone: phone || "",
+        rating,
+        category,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        location: location.address
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro de validação",
+        description: error.errors?.[0]?.message || "Verifique os campos do formulário.",
+        variant: "destructive",
       });
       return;
     }
@@ -107,16 +152,17 @@ const PostAd = () => {
       : uploadedImageUrls;
 
     const listingData = {
-      title,
+      title: title.trim(),
       rating,
-      description,
+      description: description.trim(),
       category,
       type: category as any,
       location: location.address || "Asunción, Paraguay",
       images: finalImages,
-      phone,
+      phone: phone.trim() || null,
       latitude: location.latitude,
       longitude: location.longitude,
+      user_id: user.id,
     };
 
     // Save to backend database
@@ -150,7 +196,6 @@ const PostAd = () => {
       
       navigate("/");
     } catch (error: any) {
-      console.error('Error saving listing:', error);
       toast({
         title: "Erro ao salvar",
         description: error.message || "Não foi possível salvar o anúncio.",
@@ -158,6 +203,18 @@ const PostAd = () => {
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white py-8 flex items-center justify-center">
+        <p className="text-muted-foreground">Carregando...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-white py-8">

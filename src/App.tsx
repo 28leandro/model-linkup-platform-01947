@@ -6,10 +6,11 @@ import CategoryPage from "./pages/CategoryPage";
 import FavoriteThings from "./pages/FavoriteThings";
 import MapView from "./pages/MapView";
 import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 function App() {
   return (
-    <>
+    <AuthProvider>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/post-ad" element={<PostAd />} />
@@ -20,7 +21,7 @@ function App() {
         <Route path="/map" element={<MapView />} />
       </Routes>
       <Toaster />
-    </>
+    </AuthProvider>
   );
 }
 

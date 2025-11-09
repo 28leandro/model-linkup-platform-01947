@@ -5,6 +5,11 @@ import { toast } from '@/components/ui/use-toast';
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
 
+  const getUserId = async (): Promise<string | null> => {
+    const { data: { user } } = await supabase.auth.getUser();
+    return user?.id || null;
+  };
+
   const compressImage = (file: File): Promise<Blob> => {
     return new Promise((resolve) => {
       const reader = new FileReader();
@@ -46,20 +51,46 @@ export const useImageUpload = () => {
 
   const uploadImage = async (file: File): Promise<string | null> => {
     try {
+      const userId = await getUserId();
+      if (!userId) {
+        throw new Error('Você precisa estar logado para fazer upload de imagens.');
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "Arquivo muito grande",
+          description: `O arquivo excede o limite de 5MB`,
+          variant: "destructive",
+        });
+        return null;
+      }
+
+      // Validate file type
+      if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
+        toast({
+          title: "Tipo de arquivo inválido",
+          description: "Apenas JPG, PNG e WEBP são permitidos",
+          variant: "destructive",
+        });
+        return null;
+      }
+
       setUploading(true);
       const compressedBlob = await compressImage(file);
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+      const fileExt = file.name.split('.').pop() || 'jpg';
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `${userId}/${fileName}`;
       
       const { data, error } = await supabase.storage
         .from('listing-images')
-        .upload(fileName, compressedBlob, {
+        .upload(filePath, compressedBlob, {
           contentType: 'image/jpeg',
           cacheControl: '3600',
           upsert: false
         });
 
       if (error) {
-        console.error('Upload error:', error);
         toast({
           title: 'Erro ao enviar imagem',
           description: error.message,
@@ -73,8 +104,12 @@ export const useImageUpload = () => {
         .getPublicUrl(data.path);
 
       return publicUrl;
-    } catch (error) {
-      console.error('Unexpected upload error:', error);
+    } catch (error: any) {
+      toast({
+        title: 'Erro ao enviar imagem',
+        description: error.message,
+        variant: 'destructive',
+      });
       return null;
     } finally {
       setUploading(false);

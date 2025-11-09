@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useState } from "react"
+import { useAuth } from "@/contexts/AuthContext"
 import { toast } from "@/components/ui/use-toast"
 
 interface LoginDialogProps {
@@ -18,30 +19,36 @@ interface LoginDialogProps {
 }
 
 export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
+  const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [name, setName] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!isLogin && password !== confirmPassword) {
       toast({
-        title: "Erreur",
-        description: "Les mots de passe ne correspondent pas",
+        title: "Erro",
+        description: "As senhas não coincidem",
         variant: "destructive",
       })
       return
     }
 
-    // Pour l'instant, on simule juste une connexion/inscription réussie
-    toast({
-      title: isLogin ? "Connexion réussie" : "Inscription réussie",
-      description: isLogin ? "Bienvenue sur Neo.fr !" : "Votre compte a été créé avec succès !",
-    })
-    onOpenChange(false)
+    if (isLogin) {
+      const { error } = await signIn(email, password);
+      if (!error) {
+        onOpenChange(false);
+      }
+    } else {
+      const { error } = await signUp(email, password, name);
+      if (!error) {
+        onOpenChange(false);
+      }
+    }
   }
 
   return (
@@ -87,6 +94,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                minLength={6}
               />
             </div>
             {!isLogin && (
