@@ -91,9 +91,18 @@ export const useImageUpload = () => {
         });
 
       if (error) {
+        console.error('Storage upload error:', error);
+        
+        let userMessage = "Falha ao enviar imagem. Tente novamente.";
+        if (error.message?.includes('size') || error.message?.includes('large')) {
+          userMessage = "Imagem muito grande. Use arquivos menores.";
+        } else if (error.message?.includes('Duplicate')) {
+          userMessage = "Este arquivo já foi enviado.";
+        }
+        
         toast({
           title: 'Erro ao enviar imagem',
-          description: error.message,
+          description: userMessage,
           variant: 'destructive',
         });
         return null;
@@ -105,9 +114,16 @@ export const useImageUpload = () => {
 
       return publicUrl;
     } catch (error: any) {
+      console.error('Image upload error:', error);
+      
+      let userMessage = "Falha ao processar imagem. Tente novamente.";
+      if (error.message?.includes('logged') || error.message?.includes('auth')) {
+        userMessage = "Você precisa estar logado para enviar imagens.";
+      }
+      
       toast({
         title: 'Erro ao enviar imagem',
-        description: error.message,
+        description: userMessage,
         variant: 'destructive',
       });
       return null;

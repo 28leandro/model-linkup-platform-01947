@@ -196,9 +196,21 @@ const PostAd = () => {
       
       navigate("/");
     } catch (error: any) {
+      console.error('Database error:', error);
+      
+      let userMessage = "Não foi possível salvar o anúncio. Tente novamente.";
+      
+      if (error.code === '23505') {
+        userMessage = "Este anúncio já existe.";
+      } else if (error.code === '23503') {
+        userMessage = "Erro de validação. Verifique os campos.";
+      } else if (error.message?.includes('RLS') || error.message?.includes('policy')) {
+        userMessage = "Você não tem permissão para esta ação.";
+      }
+      
       toast({
         title: "Erro ao salvar",
-        description: error.message || "Não foi possível salvar o anúncio.",
+        description: userMessage,
         variant: "destructive",
       });
     }

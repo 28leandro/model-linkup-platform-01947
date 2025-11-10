@@ -53,9 +53,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (error) {
+      console.error('Signup error:', error);
+      
+      let userMessage = "Não foi possível criar a conta. Tente novamente.";
+      if (error.message?.includes('already registered')) {
+        userMessage = "Este email já está cadastrado.";
+      } else if (error.message?.includes('invalid')) {
+        userMessage = "Email ou senha inválidos.";
+      }
+      
       toast({
         title: "Erro ao criar conta",
-        description: error.message,
+        description: userMessage,
         variant: "destructive",
       });
     } else {
@@ -75,9 +84,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     });
 
     if (error) {
+      console.error('Login error:', error);
+      
+      let userMessage = "Email ou senha incorretos.";
+      if (error.message?.includes('Invalid')) {
+        userMessage = "Email ou senha incorretos.";
+      } else if (error.message?.includes('not confirmed')) {
+        userMessage = "Confirme seu email antes de fazer login.";
+      }
+      
       toast({
         title: "Erro ao fazer login",
-        description: error.message,
+        description: userMessage,
         variant: "destructive",
       });
     } else {
