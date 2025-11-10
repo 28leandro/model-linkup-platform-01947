@@ -28,7 +28,7 @@ export type Database = {
           rating: number | null
           title: string
           type: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           category?: string | null
@@ -43,7 +43,7 @@ export type Database = {
           rating?: number | null
           title: string
           type?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           category?: string | null
@@ -58,13 +58,60 @@ export type Database = {
           rating?: number | null
           title?: string
           type?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
     }
     Views: {
-      [_ in never]: never
+      listings_public: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          images: string[] | null
+          latitude: number | null
+          location: string | null
+          longitude: number | null
+          phone: string | null
+          rating: number | null
+          title: string | null
+          type: string | null
+          user_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          phone?: never
+          rating?: number | null
+          title?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          images?: string[] | null
+          latitude?: number | null
+          location?: string | null
+          longitude?: number | null
+          phone?: never
+          rating?: number | null
+          title?: string | null
+          type?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
