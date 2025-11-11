@@ -31,7 +31,11 @@ const PostAd = () => {
   const [phone, setPhone] = useState("");
   const [previews, setPreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
-  const [location, setLocation] = useState({ address: '', latitude: 0, longitude: 0 });
+  const [location, setLocation] = useState({ 
+    address: 'Asunción, Paraguay', 
+    latitude: -25.2637, 
+    longitude: -57.5759 
+  });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -113,17 +117,6 @@ const PostAd = () => {
 
     // Validate input data
     try {
-      console.log('Validating data:', {
-        title,
-        description,
-        phone: phone || "",
-        rating,
-        category,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        location: location.address
-      });
-      
       listingSchema.parse({
         title,
         description,
@@ -135,8 +128,6 @@ const PostAd = () => {
         location: location.address
       });
     } catch (error: any) {
-      console.error('Validation error:', error);
-      
       // Provide more specific error messages
       const errorMessage = error.errors?.[0]?.message || "Verifique os campos do formulário.";
       const errorPath = error.errors?.[0]?.path?.[0];
