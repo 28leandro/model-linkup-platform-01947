@@ -5,7 +5,7 @@ export type ListingType = 'vehicles' | 'real-estate' | 'services';
 export type RealEstateType = 'sale' | 'rent';
 
 export interface Listing {
-  id: number;
+  id: string;
   title: string;
   rating: number;
   location: string;
@@ -36,8 +36,8 @@ export interface Listing {
 interface ListingsState {
   listings: Listing[];
   addListing: (listing: Omit<Listing, 'id'>) => void;
-  updateListing: (id: number, listing: Partial<Omit<Listing, 'id'>>) => void;
-  deleteListing: (id: number) => void;
+  updateListing: (id: string, listing: Partial<Omit<Listing, 'id'>>) => void;
+  deleteListing: (id: string) => void;
 }
 
 export const useListingsStore = create<ListingsState>()(
@@ -45,7 +45,7 @@ export const useListingsStore = create<ListingsState>()(
     (set) => ({
   listings: [
     {
-      id: 1,
+      id: "1",
       title: "Toyota Hilux 2019 4x4",
       rating: 4.5,
       location: "Asunción, Paraguay",
@@ -62,7 +62,7 @@ export const useListingsStore = create<ListingsState>()(
       longitude: -57.5759
     },
     {
-      id: 2,
+      id: "2",
       title: "Casa 3 Dormitorios - Fernando de la Mora",
       rating: 5,
       location: "Fernando de la Mora, Paraguay",
@@ -86,7 +86,7 @@ export const useListingsStore = create<ListingsState>()(
       longitude: -57.5428
     },
     {
-      id: 3,
+      id: "3",
       title: "Servicio de Electricista Profesional",
       rating: 4.8,
       location: "Ciudad del Este, Paraguay",
@@ -100,7 +100,7 @@ export const useListingsStore = create<ListingsState>()(
       longitude: -54.6161
     },
     {
-      id: 4,
+      id: "4",
       title: "Departamento 2 Habitaciones - Alquiler",
       rating: 4.2,
       location: "Asunción, Paraguay",
@@ -117,7 +117,7 @@ export const useListingsStore = create<ListingsState>()(
       longitude: -57.6350
     },
     {
-      id: 5,
+      id: "5",
       title: "Terreno 500m² - Luque",
       rating: 4.0,
       location: "Luque, Paraguay",
@@ -132,7 +132,7 @@ export const useListingsStore = create<ListingsState>()(
       longitude: -57.4833
     },
     {
-      id: 6,
+      id: "6",
       title: "Honda CB 250 - 2020",
       rating: 4.3,
       location: "Encarnación, Paraguay",
@@ -149,7 +149,7 @@ export const useListingsStore = create<ListingsState>()(
       longitude: -55.8658
     },
     {
-      id: 7,
+      id: "7",
       title: "Servicio de Plomería 24/7",
       rating: 4.9,
       location: "San Lorenzo, Paraguay",
@@ -163,7 +163,7 @@ export const useListingsStore = create<ListingsState>()(
       longitude: -57.5089
     },
     {
-      id: 8,
+      id: "8",
       title: "Oficina Comercial - Alquiler",
       rating: 4.6,
       location: "Asunción Centro, Paraguay",
@@ -180,7 +180,7 @@ export const useListingsStore = create<ListingsState>()(
   ],
   addListing: (newListing) => 
     set((state) => ({
-      listings: [...state.listings, { ...newListing, id: state.listings.length + 1 }]
+      listings: [...state.listings, { ...newListing, id: String(state.listings.length + 1) }]
     })),
   updateListing: (id, updatedData) =>
     set((state) => ({

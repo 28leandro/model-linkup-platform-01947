@@ -7,6 +7,7 @@ import { StarRating } from "@/components/StarRating";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -27,14 +28,28 @@ const ListingDetail = () => {
   const { user } = useAuth();
   const listings = useListingsStore((state) => state.listings);
   const deleteListing = useListingsStore((state) => state.deleteListing);
-  const listing = listings.find(l => l.id === Number(id));
+  const listing = listings.find(l => l.id === id);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   // Verificar se o usuário é o dono do anúncio
   const isOwner = user && listing && user.id === listing.user_id;
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (listing) {
+      const { error } = await supabase
+        .from('listings')
+        .delete()
+        .eq('id', listing.id);
+      
+      if (error) {
+        toast({
+          title: "Erro ao excluir",
+          description: "Não foi possível excluir o anúncio.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       deleteListing(listing.id);
       toast({
         title: "Anúncio excluído",

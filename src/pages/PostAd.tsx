@@ -46,7 +46,7 @@ const PostAd = () => {
   }, [user, loading, navigate]);
 
   const isEditing = !!id;
-  const editingListing = isEditing ? listings.find(l => l.id === Number(id)) : null;
+  const editingListing = isEditing ? listings.find(l => l.id === id) : null;
 
   useEffect(() => {
     if (editingListing) {

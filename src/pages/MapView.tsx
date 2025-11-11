@@ -11,7 +11,7 @@ const MapView = () => {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const listings = useListingsStore((state) => state.listings);
   const navigate = useNavigate();
-  const [selectedListing, setSelectedListing] = useState<number | null>(null);
+  const [selectedListing, setSelectedListing] = useState<string | null>(null);
 
   const listingsWithCoords = listings.filter(
     (listing) => listing.latitude && listing.longitude
