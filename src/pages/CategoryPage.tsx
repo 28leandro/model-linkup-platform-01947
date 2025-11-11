@@ -1,12 +1,14 @@
 import { useParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { useListingsStore } from "@/store/listingsStore";
 import { StarRating } from "@/components/StarRating";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
+import type { Listing } from "@/store/listingsStore";
 
 const CategoryPage = () => {
   const { id } = useParams();
-  const listings = useListingsStore((state) => state.listings);
+  const [listings, setListings] = useState<Listing[]>([]);
   
   const categoryMap: Record<string, { type: string, title: string }> = {
     "vehicles": { type: "vehicles", title: "Veículos" },
@@ -16,6 +18,20 @@ const CategoryPage = () => {
   };
 
   const category = categoryMap[id || "vehicles"];
+
+  useEffect(() => {
+    const fetchListings = async () => {
+      const { data, error } = await supabase
+        .from('listings_public')
+        .select('*');
+      
+      if (!error && data) {
+        setListings(data as Listing[]);
+      }
+    };
+    
+    fetchListings();
+  }, []);
   
   const categoryListings = listings.filter((listing) => 
     listing.type === category.type

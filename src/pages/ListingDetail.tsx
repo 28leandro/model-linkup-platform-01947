@@ -2,12 +2,12 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle, Trash2 } from "lucide-react";
-import { useListingsStore } from "@/store/listingsStore";
 import { StarRating } from "@/components/StarRating";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import type { Listing } from "@/store/listingsStore";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -26,10 +26,24 @@ const ListingDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const listings = useListingsStore((state) => state.listings);
-  const deleteListing = useListingsStore((state) => state.deleteListing);
-  const listing = listings.find(l => l.id === id);
+  const [listing, setListing] = useState<Listing | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  useEffect(() => {
+    const fetchListing = async () => {
+      const { data, error } = await supabase
+        .from('listings_public')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      
+      if (!error && data) {
+        setListing(data as Listing);
+      }
+    };
+    
+    fetchListing();
+  }, [id]);
   
   // Verificar se o usuário é o dono do anúncio
   const isOwner = user && listing && user.id === listing.user_id;
@@ -50,7 +64,6 @@ const ListingDetail = () => {
         return;
       }
       
-      deleteListing(listing.id);
       toast({
         title: "Anúncio excluído",
         description: "Seu anúncio foi removido com sucesso.",
