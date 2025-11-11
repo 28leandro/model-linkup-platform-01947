@@ -113,6 +113,17 @@ const PostAd = () => {
 
     // Validate input data
     try {
+      console.log('Validating data:', {
+        title,
+        description,
+        phone: phone || "",
+        rating,
+        category,
+        latitude: location.latitude,
+        longitude: location.longitude,
+        location: location.address
+      });
+      
       listingSchema.parse({
         title,
         description,
@@ -124,9 +135,27 @@ const PostAd = () => {
         location: location.address
       });
     } catch (error: any) {
+      console.error('Validation error:', error);
+      
+      // Provide more specific error messages
+      const errorMessage = error.errors?.[0]?.message || "Verifique os campos do formulário.";
+      const errorPath = error.errors?.[0]?.path?.[0];
+      
+      let userFriendlyMessage = errorMessage;
+      
+      if (errorPath === 'location' || errorPath === 'latitude' || errorPath === 'longitude') {
+        userFriendlyMessage = "Por favor, selecione uma localização no mapa.";
+      } else if (errorPath === 'category') {
+        userFriendlyMessage = "Por favor, selecione uma categoria.";
+      } else if (errorPath === 'title') {
+        userFriendlyMessage = "O título deve ter entre 5 e 100 caracteres.";
+      } else if (errorPath === 'description') {
+        userFriendlyMessage = "A descrição deve ter entre 20 e 2000 caracteres.";
+      }
+      
       toast({
         title: "Erro de validação",
-        description: error.errors?.[0]?.message || "Verifique os campos do formulário.",
+        description: userFriendlyMessage,
         variant: "destructive",
       });
       return;
