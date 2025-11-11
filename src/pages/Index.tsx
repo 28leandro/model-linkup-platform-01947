@@ -37,7 +37,7 @@ const Index = () => {
 
     const fetchListings = async () => {
       const { data, error } = await supabase
-        .from('listings')
+        .from('listings_public')
         .select('*')
         .order('created_at', { ascending: false });
       
