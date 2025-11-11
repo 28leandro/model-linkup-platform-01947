@@ -6,6 +6,7 @@ import { useListingsStore } from "@/store/listingsStore";
 import { StarRating } from "@/components/StarRating";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,10 +24,14 @@ const ListingDetail = () => {
   const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const listings = useListingsStore((state) => state.listings);
   const deleteListing = useListingsStore((state) => state.deleteListing);
   const listing = listings.find(l => l.id === Number(id));
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  // Verificar se o usuário é o dono do anúncio
+  const isOwner = user && listing && user.id === listing.user_id;
 
   const handleDelete = () => {
     if (listing) {
@@ -159,37 +164,41 @@ const ListingDetail = () => {
                   WhatsApp
                 </a>
               </Button>
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => navigate(`/post-ad/${listing.id}`)}
-              >
-                <Edit className="w-4 h-4" />
-              </Button>
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
+              {isOwner && (
+                <>
                   <Button 
-                    variant="destructive" 
+                    variant="outline" 
                     size="icon"
+                    onClick={() => navigate(`/post-ad/${listing.id}`)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Edit className="w-4 h-4" />
                   </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Tem certeza que deseja excluir este anúncio? Esta ação não pode ser desfeita.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>
-                      Excluir
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button 
+                        variant="destructive" 
+                        size="icon"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Tem certeza que deseja excluir este anúncio? Esta ação não pode ser desfeita.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete}>
+                          Excluir
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </>
+              )}
             </div>
 
             <div className="mt-6">
