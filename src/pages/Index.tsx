@@ -13,8 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
   const { t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
-  const listings = useListingsStore((state) => state.listings);
-  const [filteredListings, setFilteredListings] = useState(listings);
+  const [allListings, setAllListings] = useState<any[]>([]);
+  const [filteredListings, setFilteredListings] = useState<any[]>([]);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
@@ -58,13 +58,13 @@ const Index = () => {
           latitude: item.latitude,
           longitude: item.longitude,
         }));
+        setAllListings(formattedListings);
         setFilteredListings(formattedListings);
       }
     };
     
     fetchListings();
-    setFilteredListings(listings);
-  }, [listings]);
+  }, []);
 
   // Calculate distance between two coordinates in km
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
@@ -84,7 +84,7 @@ const Index = () => {
     setHasSearched(true);
     
     if (!query) {
-      setFilteredListings(listings);
+      setFilteredListings(allListings);
       toast({
         title: t('search.emptyTitle'),
         description: t('search.emptyDesc'),
@@ -93,10 +93,10 @@ const Index = () => {
       return;
     }
 
-    let results = listings.filter((listing) => {
+    let results = allListings.filter((listing) => {
       const titleMatch = listing.title.toLowerCase().includes(query);
-      const locationMatch = listing.location.toLowerCase().includes(query);
-      const categoryMatch = listing.category.toLowerCase().includes(query);
+      const locationMatch = listing.location?.toLowerCase().includes(query);
+      const categoryMatch = listing.category?.toLowerCase().includes(query);
       const descriptionMatch = listing.description?.toLowerCase().includes(query) || false;
 
       return titleMatch || locationMatch || categoryMatch || descriptionMatch;
