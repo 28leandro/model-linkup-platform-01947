@@ -99,11 +99,11 @@ const ListingDetail = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
         <Card>
           <CardContent className="p-6">
             {/* Galeria de Fotos */}
-            <div className="relative aspect-video bg-gray-200 rounded-lg mb-4 overflow-hidden group">
+            <div className="relative aspect-video md:aspect-[4/3] lg:max-h-[500px] bg-gray-200 rounded-lg mb-4 overflow-hidden group">
               <img
                 src={listing.images && listing.images[currentImageIndex] ? listing.images[currentImageIndex] : "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"}
                 alt={`${listing.title} - Foto ${currentImageIndex + 1}`}
