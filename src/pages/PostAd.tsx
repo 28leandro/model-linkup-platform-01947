@@ -29,6 +29,8 @@ const PostAd = () => {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [phone, setPhone] = useState("");
+  const [price, setPrice] = useState<number | "">("");
+  const [area, setArea] = useState<number | "">("");
   const [previews, setPreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [location, setLocation] = useState({ 
@@ -59,6 +61,8 @@ const PostAd = () => {
       setDescription(editingListing.description || "");
       setCategory(editingListing.type);
       setPhone(editingListing.phone || "");
+      setPrice((editingListing as any).price || "");
+      setArea((editingListing as any).area || "");
       setPreviews(editingListing.images || []);
       setLocation({
         address: editingListing.location,
@@ -123,6 +127,8 @@ const PostAd = () => {
         phone: phone || "",
         rating,
         category,
+        price: price || 0,
+        area: area || 0,
         latitude: location.latitude,
         longitude: location.longitude,
         location: location.address
@@ -180,6 +186,8 @@ const PostAd = () => {
       location: location.address || "Asunción, Paraguay",
       images: finalImages,
       phone: phone.trim() || null,
+      price: price || null,
+      area: area || null,
       latitude: location.latitude,
       longitude: location.longitude,
       user_id: user.id,
@@ -296,6 +304,32 @@ const PostAd = () => {
                   required
                 />
               </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="price">Preço (Gs)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
+                  placeholder="Ex: 50000000"
+                  min="0"
+                />
+              </div>
+
+              {category === "real-estate" && (
+                <div className="space-y-2">
+                  <Label htmlFor="area">Metragem (m²)</Label>
+                  <Input
+                    id="area"
+                    type="number"
+                    value={area}
+                    onChange={(e) => setArea(e.target.value ? Number(e.target.value) : "")}
+                    placeholder="Ex: 150"
+                    min="0"
+                  />
+                </div>
+              )}
 
               <LocationPicker
                 onLocationSelect={setLocation}

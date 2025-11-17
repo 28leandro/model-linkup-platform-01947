@@ -22,6 +22,14 @@ export const listingSchema = z.object({
     .refine((val) => ["vehicles", "real-estate", "services"].includes(val), {
       message: "Selecione uma categoria válida"
     }),
+  price: z.number()
+    .positive("O preço deve ser positivo")
+    .optional()
+    .or(z.literal(0)),
+  area: z.number()
+    .positive("A metragem deve ser positiva")
+    .optional()
+    .or(z.literal(0)),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   location: z.string().min(1, "Selecione uma localização")

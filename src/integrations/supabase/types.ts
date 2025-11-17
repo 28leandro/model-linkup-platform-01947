@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       listings: {
         Row: {
+          area: number | null
           category: string | null
           created_at: string
           description: string | null
@@ -25,12 +26,14 @@ export type Database = {
           location: string | null
           longitude: number | null
           phone: string | null
+          price: number | null
           rating: number | null
           title: string
           type: string | null
           user_id: string
         }
         Insert: {
+          area?: number | null
           category?: string | null
           created_at?: string
           description?: string | null
@@ -40,12 +43,14 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           phone?: string | null
+          price?: number | null
           rating?: number | null
           title: string
           type?: string | null
           user_id: string
         }
         Update: {
+          area?: number | null
           category?: string | null
           created_at?: string
           description?: string | null
@@ -55,6 +60,7 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           phone?: string | null
+          price?: number | null
           rating?: number | null
           title?: string
           type?: string | null
