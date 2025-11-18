@@ -25,7 +25,6 @@ const PostAd = () => {
   const listings = useListingsStore((state) => state.listings);
   const { uploadMultipleImages, uploading } = useImageUpload();
   const [title, setTitle] = useState("");
-  const [rating, setRating] = useState(5);
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [phone, setPhone] = useState("");
@@ -57,7 +56,6 @@ const PostAd = () => {
   useEffect(() => {
     if (editingListing) {
       setTitle(editingListing.title);
-      setRating(editingListing.rating);
       setDescription(editingListing.description || "");
       setCategory(editingListing.type);
       setPhone(editingListing.phone || "");
@@ -125,7 +123,6 @@ const PostAd = () => {
         title,
         description,
         phone: phone || "",
-        rating,
         category,
         price: price || 0,
         area: area || 0,
@@ -179,7 +176,7 @@ const PostAd = () => {
 
     const listingData = {
       title: title.trim(),
-      rating,
+      rating: null,
       description: description.trim(),
       category,
       type: category as any,
@@ -290,19 +287,6 @@ const PostAd = () => {
                     <SelectItem value="services">🛠️ Serviços</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="rating">Avaliação (1 a 5 estrelas)</Label>
-                <Input
-                  id="rating"
-                  type="number"
-                  value={rating}
-                  onChange={(e) => setRating(Number(e.target.value))}
-                  min="1"
-                  max="5"
-                  required
-                />
               </div>
 
               <div className="space-y-2">
