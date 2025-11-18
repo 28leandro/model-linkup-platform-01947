@@ -47,7 +47,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
               onClick={() => signOut()}
             >
               <LogOut className="w-4 h-4" />
-              Sair
+              {t('auth.logout')}
             </Button>
           ) : (
             <Button 
