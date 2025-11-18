@@ -279,12 +279,12 @@ const PostAd = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Categoria</Label>
-                <Select value={category} onValueChange={setCategory} required>
-                  <SelectTrigger className="bg-white">
+                <Label htmlFor="category">Categoria *</Label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger className="bg-white border-input">
                     <SelectValue placeholder="Selecione uma categoria" />
                   </SelectTrigger>
-                  <SelectContent className="bg-white">
+                  <SelectContent className="bg-white z-50">
                     <SelectItem value="vehicles">🚗 Veículos</SelectItem>
                     <SelectItem value="real-estate">🏠 Imóveis</SelectItem>
                     <SelectItem value="services">🛠️ Serviços</SelectItem>
@@ -319,7 +319,7 @@ const PostAd = () => {
 
               {category === "real-estate" && (
                 <div className="space-y-2">
-                  <Label htmlFor="area">Metragem (m²)</Label>
+                  <Label htmlFor="area">Dimensões do Imóvel (m²)</Label>
                   <Input
                     id="area"
                     type="number"
