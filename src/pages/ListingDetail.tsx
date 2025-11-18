@@ -57,16 +57,16 @@ const ListingDetail = () => {
       
       if (error) {
         toast({
-          title: "Erro ao excluir",
-          description: "Não foi possível excluir o anúncio.",
+          title: t('detail.deleteError'),
+          description: t('detail.deleteErrorDesc'),
           variant: "destructive"
         });
         return;
       }
       
       toast({
-        title: "Anúncio excluído",
-        description: "Seu anúncio foi removido com sucesso.",
+        title: t('detail.deleteSuccess'),
+        description: t('detail.deleteSuccessDesc'),
       });
       navigate("/");
     }
@@ -77,8 +77,8 @@ const ListingDetail = () => {
       <div className="min-h-screen bg-white flex items-center justify-center">
         <Card>
           <CardContent className="p-6">
-            <h1 className="text-xl font-semibold mb-2">Anúncio não encontrado</h1>
-            <p className="text-muted-foreground">Este anúncio não existe ou foi removido.</p>
+            <h1 className="text-xl font-semibold mb-2">{t('detail.notFound')}</h1>
+            <p className="text-muted-foreground">{t('detail.notFoundDesc')}</p>
           </CardContent>
         </Card>
       </div>
@@ -176,9 +176,9 @@ const ListingDetail = () => {
             <div className="flex gap-2 mb-4">
               <Button className="flex-1">
                 <Phone className="w-4 h-4 mr-2" />
-                {listing.phone || 'Contactar vendedor'}
+                {listing.phone || t('detail.contact')}
               </Button>
-              <Button 
+              <Button
                 variant="secondary"
                 className="flex-1 bg-green-500 hover:bg-green-600 text-white"
                 asChild
@@ -212,15 +212,15 @@ const ListingDetail = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                        <AlertDialogTitle>{t('detail.deleteConfirm')}</AlertDialogTitle>
                         <AlertDialogDescription>
-                          Tem certeza que deseja excluir este anúncio? Esta ação não pode ser desfeita.
+                          {t('detail.deleteDesc')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogCancel>{t('detail.cancel')}</AlertDialogCancel>
                         <AlertDialogAction onClick={handleDelete}>
-                          Excluir
+                          {t('detail.confirmDelete')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

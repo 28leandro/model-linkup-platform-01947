@@ -1,6 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const FavoriteThings = () => {
+  const { t } = useLanguage();
   const favorites = [
     {
       id: 1,
@@ -26,7 +28,7 @@ const FavoriteThings = () => {
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold text-primary mb-8 text-center">
-          Vos Coups de Cœur
+          {t('favorites.title')}
         </h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((favorite) => (

@@ -15,11 +15,13 @@ import { useImageUpload } from "@/hooks/useImageUpload";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { listingSchema } from "@/lib/validations";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const PostAd = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
   const addListing = useListingsStore((state) => state.addListing);
   const updateListing = useListingsStore((state) => state.updateListing);
   const listings = useListingsStore((state) => state.listings);
@@ -42,13 +44,13 @@ const PostAd = () => {
   useEffect(() => {
     if (!loading && !user) {
       toast({
-        title: "Autenticação necessária",
-        description: "Você precisa estar logado para publicar anúncios.",
+        title: t('auth.required'),
+        description: t('auth.requiredDesc'),
         variant: "destructive",
       });
       navigate("/");
     }
-  }, [user, loading, navigate]);
+  }, [user, loading, navigate, t]);
 
   const isEditing = !!id;
   const editingListing = isEditing ? listings.find(l => l.id === id) : null;
@@ -74,8 +76,8 @@ const PostAd = () => {
     const files = Array.from(e.target.files || []);
     if (files.length + previews.length > 5) {
       toast({
-        title: "Erro",
-        description: "Você não pode adicionar mais de 5 imagens",
+        title: t('postAd.maxPhotos'),
+        description: t('postAd.maxPhotosDesc'),
         variant: "destructive",
       });
       return;
@@ -87,8 +89,8 @@ const PostAd = () => {
     setImageFiles(prev => [...prev, ...files]);
     
     toast({
-      title: "Imagens adicionadas!",
-      description: `${files.length} imagem(ns) adicionada(s).`,
+      title: t('postAd.imagesAdded'),
+      description: `${files.length} ${t('postAd.imagesAddedDesc')}`,
     });
   };
 
@@ -102,8 +104,8 @@ const PostAd = () => {
     
     if (!user) {
       toast({
-        title: "Erro",
-        description: "Você precisa estar logado para publicar anúncios.",
+        title: t('postAd.error'),
+        description: t('postAd.authError'),
         variant: "destructive",
       });
       return;
@@ -111,8 +113,8 @@ const PostAd = () => {
 
     if (uploading) {
       toast({
-        title: "Aguarde",
-        description: "As imagens ainda estão sendo processadas.",
+        title: t('postAd.wait'),
+        description: t('postAd.waitDesc'),
       });
       return;
     }
@@ -132,23 +134,23 @@ const PostAd = () => {
       });
     } catch (error: any) {
       // Provide more specific error messages
-      const errorMessage = error.errors?.[0]?.message || "Verifique os campos do formulário.";
+      const errorMessage = error.errors?.[0]?.message || t('postAd.fieldError');
       const errorPath = error.errors?.[0]?.path?.[0];
       
       let userFriendlyMessage = errorMessage;
       
       if (errorPath === 'location' || errorPath === 'latitude' || errorPath === 'longitude') {
-        userFriendlyMessage = "Por favor, selecione uma localização no mapa.";
+        userFriendlyMessage = t('postAd.locationError');
       } else if (errorPath === 'category') {
-        userFriendlyMessage = "Por favor, selecione uma categoria.";
+        userFriendlyMessage = t('postAd.categoryError');
       } else if (errorPath === 'title') {
-        userFriendlyMessage = "O título deve ter entre 5 e 100 caracteres.";
+        userFriendlyMessage = t('postAd.titleError');
       } else if (errorPath === 'description') {
-        userFriendlyMessage = "A descrição deve ter entre 20 e 2000 caracteres.";
+        userFriendlyMessage = t('postAd.descriptionError');
       }
       
       toast({
-        title: "Erro de validação",
+        title: t('postAd.validationError'),
         description: userFriendlyMessage,
         variant: "destructive",
       });
@@ -161,8 +163,8 @@ const PostAd = () => {
       uploadedImageUrls = await uploadMultipleImages(imageFiles);
       if (uploadedImageUrls.length === 0) {
         toast({
-          title: "Erro",
-          description: "Falha ao enviar imagens. Tente novamente.",
+          title: t('postAd.error'),
+          description: t('postAd.uploadError'),
           variant: "destructive",
         });
         return;
@@ -202,8 +204,8 @@ const PostAd = () => {
 
         updateListing(editingListing.id, listingData);
         toast({
-          title: "Anúncio atualizado!",
-          description: "Seu anúncio foi atualizado com sucesso.",
+          title: t('postAd.updated'),
+          description: t('postAd.updatedDesc'),
         });
       } else {
         const { error } = await supabase
@@ -214,8 +216,8 @@ const PostAd = () => {
 
         addListing(listingData);
         toast({
-          title: "Anúncio publicado!",
-          description: "Seu anúncio foi publicado com sucesso.",
+          title: t('postAd.published'),
+          description: t('postAd.publishedDesc'),
         });
       }
       
@@ -223,18 +225,18 @@ const PostAd = () => {
     } catch (error: any) {
       console.error('Database error:', error);
       
-      let userMessage = "Não foi possível salvar o anúncio. Tente novamente.";
+      let userMessage = t('postAd.saveErrorDesc');
       
       if (error.code === '23505') {
-        userMessage = "Este anúncio já existe.";
+        userMessage = t('postAd.duplicateError');
       } else if (error.code === '23503') {
-        userMessage = "Erro de validação. Verifique os campos.";
+        userMessage = t('postAd.fieldError');
       } else if (error.message?.includes('RLS') || error.message?.includes('policy')) {
-        userMessage = "Você não tem permissão para esta ação.";
+        userMessage = t('postAd.permissionError');
       }
       
       toast({
-        title: "Erro ao salvar",
+        title: t('postAd.saveError'),
         description: userMessage,
         variant: "destructive",
       });
@@ -244,7 +246,7 @@ const PostAd = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-white py-8 flex items-center justify-center">
-        <p className="text-muted-foreground">Carregando...</p>
+        <p className="text-muted-foreground">{t('postAd.loading')}</p>
       </div>
     );
   }
@@ -259,57 +261,57 @@ const PostAd = () => {
         <Card className="border-none shadow-lg bg-white">
           <CardHeader>
             <CardTitle className="text-2xl font-bold">
-              {isEditing ? "Editar Anúncio" : "Publicar Anúncio"}
+              {isEditing ? t('postAd.editTitle') : t('postAd.title')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="title">Título do Anúncio</Label>
+                <Label htmlFor="title">{t('postAd.adTitle')}</Label>
                 <Input
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Ex: Toyota Corolla 2020"
+                  placeholder={t('postAd.adTitlePlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">Categoria *</Label>
+                <Label htmlFor="category">{t('postAd.category')} *</Label>
                 <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="bg-white border-input">
-                    <SelectValue placeholder="Selecione uma categoria" />
+                    <SelectValue placeholder={t('postAd.categoryPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent className="bg-white z-50">
-                    <SelectItem value="vehicles">🚗 Veículos</SelectItem>
-                    <SelectItem value="real-estate">🏠 Imóveis</SelectItem>
-                    <SelectItem value="services">🛠️ Serviços</SelectItem>
+                    <SelectItem value="vehicles">{t('postAd.categoryVehicles')}</SelectItem>
+                    <SelectItem value="real-estate">{t('postAd.categoryRealEstate')}</SelectItem>
+                    <SelectItem value="services">{t('postAd.categoryServices')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="price">Preço (Gs)</Label>
+                <Label htmlFor="price">{t('postAd.price')}</Label>
                 <Input
                   id="price"
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
-                  placeholder="Ex: 50000000"
+                  placeholder={t('postAd.pricePlaceholder')}
                   min="0"
                 />
               </div>
 
               {category === "real-estate" && (
                 <div className="space-y-2">
-                  <Label htmlFor="area">Dimensões do Imóvel (m²)</Label>
+                  <Label htmlFor="area">{t('postAd.area')}</Label>
                   <Input
                     id="area"
                     type="number"
                     value={area}
                     onChange={(e) => setArea(e.target.value ? Number(e.target.value) : "")}
-                    placeholder="Ex: 150"
+                    placeholder={t('postAd.areaPlaceholder')}
                     min="0"
                   />
                 </div>
@@ -321,29 +323,29 @@ const PostAd = () => {
               />
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Telefone</Label>
+                <Label htmlFor="phone">{t('postAd.phone')}</Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Ex: (11) 98765-4321"
+                  placeholder={t('postAd.phonePlaceholder')}
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Descrição</Label>
+                <Label htmlFor="description">{t('postAd.description')}</Label>
                 <Textarea
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Descreva seu anúncio em detalhes..."
+                  placeholder={t('postAd.descriptionPlaceholder')}
                   required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="images">Fotos (máx 5)</Label>
+                <Label htmlFor="images">{t('postAd.photos')}</Label>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
                   {previews.map((preview, index) => (
                     <div key={index} className="relative aspect-square">
@@ -369,7 +371,7 @@ const PostAd = () => {
                       >
                         <ImagePlus className="h-8 w-8 text-gray-400" />
                         <span className="mt-2 text-sm text-gray-500">
-                          Adicionar foto
+                          {t('postAd.addPhoto')}
                         </span>
                       </Label>
                       <Input
@@ -391,10 +393,10 @@ const PostAd = () => {
                   variant="outline"
                   onClick={() => navigate(-1)}
                 >
-                  Cancelar
+                  {t('postAd.cancel')}
                 </Button>
                 <Button type="submit" disabled={uploading}>
-                  {uploading ? "Enviando..." : isEditing ? "Salvar alterações" : "Publicar anúncio"}
+                  {uploading ? t('postAd.uploading') : isEditing ? t('postAd.saveChanges') : t('postAd.publish')}
                 </Button>
               </div>
             </form>

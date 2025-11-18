@@ -6,8 +6,10 @@ import Header from "@/components/Header";
 import Map from "@/components/Map";
 import { Card, CardContent } from "@/components/ui/card";
 import { StarRating } from "@/components/StarRating";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const MapView = () => {
+  const { t } = useLanguage();
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const listings = useListingsStore((state) => state.listings);
   const navigate = useNavigate();
@@ -29,9 +31,9 @@ const MapView = () => {
       
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Mapa de Anúncios</h1>
+          <h1 className="text-3xl font-bold mb-2">{t('map.title')}</h1>
           <p className="text-muted-foreground">
-            Visualize todos os anúncios disponíveis no mapa
+            {t('map.subtitle')}
           </p>
         </div>
 
@@ -47,7 +49,7 @@ const MapView = () => {
 
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">
-              {selectedListing ? 'Anúncio Selecionado' : 'Anúncios no Mapa'}
+              {selectedListing ? t('map.selected') : t('map.onMap')}
             </h2>
             
             {selectedListingData ? (
