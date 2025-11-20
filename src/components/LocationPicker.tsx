@@ -4,6 +4,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { MapPin } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface LocationPickerProps {
   onLocationSelect: (location: { address: string; latitude: number; longitude: number }) => void;
@@ -13,6 +14,7 @@ interface LocationPickerProps {
 const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPickerProps) => {
   const [address, setAddress] = useState(initialAddress);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     // Auto-detect location on mount if no initial address
@@ -24,8 +26,8 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
   const handleGetCurrentLocation = () => {
     if (!navigator.geolocation) {
       toast({
-        title: "Geolocalização não suportada",
-        description: "Seu dispositivo não suporta geolocalização",
+        title: t('location.notSupported'),
+        description: t('location.notSupportedDesc'),
         variant: "destructive",
       });
       return;
@@ -35,8 +37,8 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     const isSecureContext = window.isSecureContext || window.location.hostname === 'localhost';
     if (!isSecureContext) {
       toast({
-        title: "Conexão insegura",
-        description: "A geolocalização requer uma conexão HTTPS segura",
+        title: t('location.notSupported'),
+        description: t('location.notSupportedDesc'),
         variant: "destructive",
       });
       return;
@@ -76,8 +78,8 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
           });
           
           toast({
-            title: "Localização obtida",
-            description: "Sua localização foi detectada com sucesso",
+            title: t('location.obtained'),
+            description: t('location.obtainedDesc'),
           });
         } catch (error) {
           // Even if reverse geocoding fails, use coordinates
@@ -90,8 +92,8 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
           });
           
           toast({
-            title: "Localização obtida",
-            description: "Usando coordenadas como endereço",
+            title: t('location.obtained'),
+            description: t('location.obtainedDesc'),
           });
         } finally {
           setIsGettingLocation(false);
@@ -99,23 +101,10 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       },
       (error) => {
         setIsGettingLocation(false);
-        let errorMessage = "Não foi possível acessar sua localização.";
-        
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = "Você negou o acesso à localização. Permita nas configurações do navegador.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = "Localização indisponível no momento. Tente novamente.";
-            break;
-          case error.TIMEOUT:
-            errorMessage = "Tempo esgotado ao buscar localização. Tente novamente.";
-            break;
-        }
         
         toast({
-          title: "Erro ao obter localização",
-          description: errorMessage,
+          title: t('location.error'),
+          description: t('location.errorDesc'),
           variant: "destructive",
         });
       },
@@ -125,13 +114,17 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="location">Localização</Label>
+      <Label htmlFor="location">{t('postAd.location')}</Label>
       <div className="flex gap-2">
         <Input
           id="location"
+          type="text"
           value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          placeholder="Ex: São Paulo, SP"
+          onChange={(e) => {
+            setAddress(e.target.value);
+            onLocationSelect({ address: e.target.value, latitude: 0, longitude: 0 });
+          }}
+          placeholder={t('postAd.locationPlaceholder')}
           required
         />
         <Button
@@ -142,11 +135,11 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
           className="flex-shrink-0"
         >
           <MapPin className="w-4 h-4 mr-2" />
-          {isGettingLocation ? 'Obtendo...' : 'Usar Localização Atual'}
+          {isGettingLocation ? t('postAd.gettingLocation') : t('postAd.getCurrentLocation')}
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">
-        Digite o endereço ou use sua localização atual
+        {t('postAd.locationHelper')}
       </p>
     </div>
   );
