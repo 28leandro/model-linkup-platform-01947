@@ -33,15 +33,15 @@ const ServiceCategories = () => {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-xl font-semibold mb-4">{t('categories.title')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t('categories.title')}</h2>
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
         {categories.map((category) => (
           <Card key={category.name} className="hover:shadow-md transition-shadow bg-primary text-primary-foreground">
-            <CardContent className="p-4">
+            <CardContent className="p-3 sm:p-4">
               <Link to={category.link} className="block">
-                <h3 className="font-medium text-lg mb-1 text-primary-foreground">{category.name}</h3>
-                <p className="text-sm text-primary-foreground/80">{category.description}</p>
+                <h3 className="font-medium text-sm sm:text-lg mb-1 text-primary-foreground line-clamp-2">{category.name}</h3>
+                <p className="text-xs sm:text-sm text-primary-foreground/80 line-clamp-2">{category.description}</p>
               </Link>
             </CardContent>
           </Card>

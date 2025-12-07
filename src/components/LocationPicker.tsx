@@ -115,7 +115,7 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
   return (
     <div className="space-y-2">
       <Label htmlFor="location">{t('postAd.location')}</Label>
-      <div className="flex gap-2">
+      <div className="flex flex-col sm:flex-row gap-2">
         <Input
           id="location"
           type="text"
@@ -126,16 +126,19 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
           }}
           placeholder={t('postAd.locationPlaceholder')}
           required
+          className="h-11 sm:h-10"
         />
         <Button
           type="button"
           variant="outline"
           onClick={handleGetCurrentLocation}
           disabled={isGettingLocation}
-          className="flex-shrink-0"
+          className="flex-shrink-0 h-11 sm:h-10 w-full sm:w-auto"
         >
           <MapPin className="w-4 h-4 mr-2" />
-          {isGettingLocation ? t('postAd.gettingLocation') : t('postAd.getCurrentLocation')}
+          <span className="truncate">
+            {isGettingLocation ? t('postAd.gettingLocation') : t('postAd.getCurrentLocation')}
+          </span>
         </Button>
       </div>
       <p className="text-xs text-muted-foreground">

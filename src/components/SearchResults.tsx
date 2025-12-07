@@ -13,15 +13,15 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
   const { t } = useLanguage();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-xl font-semibold mb-4">
+    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
         {listings.length > 0 ? t('listings.searchResults') : t('search.noResults')}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {listings.map((listing) => (
-          <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-white border-2">
+          <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-card border overflow-hidden">
             <Link to={`/listing/${listing.id}`}>
-              <div className="aspect-video bg-gray-100 rounded-t-md overflow-hidden">
+              <div className="aspect-video bg-muted overflow-hidden">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
@@ -34,15 +34,15 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
                     {t('listings.noImage')}
                   </div>
                 )}
               </div>
-              <CardContent className="p-4 bg-white">
-                <h3 className="font-medium text-lg mb-2 text-gray-900">{listing.title}</h3>
+              <CardContent className="p-3 sm:p-4">
+                <h3 className="font-medium text-base sm:text-lg mb-2 line-clamp-2">{listing.title}</h3>
                 <StarRating rating={listing.rating} />
-                <p className="text-sm text-gray-600 mt-2">{listing.location}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
               </CardContent>
             </Link>
           </Card>
