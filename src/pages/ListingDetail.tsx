@@ -98,12 +98,12 @@ const ListingDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
         <Card>
-          <CardContent className="p-6">
+          <CardContent className="p-3 sm:p-6">
             {/* Galeria de Fotos */}
-            <div className="relative aspect-video md:aspect-[4/3] lg:max-h-[500px] bg-gray-200 rounded-lg mb-4 overflow-hidden group">
+            <div className="relative aspect-[4/3] sm:aspect-video md:aspect-[4/3] lg:max-h-[500px] bg-muted rounded-lg mb-3 sm:mb-4 overflow-hidden group">
               <img
                 src={listing.images && listing.images[currentImageIndex] ? listing.images[currentImageIndex] : "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"}
                 alt={`${listing.title} - Foto ${currentImageIndex + 1}`}
@@ -120,7 +120,7 @@ const ListingDetail = () => {
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 sm:h-10 sm:w-10"
                     onClick={prevImage}
                   >
                     <ChevronLeft className="h-4 w-4" />
@@ -128,14 +128,14 @@ const ListingDetail = () => {
                   <Button
                     variant="secondary"
                     size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 sm:h-10 sm:w-10"
                     onClick={nextImage}
                   >
                     <ChevronRight className="h-4 w-4" />
                   </Button>
                   
                   {/* Indicador de foto atual */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-3 py-1 rounded-full text-sm">
+                  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
                     {currentImageIndex + 1} / {listing.images.length}
                   </div>
                 </>
@@ -144,7 +144,7 @@ const ListingDetail = () => {
 
             {/* Miniaturas */}
             {listing.images && listing.images.length > 1 && (
-              <div className="grid grid-cols-5 gap-2 mb-6">
+              <div className="grid grid-cols-4 xs:grid-cols-5 gap-1.5 sm:gap-2 mb-4 sm:mb-6">
                 {listing.images.map((image, index) => (
                   <button
                     key={index}
@@ -163,24 +163,24 @@ const ListingDetail = () => {
               </div>
             )}
             
-            <h1 className="text-2xl font-bold mb-2">{listing.title}</h1>
-            <div className="mb-4">
+            <h1 className="text-xl sm:text-2xl font-bold mb-2">{listing.title}</h1>
+            <div className="mb-3 sm:mb-4">
               <StarRating rating={listing.rating} />
             </div>
             
-            <div className="flex items-center gap-2 text-muted-foreground mb-6">
-              <MapPin className="w-4 h-4" />
-              <span>{listing.location}</span>
+            <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
+              <MapPin className="w-4 h-4 flex-shrink-0" />
+              <span className="line-clamp-1">{listing.location}</span>
             </div>
 
-            <div className="flex gap-2 mb-4">
-              <Button className="flex-1">
-                <Phone className="w-4 h-4 mr-2" />
-                {listing.phone || t('detail.contact')}
+            <div className="flex flex-wrap gap-2 mb-4">
+              <Button className="flex-1 min-w-[120px] h-10 sm:h-11 text-sm sm:text-base">
+                <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
+                <span className="truncate">{listing.phone || t('detail.contact')}</span>
               </Button>
               <Button
                 variant="secondary"
-                className="flex-1 bg-green-500 hover:bg-green-600 text-white"
+                className="flex-1 min-w-[120px] bg-green-500 hover:bg-green-600 text-white h-10 sm:h-11 text-sm sm:text-base"
                 asChild
               >
                 <a 
@@ -188,16 +188,17 @@ const ListingDetail = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <MessageCircle className="w-4 h-4 mr-2" />
+                  <MessageCircle className="w-4 h-4 mr-2 flex-shrink-0" />
                   WhatsApp
                 </a>
               </Button>
               {isOwner && (
-                <>
+                <div className="flex gap-2 w-full xs:w-auto">
                   <Button 
                     variant="outline" 
                     size="icon"
                     onClick={() => navigate(`/post-ad/${listing.id}`)}
+                    className="h-10 w-10 sm:h-11 sm:w-11"
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -206,62 +207,63 @@ const ListingDetail = () => {
                       <Button 
                         variant="destructive" 
                         size="icon"
+                        className="h-10 w-10 sm:h-11 sm:w-11"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </AlertDialogTrigger>
-                    <AlertDialogContent>
+                    <AlertDialogContent className="w-[90vw] max-w-md mx-auto">
                       <AlertDialogHeader>
                         <AlertDialogTitle>{t('detail.deleteConfirm')}</AlertDialogTitle>
                         <AlertDialogDescription>
                           {t('detail.deleteDesc')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t('detail.cancel')}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete}>
+                      <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+                        <AlertDialogCancel className="w-full sm:w-auto">{t('detail.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleDelete} className="w-full sm:w-auto">
                           {t('detail.confirmDelete')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-                </>
+                </div>
               )}
             </div>
 
-            <div className="mt-6">
-              <h2 className="text-xl font-semibold mb-3">Descripción</h2>
-              <p className="text-muted-foreground">
+            <div className="mt-4 sm:mt-6">
+              <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Descripción</h2>
+              <p className="text-muted-foreground text-sm sm:text-base">
                 {listing.description || 'Sin descripción disponible'}
               </p>
               
               {/* Informações adicionais para imóveis */}
               {listing.type === 'real-estate' && (
-                <div className="mt-4 grid grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-4">
                   {listing.bedrooms && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Dormitorios</p>
-                      <p className="text-lg font-semibold">{listing.bedrooms}</p>
+                    <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
+                      <p className="text-xs sm:text-sm text-muted-foreground">Dormitorios</p>
+                      <p className="text-base sm:text-lg font-semibold">{listing.bedrooms}</p>
                     </div>
                   )}
                   {listing.bathrooms && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Baños</p>
-                      <p className="text-lg font-semibold">{listing.bathrooms}</p>
+                    <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
+                      <p className="text-xs sm:text-sm text-muted-foreground">Baños</p>
+                      <p className="text-base sm:text-lg font-semibold">{listing.bathrooms}</p>
                     </div>
                   )}
                   {listing.area && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-muted-foreground">Área</p>
-                      <p className="text-lg font-semibold">{listing.area}m²</p>
+                    <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
+                      <p className="text-xs sm:text-sm text-muted-foreground">Área</p>
+                      <p className="text-base sm:text-lg font-semibold">{listing.area}m²</p>
                     </div>
                   )}
                   {listing.price && (
-                    <div className="bg-gray-50 p-3 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
+                    <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
+                      <p className="text-xs sm:text-sm text-muted-foreground">
                         {listing.realEstateType === 'rent' ? 'Alquiler/mes' : 'Precio'}
                       </p>
-                      <p className="text-lg font-semibold text-primary">
+                      <p className="text-base sm:text-lg font-semibold text-primary">
                         ₲ {listing.price.toLocaleString('es-PY')}
                       </p>
                     </div>

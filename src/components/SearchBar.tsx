@@ -14,16 +14,16 @@ const SearchBar = ({ searchQuery, onSearchQueryChange, onSearch }: SearchBarProp
 
   return (
     <div className="border-b">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-4 max-w-2xl mx-auto">
+      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-2xl mx-auto">
           <Input 
             placeholder={t('search.placeholder')}
-            className="flex-1"
+            className="flex-1 h-11 sm:h-10 text-base"
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && onSearch()}
           />
-          <Button onClick={onSearch}>
+          <Button onClick={onSearch} className="w-full sm:w-auto h-11 sm:h-10">
             <Search className="w-4 h-4 mr-2" />
             {t('search.button')}
           </Button>

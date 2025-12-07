@@ -25,26 +25,26 @@ const FavoriteThings = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-primary mb-8 text-center">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary mb-6 sm:mb-8 text-center">
           {t('favorites.title')}
         </h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {favorites.map((favorite) => (
-            <Card key={favorite.id} className="hover:shadow-lg transition-shadow bg-white">
-              <CardHeader>
-                <div className="aspect-video w-full overflow-hidden rounded-t-lg">
+            <Card key={favorite.id} className="hover:shadow-lg transition-shadow bg-card overflow-hidden">
+              <CardHeader className="p-0">
+                <div className="aspect-video w-full overflow-hidden">
                   <img
                     src={favorite.image}
                     alt={favorite.title}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform hover:scale-105"
                   />
                 </div>
-                <CardTitle className="mt-4">{favorite.title}</CardTitle>
+                <CardTitle className="px-4 pt-4 text-base sm:text-lg">{favorite.title}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
+              <CardContent className="px-4 pb-4">
+                <p className="text-sm text-muted-foreground">
                   {favorite.description}
                 </p>
               </CardContent>

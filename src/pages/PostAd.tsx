@@ -256,16 +256,16 @@ const PostAd = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white py-8">
-      <div className="container max-w-2xl">
-        <Card className="border-none shadow-lg bg-white">
-          <CardHeader>
-            <CardTitle className="text-2xl font-bold">
+    <div className="min-h-screen bg-background py-4 sm:py-8 px-3 sm:px-4">
+      <div className="container max-w-2xl mx-auto">
+        <Card className="border-none shadow-lg bg-card">
+          <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
+            <CardTitle className="text-xl sm:text-2xl font-bold">
               {isEditing ? t('postAd.editTitle') : t('postAd.title')}
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="title">{t('postAd.adTitle')}</Label>
                 <Input
@@ -274,16 +274,17 @@ const PostAd = () => {
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder={t('postAd.adTitlePlaceholder')}
                   required
+                  className="h-11 sm:h-10"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="category">{t('postAd.category')} *</Label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="bg-white border-input">
+                  <SelectTrigger className="bg-card border-input h-11 sm:h-10">
                     <SelectValue placeholder={t('postAd.categoryPlaceholder')} />
                   </SelectTrigger>
-                  <SelectContent className="bg-white z-50">
+                  <SelectContent className="bg-card z-50">
                     <SelectItem value="vehicles">{t('postAd.categoryVehicles')}</SelectItem>
                     <SelectItem value="real-estate">{t('postAd.categoryRealEstate')}</SelectItem>
                     <SelectItem value="services">{t('postAd.categoryServices')}</SelectItem>
@@ -300,6 +301,7 @@ const PostAd = () => {
                   onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
                   placeholder={t('postAd.pricePlaceholder')}
                   min="0"
+                  className="h-11 sm:h-10"
                 />
               </div>
 
@@ -313,6 +315,7 @@ const PostAd = () => {
                     onChange={(e) => setArea(e.target.value ? Number(e.target.value) : "")}
                     placeholder={t('postAd.areaPlaceholder')}
                     min="0"
+                    className="h-11 sm:h-10"
                   />
                 </div>
               )}
@@ -330,6 +333,7 @@ const PostAd = () => {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder={t('postAd.phonePlaceholder')}
+                  className="h-11 sm:h-10"
                 />
               </div>
 
@@ -341,12 +345,13 @@ const PostAd = () => {
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder={t('postAd.descriptionPlaceholder')}
                   required
+                  className="min-h-[120px]"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="images">{t('postAd.photos')}</Label>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
+                <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 sm:gap-4">
                   {previews.map((preview, index) => (
                     <div key={index} className="relative aspect-square">
                       <img
@@ -367,10 +372,10 @@ const PostAd = () => {
                     <div className="aspect-square">
                       <Label
                         htmlFor="image-upload"
-                        className="flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 hover:border-primary"
+                        className="flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border hover:border-primary transition-colors"
                       >
-                        <ImagePlus className="h-8 w-8 text-gray-400" />
-                        <span className="mt-2 text-sm text-gray-500">
+                        <ImagePlus className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
+                        <span className="mt-2 text-xs sm:text-sm text-muted-foreground text-center px-2">
                           {t('postAd.addPhoto')}
                         </span>
                       </Label>
@@ -387,15 +392,16 @@ const PostAd = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2">
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 pt-4">
                 <Button 
                   type="button" 
                   variant="outline"
                   onClick={() => navigate(-1)}
+                  className="w-full sm:w-auto"
                 >
                   {t('postAd.cancel')}
                 </Button>
-                <Button type="submit" disabled={uploading}>
+                <Button type="submit" disabled={uploading} className="w-full sm:w-auto">
                   {uploading ? t('postAd.uploading') : isEditing ? t('postAd.saveChanges') : t('postAd.publish')}
                 </Button>
               </div>

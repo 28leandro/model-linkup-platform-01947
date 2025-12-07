@@ -13,13 +13,13 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
   const { t } = useLanguage();
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-xl font-semibold mb-4">{t('listings.recent')}</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t('listings.recent')}</h2>
+      <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {listings.map((listing) => (
-          <div key={listing.id} className="group hover:shadow-md transition-shadow bg-white">
+          <div key={listing.id} className="group hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden">
             <Link to={`/listing/${listing.id}`}>
-              <AspectRatio ratio={16 / 9} className="rounded-md mb-3 overflow-hidden bg-gray-100">
+              <AspectRatio ratio={16 / 9} className="overflow-hidden bg-muted">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
@@ -32,14 +32,16 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                     }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400">
+                  <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
                     {t('listings.noImage')}
                   </div>
                 )}
               </AspectRatio>
-              <h3 className="font-medium text-lg mb-1">{listing.title}</h3>
-              <StarRating rating={listing.rating} />
-              <p className="text-sm text-gray-500 mt-2">{listing.location}</p>
+              <div className="p-3 sm:p-4">
+                <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
+                <StarRating rating={listing.rating} />
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
+              </div>
             </Link>
           </div>
         ))}

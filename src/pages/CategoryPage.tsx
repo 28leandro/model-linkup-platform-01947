@@ -38,41 +38,43 @@ const CategoryPage = () => {
   );
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <Link to="/" className="text-primary hover:underline">
+    <div className="min-h-screen bg-background">
+      <header className="bg-background shadow-sm sticky top-0 z-50">
+        <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
+          <Link to="/" className="text-primary hover:underline text-sm sm:text-base">
             ← Voltar
           </Link>
-          <h1 className="text-2xl font-bold mt-2">
+          <h1 className="text-xl sm:text-2xl font-bold mt-2">
             {category?.title || "Categoria"}
           </h1>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {categoryListings.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Nenhum anúncio encontrado nesta categoria.</p>
+          <div className="text-center py-8 sm:py-12">
+            <p className="text-muted-foreground text-sm sm:text-base">Nenhum anúncio encontrado nesta categoria.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {categoryListings.map((listing) => (
-              <Card key={listing.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-4">
+              <Card key={listing.id} className="hover:shadow-md transition-shadow overflow-hidden">
+                <CardContent className="p-0">
                   <Link to={`/listing/${listing.id}`}>
-                    <div className="aspect-video bg-white rounded-md mb-3 overflow-hidden">
+                    <div className="aspect-video bg-muted overflow-hidden">
                       <img
                         src={listing.images[0] || "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=500&q=80"}
                         alt={listing.title}
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover transition-transform hover:scale-105"
                       />
                     </div>
-                    <h3 className="font-medium text-lg mb-1">{listing.title}</h3>
-                    <div className="mb-2">
-                      <StarRating rating={listing.rating} />
+                    <div className="p-3 sm:p-4">
+                      <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
+                      <div className="mb-2">
+                        <StarRating rating={listing.rating} />
+                      </div>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground mt-2">{listing.location}</p>
                   </Link>
                 </CardContent>
               </Card>
