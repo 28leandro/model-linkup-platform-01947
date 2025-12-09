@@ -15,24 +15,22 @@ export const listingSchema = z.object({
     .max(20, "Telefone muito longo")
     .optional()
     .or(z.literal("")),
-  rating: z.number()
-    .min(1, "A avaliação deve ser no mínimo 1")
-    .max(5, "A avaliação deve ser no máximo 5"),
   category: z.string()
+    .min(1, "Selecione uma categoria válida")
     .refine((val) => ["vehicles", "real-estate", "services"].includes(val), {
       message: "Selecione uma categoria válida"
     }),
   price: z.number()
-    .positive("O preço deve ser positivo")
+    .nonnegative("O preço deve ser positivo ou zero")
     .optional()
     .or(z.literal(0)),
   area: z.number()
-    .positive("A metragem deve ser positiva")
+    .nonnegative("A metragem deve ser positiva ou zero")
     .optional()
     .or(z.literal(0)),
-  latitude: z.number().min(-90).max(90),
-  longitude: z.number().min(-180).max(180),
-  location: z.string().min(1, "Selecione uma localização")
+  latitude: z.number().min(-90).max(90).optional().default(0),
+  longitude: z.number().min(-180).max(180).optional().default(0),
+  location: z.string().min(1, "Digite uma localização")
 });
 
 export type ListingFormData = z.infer<typeof listingSchema>;

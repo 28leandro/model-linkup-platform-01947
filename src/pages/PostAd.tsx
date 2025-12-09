@@ -122,15 +122,15 @@ const PostAd = () => {
     // Validate input data
     try {
       listingSchema.parse({
-        title,
-        description,
-        phone: phone || "",
+        title: title.trim(),
+        description: description.trim(),
+        phone: phone.trim() || "",
         category,
         price: price || 0,
         area: area || 0,
-        latitude: location.latitude,
-        longitude: location.longitude,
-        location: location.address
+        latitude: location.latitude || 0,
+        longitude: location.longitude || 0,
+        location: location.address.trim()
       });
     } catch (error: any) {
       // Provide more specific error messages
@@ -280,11 +280,15 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="category">{t('postAd.category')} *</Label>
-                <Select value={category} onValueChange={setCategory}>
+                <Select value={category} onValueChange={setCategory} required>
                   <SelectTrigger className="bg-card border-input h-11 sm:h-10">
                     <SelectValue placeholder={t('postAd.categoryPlaceholder')} />
                   </SelectTrigger>
-                  <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
+                  <SelectContent 
+                    className="bg-popover border border-border shadow-xl"
+                    position="popper"
+                    sideOffset={4}
+                  >
                     <SelectItem value="vehicles">{t('postAd.categoryVehicles')}</SelectItem>
                     <SelectItem value="real-estate">{t('postAd.categoryRealEstate')}</SelectItem>
                     <SelectItem value="services">{t('postAd.categoryServices')}</SelectItem>
