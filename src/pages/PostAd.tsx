@@ -284,7 +284,7 @@ const PostAd = () => {
                   <SelectTrigger className="bg-card border-input h-11 sm:h-10">
                     <SelectValue placeholder={t('postAd.categoryPlaceholder')} />
                   </SelectTrigger>
-                  <SelectContent className="bg-card z-50">
+                  <SelectContent className="bg-popover border border-border shadow-lg z-[100]">
                     <SelectItem value="vehicles">{t('postAd.categoryVehicles')}</SelectItem>
                     <SelectItem value="real-estate">{t('postAd.categoryRealEstate')}</SelectItem>
                     <SelectItem value="services">{t('postAd.categoryServices')}</SelectItem>
