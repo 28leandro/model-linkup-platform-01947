@@ -245,7 +245,7 @@ const PostAd = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white py-8 flex items-center justify-center">
+      <div className="min-h-screen bg-background py-8 flex items-center justify-center">
         <p className="text-muted-foreground">{t('postAd.loading')}</p>
       </div>
     );
