@@ -24,6 +24,7 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
   }, []); // Only run once on mount
 
   const handleGetCurrentLocation = () => {
+    // Check if geolocation API is available
     if (!navigator.geolocation) {
       toast({
         title: t('location.notSupported'),
@@ -33,9 +34,13 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       return;
     }
 
-    // Check if running on HTTPS or localhost (required for geolocation on most browsers)
-    const isSecureContext = window.isSecureContext || window.location.hostname === 'localhost';
-    if (!isSecureContext) {
+    // Check if running on HTTPS or localhost (required for geolocation)
+    const isSecure = window.isSecureContext || 
+                     window.location.protocol === 'https:' || 
+                     window.location.hostname === 'localhost' ||
+                     window.location.hostname === '127.0.0.1';
+    
+    if (!isSecure) {
       toast({
         title: t('location.notSupported'),
         description: t('location.notSupportedDesc'),
@@ -46,30 +51,50 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
 
     setIsGettingLocation(true);
     
-    // Use higher accuracy for mobile devices
-    const options = {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
+    // Configuration for different device types
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const options: PositionOptions = {
+      enableHighAccuracy: isMobile, // High accuracy on mobile for GPS
+      timeout: 15000, // Longer timeout for slower connections
+      maximumAge: 60000 // Cache location for 1 minute
     };
+
+    // Timeout fallback in case geolocation hangs
+    const timeoutId = setTimeout(() => {
+      setIsGettingLocation(false);
+      toast({
+        title: t('location.error'),
+        description: t('location.errorDesc'),
+        variant: "destructive",
+      });
+    }, 20000);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+        clearTimeout(timeoutId);
         const { latitude, longitude } = position.coords;
         
         try {
-          // Reverse geocoding usando Nominatim (OpenStreetMap)
+          // Reverse geocoding using Nominatim (OpenStreetMap)
+          const controller = new AbortController();
+          const fetchTimeout = setTimeout(() => controller.abort(), 8000);
+          
           const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`,
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt`,
             {
               headers: {
                 'User-Agent': 'LinkUpPlatform/1.0'
-              }
+              },
+              signal: controller.signal
             }
           );
-          const data = await response.json();
+          clearTimeout(fetchTimeout);
           
+          if (!response.ok) throw new Error('Geocoding failed');
+          
+          const data = await response.json();
           const formattedAddress = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+          
           setAddress(formattedAddress);
           onLocationSelect({
             address: formattedAddress,
@@ -82,7 +107,7 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
             description: t('location.obtainedDesc'),
           });
         } catch (error) {
-          // Even if reverse geocoding fails, use coordinates
+          // Fallback to coordinates if geocoding fails
           const fallbackAddress = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
           setAddress(fallbackAddress);
           onLocationSelect({
@@ -100,11 +125,22 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
         }
       },
       (error) => {
+        clearTimeout(timeoutId);
         setIsGettingLocation(false);
+        
+        // Provide specific error messages based on error code
+        let errorMessage = t('location.errorDesc');
+        if (error.code === error.PERMISSION_DENIED) {
+          errorMessage = 'Permissão de localização negada. Verifique as configurações do navegador.';
+        } else if (error.code === error.POSITION_UNAVAILABLE) {
+          errorMessage = 'Localização indisponível. Verifique sua conexão ou GPS.';
+        } else if (error.code === error.TIMEOUT) {
+          errorMessage = 'Tempo esgotado. Tente novamente.';
+        }
         
         toast({
           title: t('location.error'),
-          description: t('location.errorDesc'),
+          description: errorMessage,
           variant: "destructive",
         });
       },
