@@ -21,12 +21,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import ShareButtons from "@/components/ShareButtons";
+import Header from "@/components/Header";
+import { LoginDialog } from "@/components/LoginDialog";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [listing, setListing] = useState<Listing | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
@@ -99,8 +102,11 @@ const ListingDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
+    <>
+      <Header onLoginClick={() => setShowLoginDialog(true)} />
+      <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
+      <div className="min-h-screen bg-background">
+        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
         <Card>
           <CardContent className="p-3 sm:p-6">
             {/* Galeria de Fotos */}
@@ -277,6 +283,7 @@ const ListingDetail = () => {
         </Card>
       </div>
     </div>
+    </>
   );
 };
 
