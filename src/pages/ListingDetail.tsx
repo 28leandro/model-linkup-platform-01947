@@ -19,7 +19,8 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
+import ShareButtons from "@/components/ShareButtons";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -192,6 +193,7 @@ const ListingDetail = () => {
                   WhatsApp
                 </a>
               </Button>
+              <ShareButtons title={listing.title} />
               {isOwner && (
                 <div className="flex gap-2 w-full xs:w-auto">
                   <Button 

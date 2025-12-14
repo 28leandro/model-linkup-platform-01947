@@ -144,6 +144,13 @@ const translations = {
     'auth.requiredDesc': 'Você precisa estar logado para publicar anúncios.',
     'auth.logout': 'Sair',
     
+    // Share
+    'share.title': 'Compartilhar',
+    'share.copied': 'Link copiado!',
+    'share.copiedDesc': 'O link foi copiado para a área de transferência.',
+    'share.copyLink': 'Copiar link',
+    'share.error': 'Erro ao copiar',
+    
     // Favorites
     'favorites.title': 'Vos Coups de Cœur',
   },
@@ -281,6 +288,13 @@ const translations = {
     'auth.required': 'Autenticación necesaria',
     'auth.requiredDesc': 'Debe iniciar sesión para publicar anuncios.',
     'auth.logout': 'Cerrar sesión',
+    
+    // Share
+    'share.title': 'Compartir',
+    'share.copied': '¡Enlace copiado!',
+    'share.copiedDesc': 'El enlace fue copiado al portapapeles.',
+    'share.copyLink': 'Copiar enlace',
+    'share.error': 'Error al copiar',
     
     // Favorites
     'favorites.title': 'Sus Favoritos',
