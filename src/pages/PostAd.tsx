@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 import { ImagePlus, X } from "lucide-react";
 import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
@@ -133,9 +133,10 @@ const PostAd = () => {
         location: location.address.trim()
       });
     } catch (error: any) {
-      // Provide more specific error messages
-      const errorMessage = error.errors?.[0]?.message || t('postAd.fieldError');
-      const errorPath = error.errors?.[0]?.path?.[0];
+      // Provide more specific error messages (Zod v4 uses 'issues' instead of 'errors')
+      const issues = error.issues || error.errors || [];
+      const errorMessage = issues[0]?.message || t('postAd.fieldError');
+      const errorPath = issues[0]?.path?.[0];
       
       let userFriendlyMessage = errorMessage;
       
