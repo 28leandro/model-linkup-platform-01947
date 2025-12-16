@@ -32,9 +32,11 @@ const ListingDetail = () => {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [listing, setListing] = useState<Listing | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   
   useEffect(() => {
     const fetchListing = async () => {
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('listings_public')
         .select('*')
@@ -44,6 +46,7 @@ const ListingDetail = () => {
       if (!error && data) {
         setListing(data as Listing);
       }
+      setIsLoading(false);
     };
     
     fetchListing();
@@ -76,16 +79,32 @@ const ListingDetail = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <>
+        <Header onLoginClick={() => setShowLoginDialog(true)} />
+        <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      </>
+    );
+  }
+
   if (!listing) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <Card>
-          <CardContent className="p-6">
-            <h1 className="text-xl font-semibold mb-2">{t('detail.notFound')}</h1>
-            <p className="text-muted-foreground">{t('detail.notFoundDesc')}</p>
-          </CardContent>
-        </Card>
-      </div>
+      <>
+        <Header onLoginClick={() => setShowLoginDialog(true)} />
+        <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <Card>
+            <CardContent className="p-6">
+              <h1 className="text-xl font-semibold mb-2">{t('detail.notFound')}</h1>
+              <p className="text-muted-foreground">{t('detail.notFoundDesc')}</p>
+            </CardContent>
+          </Card>
+        </div>
+      </>
     );
   }
 
