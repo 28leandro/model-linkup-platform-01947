@@ -1,7 +1,7 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle, Trash2 } from "lucide-react";
+import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle, Trash2, ArrowLeft } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -127,6 +127,12 @@ const ListingDetail = () => {
       <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
+          <Button asChild variant="ghost" size="sm" className="mb-4">
+            <Link to="/" className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              Volver al inicio
+            </Link>
+          </Button>
         <Card>
           <CardContent className="p-3 sm:p-6">
             {/* Galeria de Fotos */}
