@@ -152,7 +152,13 @@ const translations = {
     'share.error': 'Erro ao copiar',
     
     // Favorites
-    'favorites.title': 'Vos Coups de Cœur',
+    'favorites.title': 'Seus Favoritos',
+    'favorites.empty': 'Você ainda não tem favoritos',
+    'favorites.emptyDesc': 'Explore os anúncios e adicione seus favoritos clicando no ícone de coração.',
+    'favorites.added': 'Adicionado aos favoritos!',
+    'favorites.removed': 'Removido dos favoritos',
+    'favorites.loginRequired': 'Faça login para salvar favoritos',
+    'favorites.browse': 'Explorar anúncios',
   },
   es: {
     // Header
@@ -298,6 +304,12 @@ const translations = {
     
     // Favorites
     'favorites.title': 'Sus Favoritos',
+    'favorites.empty': 'Aún no tiene favoritos',
+    'favorites.emptyDesc': 'Explore los anuncios y agregue sus favoritos haciendo clic en el ícono de corazón.',
+    'favorites.added': '¡Agregado a favoritos!',
+    'favorites.removed': 'Eliminado de favoritos',
+    'favorites.loginRequired': 'Inicie sesión para guardar favoritos',
+    'favorites.browse': 'Explorar anuncios',
   }
 };
 
