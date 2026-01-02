@@ -69,17 +69,36 @@ const Map = ({ listings, onMarkerClick, center = [-58.4438, -23.4425], zoom = 6 
           el.style.border = '2px solid white';
           el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
 
+          // Create popup content using DOM elements to prevent XSS
+          const popupContent = document.createElement('div');
+          popupContent.style.padding = '8px';
+
+          const title = document.createElement('h3');
+          title.textContent = listing.title; // Safe - no HTML parsing
+          title.style.fontWeight = 'bold';
+          title.style.marginBottom = '4px';
+          popupContent.appendChild(title);
+
+          const location = document.createElement('p');
+          location.textContent = listing.location || '';
+          location.style.fontSize = '14px';
+          location.style.color = '#666';
+          popupContent.appendChild(location);
+
+          if (listing.price) {
+            const price = document.createElement('p');
+            price.textContent = `₲ ${listing.price.toLocaleString('es-PY')}`;
+            price.style.fontWeight = 'bold';
+            price.style.color = '#10b981';
+            price.style.marginTop = '4px';
+            popupContent.appendChild(price);
+          }
+
           const marker = new mapboxgl.Marker(el)
             .setLngLat([listing.longitude, listing.latitude])
             .setPopup(
               new mapboxgl.Popup({ offset: 25 })
-                .setHTML(`
-                  <div style="padding: 8px;">
-                    <h3 style="font-weight: bold; margin-bottom: 4px;">${listing.title}</h3>
-                    <p style="font-size: 14px; color: #666;">${listing.location}</p>
-                    ${listing.price ? `<p style="font-weight: bold; color: #10b981; margin-top: 4px;">R$ ${listing.price.toLocaleString('pt-BR')}</p>` : ''}
-                  </div>
-                `)
+                .setDOMContent(popupContent)
             )
             .addTo(map.current);
 
