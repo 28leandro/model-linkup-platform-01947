@@ -3,6 +3,7 @@ import { StarRating } from "@/components/StarRating";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import FavoriteButton from "@/components/FavoriteButton";
 
 interface RecentListingsProps {
   listings: Listing[];
@@ -17,7 +18,10 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t('listings.recent')}</h2>
       <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
         {listings.map((listing) => (
-          <div key={listing.id} className="group hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden">
+          <div key={listing.id} className="group relative hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden">
+            <div className="absolute top-2 right-2 z-10">
+              <FavoriteButton listingId={listing.id} className="bg-background/80 backdrop-blur-sm" />
+            </div>
             <Link to={`/listing/${listing.id}`}>
               <AspectRatio ratio={16 / 9} className="overflow-hidden bg-muted">
                 {listing.images && listing.images.length > 0 ? (
