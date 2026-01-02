@@ -23,6 +23,7 @@ import { toast } from "@/hooks/use-toast";
 import ShareButtons from "@/components/ShareButtons";
 import Header from "@/components/Header";
 import { LoginDialog } from "@/components/LoginDialog";
+import ListingMap from "@/components/ListingMap";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -296,6 +297,16 @@ const ListingDetail = () => {
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* Mapa de ubicación */}
+              {listing.latitude && listing.longitude && (
+                <ListingMap
+                  latitude={listing.latitude}
+                  longitude={listing.longitude}
+                  title={listing.title}
+                  location={listing.location}
+                />
               )}
             </div>
           </CardContent>
