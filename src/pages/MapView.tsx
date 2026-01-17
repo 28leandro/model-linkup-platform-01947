@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useListingsStore } from "@/store/listingsStore";
 import { LoginDialog } from "@/components/LoginDialog";
 import Header from "@/components/Header";
 import Map from "@/components/Map";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { useLanguage } from "@/contexts/LanguageContext";
 
@@ -30,6 +32,12 @@ const MapView = () => {
       <Header onLoginClick={() => setLoginDialogOpen(true)} />
       
       <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 flex-1">
+        <Button asChild variant="ghost" size="sm" className="mb-4">
+          <Link to="/" className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            {t('common.backToHome')}
+          </Link>
+        </Button>
         <div className="mb-4 sm:mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">{t('map.title')}</h1>
           <p className="text-muted-foreground text-sm sm:text-base">

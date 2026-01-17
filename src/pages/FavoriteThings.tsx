@@ -86,7 +86,7 @@ const FavoriteThings = () => {
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/" className="flex items-center gap-2">
             <ArrowLeft className="w-4 h-4" />
-            Volver al inicio
+            {t('common.backToHome')}
           </Link>
         </Button>
         <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-8 text-center">

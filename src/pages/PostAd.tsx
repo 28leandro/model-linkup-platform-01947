@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { ImagePlus, X } from "lucide-react";
+import { ImagePlus, X, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
 import { useImageUpload } from "@/hooks/useImageUpload";
@@ -259,6 +260,12 @@ const PostAd = () => {
   return (
     <div className="min-h-screen bg-background py-4 sm:py-8 px-3 sm:px-4">
       <div className="container max-w-2xl mx-auto">
+        <Button asChild variant="ghost" size="sm" className="mb-4">
+          <Link to="/" className="flex items-center gap-2">
+            <ArrowLeft className="w-4 h-4" />
+            {t('common.backToHome')}
+          </Link>
+        </Button>
         <Card className="border-none shadow-lg bg-card">
           <CardHeader className="px-4 sm:px-6 pt-4 sm:pt-6">
             <CardTitle className="text-xl sm:text-2xl font-bold">
