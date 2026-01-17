@@ -21,15 +21,17 @@ const LanguageSelector = () => {
       <DropdownMenuContent align="end">
         <DropdownMenuItem
           onClick={() => setLanguage('pt')}
-          className={language === 'pt' ? 'bg-accent' : ''}
+          className={`${language === 'pt' ? 'bg-accent' : ''} flex items-center gap-2`}
         >
-          🇧🇷 Português
+          <span className="text-xl">🇧🇷</span>
+          <span>Português</span>
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() => setLanguage('es')}
-          className={language === 'es' ? 'bg-accent' : ''}
+          className={`${language === 'es' ? 'bg-accent' : ''} flex items-center gap-2`}
         >
-          🇵🇾 Español
+          <span className="text-xl">🇵🇾</span>
+          <span>Español</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
