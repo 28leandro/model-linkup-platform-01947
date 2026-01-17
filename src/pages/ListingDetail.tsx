@@ -130,7 +130,7 @@ const ListingDetail = () => {
           <Button asChild variant="ghost" size="sm" className="mb-4">
             <Link to="/" className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              Volver al inicio
+              {t('common.backToHome')}
             </Link>
           </Button>
         <Card>

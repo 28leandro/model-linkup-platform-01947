@@ -1,13 +1,16 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
 import type { Listing } from "@/store/listingsStore";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const CategoryPage = () => {
   const { id } = useParams();
+  const { t } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   
   const categoryMap: Record<string, { type: string, title: string }> = {
@@ -41,9 +44,12 @@ const CategoryPage = () => {
     <div className="min-h-screen bg-background">
       <header className="bg-background shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
-          <Link to="/" className="text-primary hover:underline text-sm sm:text-base">
-            ← Voltar
-          </Link>
+          <Button asChild variant="ghost" size="sm" className="mb-2">
+            <Link to="/" className="flex items-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              {t('common.backToHome')}
+            </Link>
+          </Button>
           <h1 className="text-xl sm:text-2xl font-bold mt-2">
             {category?.title || "Categoria"}
           </h1>

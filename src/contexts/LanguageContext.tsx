@@ -159,6 +159,9 @@ const translations = {
     'favorites.removed': 'Removido dos favoritos',
     'favorites.loginRequired': 'Faça login para salvar favoritos',
     'favorites.browse': 'Explorar anúncios',
+    
+    // Common
+    'common.backToHome': 'Voltar ao início',
   },
   es: {
     // Header
@@ -310,6 +313,9 @@ const translations = {
     'favorites.removed': 'Eliminado de favoritos',
     'favorites.loginRequired': 'Inicie sesión para guardar favoritos',
     'favorites.browse': 'Explorar anuncios',
+    
+    // Common
+    'common.backToHome': 'Volver al inicio',
   }
 };
 
