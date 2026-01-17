@@ -15,8 +15,7 @@ const LanguageSelector = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-2">
-          <Globe className="w-4 h-4" />
-          <span className="uppercase">{language}</span>
+          <span className="text-lg">{language === 'pt' ? '🇧🇷' : '🇵🇾'}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
