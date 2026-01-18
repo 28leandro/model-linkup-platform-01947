@@ -28,8 +28,9 @@ const translations = {
     'categories.services.desc': 'Prestação de serviços',
     
     // Search
-    'search.placeholder': 'Que recherchez-vous ?',
+    'search.placeholder': 'O que você está procurando?',
     'search.button': 'Pesquisar',
+    'search.sortedByProximity': 'ordenados por proximidade',
     'search.emptyTitle': 'Pesquisa vazia',
     'search.emptyDesc': 'Por favor, digite um termo de pesquisa',
     'search.noResults': 'Nenhum resultado',
@@ -162,6 +163,46 @@ const translations = {
     
     // Common
     'common.backToHome': 'Voltar ao início',
+    'common.noListingsInCategory': 'Nenhum anúncio encontrado nesta categoria.',
+    
+    // Login Dialog
+    'login.title': 'Entrar',
+    'login.signupTitle': 'Criar Conta',
+    'login.description': 'Acesse sua conta',
+    'login.signupDescription': 'Crie sua conta',
+    'login.name': 'Nome completo',
+    'login.namePlaceholder': 'João Silva',
+    'login.email': 'Email',
+    'login.emailPlaceholder': 'exemplo@email.com',
+    'login.password': 'Senha',
+    'login.confirmPassword': 'Confirmar senha',
+    'login.submit': 'Entrar',
+    'login.signupSubmit': 'Criar conta',
+    'login.switchToSignup': 'Não tem conta? Criar conta',
+    'login.switchToLogin': 'Já tem conta? Entrar',
+    'login.invalidEmail': 'Email inválido',
+    'login.passwordMin': 'A senha deve ter pelo menos 6 caracteres',
+    'login.nameTooShort': 'Nome muito curto',
+    'login.passwordMismatch': 'As senhas não coincidem',
+    
+    // ListingDetail
+    'detail.description': 'Descrição',
+    'detail.noDescription': 'Sem descrição disponível',
+    'detail.bedrooms': 'Quartos',
+    'detail.bathrooms': 'Banheiros',
+    'detail.rentPerMonth': 'Aluguel/mês',
+    
+    // Category Page
+    'category.vehicles': 'Veículos',
+    'category.realEstateSale': 'Imóveis à Venda',
+    'category.realEstateRent': 'Imóveis para Alugar',
+    'category.services': 'Serviços',
+    'category.default': 'Categoria',
+    
+    // Location errors
+    'location.permissionDenied': 'Permissão de localização negada. Verifique as configurações do navegador.',
+    'location.unavailable': 'Localização indisponível. Verifique sua conexão ou GPS.',
+    'location.timeout': 'Tempo esgotado. Tente novamente.',
   },
   es: {
     // Header
@@ -184,6 +225,7 @@ const translations = {
     // Search
     'search.placeholder': '¿Qué estás buscando?',
     'search.button': 'Buscar',
+    'search.sortedByProximity': 'ordenados por proximidad',
     'search.emptyTitle': 'Búsqueda vacía',
     'search.emptyDesc': 'Por favor, ingrese un término de búsqueda',
     'search.noResults': 'Sin resultados',
@@ -316,6 +358,46 @@ const translations = {
     
     // Common
     'common.backToHome': 'Volver al inicio',
+    'common.noListingsInCategory': 'No se encontraron anuncios en esta categoría.',
+    
+    // Login Dialog
+    'login.title': 'Ingresar',
+    'login.signupTitle': 'Crear Cuenta',
+    'login.description': 'Accede a tu cuenta',
+    'login.signupDescription': 'Crea tu cuenta',
+    'login.name': 'Nombre completo',
+    'login.namePlaceholder': 'Juan Pérez',
+    'login.email': 'Email',
+    'login.emailPlaceholder': 'ejemplo@email.com',
+    'login.password': 'Contraseña',
+    'login.confirmPassword': 'Confirmar contraseña',
+    'login.submit': 'Ingresar',
+    'login.signupSubmit': 'Crear cuenta',
+    'login.switchToSignup': '¿No tienes cuenta? Crear cuenta',
+    'login.switchToLogin': '¿Ya tienes cuenta? Ingresar',
+    'login.invalidEmail': 'Email inválido',
+    'login.passwordMin': 'La contraseña debe tener al menos 6 caracteres',
+    'login.nameTooShort': 'Nombre muy corto',
+    'login.passwordMismatch': 'Las contraseñas no coinciden',
+    
+    // ListingDetail
+    'detail.description': 'Descripción',
+    'detail.noDescription': 'Sin descripción disponible',
+    'detail.bedrooms': 'Dormitorios',
+    'detail.bathrooms': 'Baños',
+    'detail.rentPerMonth': 'Alquiler/mes',
+    
+    // Category Page
+    'category.vehicles': 'Vehículos',
+    'category.realEstateSale': 'Inmuebles en Venta',
+    'category.realEstateRent': 'Inmuebles en Alquiler',
+    'category.services': 'Servicios',
+    'category.default': 'Categoría',
+    
+    // Location errors
+    'location.permissionDenied': 'Permiso de ubicación denegado. Verifique la configuración del navegador.',
+    'location.unavailable': 'Ubicación no disponible. Verifique su conexión o GPS.',
+    'location.timeout': 'Tiempo agotado. Intente nuevamente.',
   }
 };
 

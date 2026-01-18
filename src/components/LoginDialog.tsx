@@ -13,21 +13,7 @@ import { useState } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { toast } from "@/components/ui/use-toast"
 import { z } from "zod"
-
-const loginSchema = z.object({
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres")
-});
-
-const signupSchema = z.object({
-  name: z.string().min(2, "Nome muito curto"),
-  email: z.string().email("Email inválido"),
-  password: z.string().min(6, "A senha deve ter pelo menos 6 caracteres"),
-  confirmPassword: z.string()
-}).refine(data => data.password === data.confirmPassword, {
-  message: "As senhas não coincidem",
-  path: ["confirmPassword"]
-});
+import { useLanguage } from "@/contexts/LanguageContext"
 
 interface LoginDialogProps {
   open: boolean
@@ -36,12 +22,28 @@ interface LoginDialogProps {
 
 export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const { signIn, signUp } = useAuth();
+  const { t } = useLanguage();
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [name, setName] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const loginSchema = z.object({
+    email: z.string().email(t('login.invalidEmail')),
+    password: z.string().min(6, t('login.passwordMin'))
+  });
+
+  const signupSchema = z.object({
+    name: z.string().min(2, t('login.nameTooShort')),
+    email: z.string().email(t('login.invalidEmail')),
+    password: z.string().min(6, t('login.passwordMin')),
+    confirmPassword: z.string()
+  }).refine(data => data.password === data.confirmPassword, {
+    message: t('login.passwordMismatch'),
+    path: ["confirmPassword"]
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,40 +91,40 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>{isLogin ? "Connexion" : "Inscription"}</DialogTitle>
+            <DialogTitle>{isLogin ? t('login.title') : t('login.signupTitle')}</DialogTitle>
             <DialogDescription>
-              {isLogin ? "Connectez-vous à votre compte Neo.fr" : "Créez votre compte Neo.fr"}
+              {isLogin ? t('login.description') : t('login.signupDescription')}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             {!isLogin && (
               <div className="grid gap-2">
-                <Label htmlFor="name">Nom complet</Label>
+                <Label htmlFor="name">{t('login.name')}</Label>
                 <Input
                   id="name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Jean Dupont"
+                  placeholder={t('login.namePlaceholder')}
                   className={errors.name ? "border-destructive" : ""}
                 />
                 {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
               </div>
             )}
             <div className="grid gap-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('login.email')}</Label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="exemple@email.com"
+                placeholder={t('login.emailPlaceholder')}
                 className={errors.email ? "border-destructive" : ""}
               />
               {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">{t('login.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -135,7 +137,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
             </div>
             {!isLogin && (
               <div className="grid gap-2">
-                <Label htmlFor="confirmPassword">Confirmer le mot de passe</Label>
+                <Label htmlFor="confirmPassword">{t('login.confirmPassword')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -149,7 +151,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           </div>
           <DialogFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full">
-              {isLogin ? "Se connecter" : "S'inscrire"}
+              {isLogin ? t('login.submit') : t('login.signupSubmit')}
             </Button>
             <Button
               type="button"
@@ -158,8 +160,8 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               onClick={() => setIsLogin(!isLogin)}
             >
               {isLogin
-                ? "Pas encore de compte ? S'inscrire"
-                : "Déjà un compte ? Se connecter"}
+                ? t('login.switchToSignup')
+                : t('login.switchToLogin')}
             </Button>
           </DialogFooter>
         </form>

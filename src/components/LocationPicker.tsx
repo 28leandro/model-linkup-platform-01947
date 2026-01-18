@@ -131,11 +131,11 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
         // Provide specific error messages based on error code
         let errorMessage = t('location.errorDesc');
         if (error.code === error.PERMISSION_DENIED) {
-          errorMessage = 'Permissão de localização negada. Verifique as configurações do navegador.';
+          errorMessage = t('location.permissionDenied');
         } else if (error.code === error.POSITION_UNAVAILABLE) {
-          errorMessage = 'Localização indisponível. Verifique sua conexão ou GPS.';
+          errorMessage = t('location.unavailable');
         } else if (error.code === error.TIMEOUT) {
-          errorMessage = 'Tempo esgotado. Tente novamente.';
+          errorMessage = t('location.timeout');
         }
         
         toast({
