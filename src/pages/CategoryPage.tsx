@@ -13,11 +13,11 @@ const CategoryPage = () => {
   const { t } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   
-  const categoryMap: Record<string, { type: string, title: string }> = {
-    "vehicles": { type: "vehicles", title: "Veículos" },
-    "real-estate-sale": { type: "real-estate", title: "Imóveis à Venda" },
-    "real-estate-rent": { type: "real-estate", title: "Imóveis para Alugar" },
-    "services": { type: "services", title: "Serviços" }
+  const categoryMap: Record<string, { type: string, titleKey: string }> = {
+    "vehicles": { type: "vehicles", titleKey: "category.vehicles" },
+    "real-estate-sale": { type: "real-estate", titleKey: "category.realEstateSale" },
+    "real-estate-rent": { type: "real-estate", titleKey: "category.realEstateRent" },
+    "services": { type: "services", titleKey: "category.services" }
   };
 
   const category = categoryMap[id || "vehicles"];
@@ -51,7 +51,7 @@ const CategoryPage = () => {
             </Link>
           </Button>
           <h1 className="text-xl sm:text-2xl font-bold mt-2">
-            {category?.title || "Categoria"}
+            {category ? t(category.titleKey) : t('category.default')}
           </h1>
         </div>
       </header>
@@ -59,7 +59,7 @@ const CategoryPage = () => {
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {categoryListings.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
-            <p className="text-muted-foreground text-sm sm:text-base">Nenhum anúncio encontrado nesta categoria.</p>
+            <p className="text-muted-foreground text-sm sm:text-base">{t('common.noListingsInCategory')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">

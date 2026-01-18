@@ -128,7 +128,7 @@ const Index = () => {
       });
     } else {
       const message = userLocation 
-        ? `${results.length} ${t('search.resultsDesc')} (ordenados por proximidade)`
+        ? `${results.length} ${t('search.resultsDesc')} (${t('search.sortedByProximity')})`
         : `${results.length} ${t('search.resultsDesc')}`;
       toast({
         title: `${results.length} ${t('search.results')}`,

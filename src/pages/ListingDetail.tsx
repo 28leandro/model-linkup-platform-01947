@@ -266,9 +266,9 @@ const ListingDetail = () => {
             </div>
 
             <div className="mt-4 sm:mt-6">
-              <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">Descripción</h2>
+              <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{t('detail.description')}</h2>
               <p className="text-muted-foreground text-sm sm:text-base">
-                {listing.description || 'Sin descripción disponible'}
+                {listing.description || t('detail.noDescription')}
               </p>
               
               {/* Informações adicionais para imóveis */}
@@ -276,13 +276,13 @@ const ListingDetail = () => {
                 <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-4">
                   {listing.bedrooms && (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
-                      <p className="text-xs sm:text-sm text-muted-foreground">Dormitorios</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{t('detail.bedrooms')}</p>
                       <p className="text-base sm:text-lg font-semibold">{listing.bedrooms}</p>
                     </div>
                   )}
                   {listing.bathrooms && (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
-                      <p className="text-xs sm:text-sm text-muted-foreground">Baños</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{t('detail.bathrooms')}</p>
                       <p className="text-base sm:text-lg font-semibold">{listing.bathrooms}</p>
                     </div>
                   )}
@@ -295,7 +295,7 @@ const ListingDetail = () => {
                   {listing.price && (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
                       <p className="text-xs sm:text-sm text-muted-foreground">
-                        {listing.realEstateType === 'rent' ? 'Alquiler/mes' : 'Precio'}
+                        {listing.realEstateType === 'rent' ? t('detail.rentPerMonth') : t('detail.price')}
                       </p>
                       <p className="text-base sm:text-lg font-semibold text-primary">
                         ₲ {listing.price.toLocaleString('es-PY')}
