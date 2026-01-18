@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle, Trash2, ArrowLeft } from "lucide-react";
-import { StarRating } from "@/components/StarRating";
+import { RatingSystem } from "@/components/RatingSystem";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -198,7 +198,10 @@ const ListingDetail = () => {
             
             <h1 className="text-xl sm:text-2xl font-bold mb-2">{listing.title}</h1>
             <div className="mb-3 sm:mb-4">
-              <StarRating rating={listing.rating} />
+              <RatingSystem 
+                listingId={listing.id} 
+                listingOwnerId={listing.user_id} 
+              />
             </div>
             
             <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">

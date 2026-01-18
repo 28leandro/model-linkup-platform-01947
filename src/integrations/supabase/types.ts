@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      listing_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          rating: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          rating: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          rating?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_ratings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_ratings_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           area: number | null
@@ -156,7 +195,10 @@ export type Database = {
       }
     }
     Functions: {
-      [_ in never]: never
+      get_listing_average_rating: {
+        Args: { listing_uuid: string }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
