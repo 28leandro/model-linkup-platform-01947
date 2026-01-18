@@ -203,6 +203,20 @@ const translations = {
     'location.permissionDenied': 'Permissão de localização negada. Verifique as configurações do navegador.',
     'location.unavailable': 'Localização indisponível. Verifique sua conexão ou GPS.',
     'location.timeout': 'Tempo esgotado. Tente novamente.',
+    
+    // Rating System
+    'rating.title': 'Avaliação',
+    'rating.vote': 'voto',
+    'rating.votes': 'votos',
+    'rating.rateThis': 'Avalie este anúncio:',
+    'rating.yourRating': 'Sua avaliação:',
+    'rating.loginRequired': 'Faça login para avaliar',
+    'rating.cannotRateOwn': 'Você não pode avaliar seu próprio anúncio',
+    'rating.submitted': 'Avaliação enviada!',
+    'rating.updated': 'Avaliação atualizada!',
+    'rating.error': 'Erro ao enviar avaliação',
+    'rating.ownerMessage': 'Você não pode avaliar seu próprio anúncio',
+    'rating.loginToRate': 'Faça login para avaliar este anúncio',
   },
   es: {
     // Header
@@ -398,6 +412,20 @@ const translations = {
     'location.permissionDenied': 'Permiso de ubicación denegado. Verifique la configuración del navegador.',
     'location.unavailable': 'Ubicación no disponible. Verifique su conexión o GPS.',
     'location.timeout': 'Tiempo agotado. Intente nuevamente.',
+    
+    // Rating System
+    'rating.title': 'Evaluación',
+    'rating.vote': 'voto',
+    'rating.votes': 'votos',
+    'rating.rateThis': 'Evalúe este anuncio:',
+    'rating.yourRating': 'Su evaluación:',
+    'rating.loginRequired': 'Inicie sesión para evaluar',
+    'rating.cannotRateOwn': 'No puede evaluar su propio anuncio',
+    'rating.submitted': '¡Evaluación enviada!',
+    'rating.updated': '¡Evaluación actualizada!',
+    'rating.error': 'Error al enviar evaluación',
+    'rating.ownerMessage': 'No puede evaluar su propio anuncio',
+    'rating.loginToRate': 'Inicie sesión para evaluar este anuncio',
   }
 };
 
