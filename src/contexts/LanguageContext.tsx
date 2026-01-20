@@ -217,6 +217,15 @@ const translations = {
     'rating.error': 'Erro ao enviar avaliação',
     'rating.ownerMessage': 'Você não pode avaliar seu próprio anúncio',
     'rating.loginToRate': 'Faça login para avaliar este anúncio',
+    
+    // Filter
+    'filter.sortBy': 'Ordenar por',
+    'filter.selectSort': 'Selecione uma opção',
+    'filter.recent': 'Mais recente',
+    'filter.oldest': 'Mais antigo',
+    'filter.priceAsc': 'Preço crescente',
+    'filter.priceDesc': 'Preço decrescente',
+    'filter.relevant': 'Pesquisa pertinente',
   },
   es: {
     // Header
@@ -426,6 +435,15 @@ const translations = {
     'rating.error': 'Error al enviar evaluación',
     'rating.ownerMessage': 'No puede evaluar su propio anuncio',
     'rating.loginToRate': 'Inicie sesión para evaluar este anuncio',
+    
+    // Filter
+    'filter.sortBy': 'Ordenar por',
+    'filter.selectSort': 'Seleccione una opción',
+    'filter.recent': 'Más reciente',
+    'filter.oldest': 'Más antiguo',
+    'filter.priceAsc': 'Precio ascendente',
+    'filter.priceDesc': 'Precio descendente',
+    'filter.relevant': 'Búsqueda relevante',
   }
 };
 
