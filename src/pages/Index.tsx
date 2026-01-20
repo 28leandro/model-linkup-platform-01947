@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { toast } from "@/components/ui/use-toast";
 import { useListingsStore } from "@/store/listingsStore";
 import { LoginDialog } from "@/components/LoginDialog";
@@ -7,6 +7,7 @@ import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
+import ListingFilter, { SortOption } from "@/components/ListingFilter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -18,6 +19,7 @@ const Index = () => {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const [sortOption, setSortOption] = useState<SortOption>('recent');
 
   useEffect(() => {
     // Get user's location
@@ -57,6 +59,8 @@ const Index = () => {
           images: item.images || [],
           latitude: item.latitude,
           longitude: item.longitude,
+          price: item.price,
+          created_at: item.created_at,
         }));
         setAllListings(formattedListings);
         setFilteredListings(formattedListings);
@@ -138,6 +142,28 @@ const Index = () => {
     }
   };
 
+  // Sort listings based on selected option
+  const sortedListings = useMemo(() => {
+    const listings = hasSearched ? filteredListings : allListings;
+    const sorted = [...listings];
+    
+    switch (sortOption) {
+      case 'recent':
+        return sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+      case 'oldest':
+        return sorted.sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
+      case 'price_asc':
+        return sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+      case 'price_desc':
+        return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+      case 'relevant':
+        // For relevant search, keep the original search order (by proximity if available)
+        return listings;
+      default:
+        return sorted;
+    }
+  }, [filteredListings, allListings, hasSearched, sortOption]);
+
   return (
     <div className="min-h-screen">
       <Header onLoginClick={() => setLoginDialogOpen(true)} />
@@ -148,11 +174,15 @@ const Index = () => {
         onSearch={handleSearch}
       />
 
+      <div className="container mx-auto px-3 sm:px-4 py-4">
+        <ListingFilter sortOption={sortOption} onSortChange={setSortOption} />
+      </div>
+
       {!hasSearched && <ServiceCategories />}
 
-      {hasSearched && <SearchResults listings={filteredListings} />}
+      {hasSearched && <SearchResults listings={sortedListings} />}
 
-      {!hasSearched && <RecentListings listings={filteredListings} />}
+      {!hasSearched && <RecentListings listings={sortedListings} />}
 
       <LoginDialog
         open={loginDialogOpen} 
