@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import type { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
+import ListingFilter, { SortOption } from "@/components/ListingFilter";
 
 const CategoryPage = () => {
   const { id } = useParams();
   const { t } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
+  const [sortOption, setSortOption] = useState<SortOption>('recent');
   
   const categoryMap: Record<string, { type: string, titleKey: string }> = {
     "vehicles": { type: "vehicles", titleKey: "category.vehicles" },
@@ -40,6 +42,26 @@ const CategoryPage = () => {
     listing.type === category.type
   );
 
+  // Sort listings based on selected option
+  const sortedListings = useMemo(() => {
+    const sorted = [...categoryListings];
+    
+    switch (sortOption) {
+      case 'recent':
+        return sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+      case 'oldest':
+        return sorted.sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
+      case 'price_asc':
+        return sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+      case 'price_desc':
+        return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+      case 'relevant':
+        return categoryListings;
+      default:
+        return sorted;
+    }
+  }, [categoryListings, sortOption]);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="bg-background shadow-sm sticky top-0 z-50">
@@ -57,13 +79,17 @@ const CategoryPage = () => {
       </header>
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        {categoryListings.length === 0 ? (
+        <div className="mb-4">
+          <ListingFilter sortOption={sortOption} onSortChange={setSortOption} />
+        </div>
+        
+        {sortedListings.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <p className="text-muted-foreground text-sm sm:text-base">{t('common.noListingsInCategory')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {categoryListings.map((listing) => (
+            {sortedListings.map((listing) => (
               <Card key={listing.id} className="hover:shadow-md transition-shadow overflow-hidden">
                 <CardContent className="p-0">
                   <Link to={`/listing/${listing.id}`}>
