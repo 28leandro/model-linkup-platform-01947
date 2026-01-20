@@ -12,13 +12,13 @@ const ListingFilter = ({ sortOption, onSortChange }: ListingFilterProps) => {
   const { t } = useLanguage();
 
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-sm text-muted-foreground">{t('filter.sortBy')}:</span>
+    <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full">
+      <span className="text-sm text-muted-foreground whitespace-nowrap">{t('filter.sortBy')}:</span>
       <Select value={sortOption} onValueChange={(value) => onSortChange(value as SortOption)}>
-        <SelectTrigger className="w-[200px]">
+        <SelectTrigger className="w-full sm:w-[200px]">
           <SelectValue placeholder={t('filter.selectSort')} />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent position="popper" className="z-50 bg-background border">
           <SelectItem value="recent">{t('filter.recent')}</SelectItem>
           <SelectItem value="oldest">{t('filter.oldest')}</SelectItem>
           <SelectItem value="price_asc">{t('filter.priceAsc')}</SelectItem>
