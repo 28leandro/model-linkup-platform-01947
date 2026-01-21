@@ -7,7 +7,7 @@ import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
-import ListingFilter, { SortOption } from "@/components/ListingFilter";
+import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -20,6 +20,10 @@ const Index = () => {
   const [hasSearched, setHasSearched] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
+  const [filters, setFilters] = useState<FilterOptions>({
+    sortOption: 'recent',
+    fuelType: 'all',
+  });
 
   useEffect(() => {
     // Get user's location
@@ -142,11 +146,33 @@ const Index = () => {
     }
   };
 
-  // Sort listings based on selected option
+  // Apply filters and sort listings
   const sortedListings = useMemo(() => {
-    const listings = hasSearched ? filteredListings : allListings;
-    const sorted = [...listings];
+    let listings = hasSearched ? filteredListings : allListings;
     
+    // Apply price filter
+    if (filters.minPrice !== undefined) {
+      listings = listings.filter(l => (l.price || 0) >= filters.minPrice!);
+    }
+    if (filters.maxPrice !== undefined) {
+      listings = listings.filter(l => (l.price || 0) <= filters.maxPrice!);
+    }
+    
+    // Apply year filter (if listing has year field)
+    if (filters.minYear !== undefined) {
+      listings = listings.filter(l => !l.year || l.year >= filters.minYear!);
+    }
+    if (filters.maxYear !== undefined) {
+      listings = listings.filter(l => !l.year || l.year <= filters.maxYear!);
+    }
+    
+    // Apply fuel type filter (if listing has fuelType field)
+    if (filters.fuelType && filters.fuelType !== 'all') {
+      listings = listings.filter(l => !l.fuelType || l.fuelType === filters.fuelType);
+    }
+    
+    // Sort listings
+    const sorted = [...listings];
     switch (sortOption) {
       case 'recent':
         return sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
@@ -157,12 +183,11 @@ const Index = () => {
       case 'price_desc':
         return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
       case 'relevant':
-        // For relevant search, keep the original search order (by proximity if available)
         return listings;
       default:
         return sorted;
     }
-  }, [filteredListings, allListings, hasSearched, sortOption]);
+  }, [filteredListings, allListings, hasSearched, sortOption, filters]);
 
   return (
     <div className="min-h-screen">
@@ -175,7 +200,12 @@ const Index = () => {
       />
 
       <div className="container mx-auto px-3 sm:px-4 py-4">
-        <ListingFilter sortOption={sortOption} onSortChange={setSortOption} />
+        <ListingFilter 
+          sortOption={sortOption} 
+          onSortChange={setSortOption}
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
       </div>
 
       {!hasSearched && <ServiceCategories />}

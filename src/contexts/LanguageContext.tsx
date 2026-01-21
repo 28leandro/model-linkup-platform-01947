@@ -219,6 +219,8 @@ const translations = {
     'rating.loginToRate': 'Faça login para avaliar este anúncio',
     
     // Filter
+    'filter.title': 'Filtros',
+    'filter.description': 'Configure os filtros para refinar sua busca',
     'filter.sortBy': 'Ordenar por',
     'filter.selectSort': 'Selecione uma opção',
     'filter.recent': 'Mais recente',
@@ -226,6 +228,20 @@ const translations = {
     'filter.priceAsc': 'Preço crescente',
     'filter.priceDesc': 'Preço decrescente',
     'filter.relevant': 'Pesquisa pertinente',
+    'filter.priceRange': 'Faixa de preço (Gs)',
+    'filter.minPrice': 'Preço mínimo',
+    'filter.maxPrice': 'Preço máximo',
+    'filter.yearRange': 'Faixa de ano',
+    'filter.minYear': 'Ano mínimo',
+    'filter.maxYear': 'Ano máximo',
+    'filter.fuelType': 'Tipo de combustível',
+    'filter.selectFuel': 'Selecione o combustível',
+    'filter.allFuels': 'Todos',
+    'filter.gasoline': 'Gasolina',
+    'filter.diesel': 'Diesel',
+    'filter.electric': 'Elétrico',
+    'filter.apply': 'Aplicar filtros',
+    'filter.clear': 'Limpar filtros',
   },
   es: {
     // Header
@@ -437,6 +453,8 @@ const translations = {
     'rating.loginToRate': 'Inicie sesión para evaluar este anuncio',
     
     // Filter
+    'filter.title': 'Filtros',
+    'filter.description': 'Configure los filtros para refinar su búsqueda',
     'filter.sortBy': 'Ordenar por',
     'filter.selectSort': 'Seleccione una opción',
     'filter.recent': 'Más reciente',
@@ -444,6 +462,20 @@ const translations = {
     'filter.priceAsc': 'Precio ascendente',
     'filter.priceDesc': 'Precio descendente',
     'filter.relevant': 'Búsqueda relevante',
+    'filter.priceRange': 'Rango de precio (Gs)',
+    'filter.minPrice': 'Precio mínimo',
+    'filter.maxPrice': 'Precio máximo',
+    'filter.yearRange': 'Rango de año',
+    'filter.minYear': 'Año mínimo',
+    'filter.maxYear': 'Año máximo',
+    'filter.fuelType': 'Tipo de combustible',
+    'filter.selectFuel': 'Seleccione el combustible',
+    'filter.allFuels': 'Todos',
+    'filter.gasoline': 'Gasolina',
+    'filter.diesel': 'Diésel',
+    'filter.electric': 'Eléctrico',
+    'filter.apply': 'Aplicar filtros',
+    'filter.clear': 'Limpiar filtros',
   }
 };
 
