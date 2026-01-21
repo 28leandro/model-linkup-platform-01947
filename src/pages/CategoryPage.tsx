@@ -7,13 +7,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, useMemo } from "react";
 import type { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
-import ListingFilter, { SortOption } from "@/components/ListingFilter";
+import ListingFilter, { SortOption, FilterOptions } from "@/components/ListingFilter";
 
 const CategoryPage = () => {
   const { id } = useParams();
   const { t } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
+  const [filters, setFilters] = useState<FilterOptions>({
+    sortOption: 'recent',
+    fuelType: 'all',
+  });
   
   const categoryMap: Record<string, { type: string, titleKey: string }> = {
     "vehicles": { type: "vehicles", titleKey: "category.vehicles" },
@@ -42,25 +46,47 @@ const CategoryPage = () => {
     listing.type === category.type
   );
 
-  // Sort listings based on selected option
+  // Apply filters and sort listings
   const sortedListings = useMemo(() => {
-    const sorted = [...categoryListings];
+    let filtered = [...categoryListings];
     
+    // Apply price filter
+    if (filters.minPrice !== undefined) {
+      filtered = filtered.filter(l => (l.price || 0) >= filters.minPrice!);
+    }
+    if (filters.maxPrice !== undefined) {
+      filtered = filtered.filter(l => (l.price || 0) <= filters.maxPrice!);
+    }
+    
+    // Apply year filter (if listing has year field)
+    if (filters.minYear !== undefined) {
+      filtered = filtered.filter(l => !(l as any).year || (l as any).year >= filters.minYear!);
+    }
+    if (filters.maxYear !== undefined) {
+      filtered = filtered.filter(l => !(l as any).year || (l as any).year <= filters.maxYear!);
+    }
+    
+    // Apply fuel type filter (if listing has fuelType field)
+    if (filters.fuelType && filters.fuelType !== 'all') {
+      filtered = filtered.filter(l => !(l as any).fuelType || (l as any).fuelType === filters.fuelType);
+    }
+    
+    // Sort listings
     switch (sortOption) {
       case 'recent':
-        return sorted.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
+        return filtered.sort((a, b) => new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime());
       case 'oldest':
-        return sorted.sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
+        return filtered.sort((a, b) => new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime());
       case 'price_asc':
-        return sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+        return filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
       case 'price_desc':
-        return sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+        return filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
       case 'relevant':
-        return categoryListings;
+        return filtered;
       default:
-        return sorted;
+        return filtered;
     }
-  }, [categoryListings, sortOption]);
+  }, [categoryListings, sortOption, filters]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -80,7 +106,12 @@ const CategoryPage = () => {
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
         <div className="mb-4">
-          <ListingFilter sortOption={sortOption} onSortChange={setSortOption} />
+          <ListingFilter 
+            sortOption={sortOption} 
+            onSortChange={setSortOption}
+            filters={filters}
+            onFiltersChange={setFilters}
+          />
         </div>
         
         {sortedListings.length === 0 ? (
