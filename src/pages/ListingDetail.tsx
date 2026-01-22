@@ -291,7 +291,7 @@ const ListingDetail = () => {
                   )}
                   {listing.area && (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
-                      <p className="text-xs sm:text-sm text-muted-foreground">Área</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">{t('detail.area')}</p>
                       <p className="text-base sm:text-lg font-semibold">{listing.area}m²</p>
                     </div>
                   )}
