@@ -43,6 +43,11 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
               </AspectRatio>
               <div className="p-3 sm:p-4">
                 <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
+                {listing.price && listing.price > 0 && (
+                  <p className="text-primary font-bold text-sm sm:text-base mb-1">
+                    Gs. {listing.price.toLocaleString('es-PY')}
+                  </p>
+                )}
                 <StarRating rating={listing.rating} />
                 <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
               </div>
