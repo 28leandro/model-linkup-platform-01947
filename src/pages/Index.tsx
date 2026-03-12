@@ -64,6 +64,8 @@ const Index = () => {
           latitude: item.latitude,
           longitude: item.longitude,
           price: item.price,
+          year: item.year,
+          fuelType: item.fuel_type,
           created_at: item.created_at,
         }));
         setAllListings(formattedListings);

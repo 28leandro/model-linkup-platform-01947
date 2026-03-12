@@ -338,6 +338,37 @@ const PostAd = () => {
                 </div>
               )}
 
+              {category === "vehicles" && (
+                <>
+                  <div className="space-y-2">
+                    <Label htmlFor="year">{t('postAd.year')}</Label>
+                    <Input
+                      id="year"
+                      type="number"
+                      value={year}
+                      onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")}
+                      placeholder={t('postAd.yearPlaceholder')}
+                      min="1900"
+                      max={new Date().getFullYear() + 1}
+                      className="h-11 sm:h-10"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="fuelType">{t('postAd.fuelType')}</Label>
+                    <Select value={fuelType} onValueChange={setFuelType}>
+                      <SelectTrigger className="bg-card border-input h-11 sm:h-10">
+                        <SelectValue placeholder={t('postAd.fuelTypePlaceholder')} />
+                      </SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        <SelectItem value="gasoline">{t('postAd.fuelGasoline')}</SelectItem>
+                        <SelectItem value="diesel">{t('postAd.fuelDiesel')}</SelectItem>
+                        <SelectItem value="electric">{t('postAd.fuelElectric')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </>
+              )}
+
               <LocationPicker
                 onLocationSelect={setLocation}
                 initialAddress={location.address}
