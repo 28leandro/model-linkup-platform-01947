@@ -112,6 +112,13 @@ const translations = {
     'postAd.fieldError': 'Erro de validação. Verifique os campos.',
     'postAd.permissionError': 'Você não tem permissão para esta ação.',
     'postAd.loading': 'Carregando...',
+    'postAd.year': 'Ano do Veículo',
+    'postAd.yearPlaceholder': 'Ex: 2020',
+    'postAd.fuelType': 'Tipo de Combustível',
+    'postAd.fuelTypePlaceholder': 'Selecione o combustível',
+    'postAd.fuelGasoline': 'Gasolina',
+    'postAd.fuelDiesel': 'Diesel',
+    'postAd.fuelElectric': 'Elétrico',
     
     // Location
     'location.notSupported': 'Geolocalização não suportada',
