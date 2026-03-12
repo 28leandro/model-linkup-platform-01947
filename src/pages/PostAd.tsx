@@ -33,6 +33,8 @@ const PostAd = () => {
   const [phone, setPhone] = useState("");
   const [price, setPrice] = useState<number | "">("");
   const [area, setArea] = useState<number | "">("");
+  const [year, setYear] = useState<number | "">("");
+  const [fuelType, setFuelType] = useState("");
   const [previews, setPreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [location, setLocation] = useState({ 
