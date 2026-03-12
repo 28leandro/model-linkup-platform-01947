@@ -59,6 +59,7 @@ export type Database = {
           category: string | null
           created_at: string
           description: string | null
+          fuel_type: string | null
           id: string
           images: string[] | null
           latitude: number | null
@@ -70,12 +71,14 @@ export type Database = {
           title: string
           type: string | null
           user_id: string
+          year: number | null
         }
         Insert: {
           area?: number | null
           category?: string | null
           created_at?: string
           description?: string | null
+          fuel_type?: string | null
           id?: string
           images?: string[] | null
           latitude?: number | null
@@ -87,12 +90,14 @@ export type Database = {
           title: string
           type?: string | null
           user_id: string
+          year?: number | null
         }
         Update: {
           area?: number | null
           category?: string | null
           created_at?: string
           description?: string | null
+          fuel_type?: string | null
           id?: string
           images?: string[] | null
           latitude?: number | null
@@ -104,6 +109,7 @@ export type Database = {
           title?: string
           type?: string | null
           user_id?: string
+          year?: number | null
         }
         Relationships: []
       }
@@ -147,49 +153,61 @@ export type Database = {
     Views: {
       listings_public: {
         Row: {
+          area: number | null
           category: string | null
           created_at: string | null
           description: string | null
+          fuel_type: string | null
           id: string | null
           images: string[] | null
           latitude: number | null
           location: string | null
           longitude: number | null
           phone: string | null
+          price: number | null
           rating: number | null
           title: string | null
           type: string | null
           user_id: string | null
+          year: number | null
         }
         Insert: {
+          area?: number | null
           category?: string | null
           created_at?: string | null
           description?: string | null
+          fuel_type?: string | null
           id?: string | null
           images?: string[] | null
           latitude?: number | null
           location?: string | null
           longitude?: number | null
-          phone?: never
+          phone?: string | null
+          price?: number | null
           rating?: number | null
           title?: string | null
           type?: string | null
           user_id?: string | null
+          year?: number | null
         }
         Update: {
+          area?: number | null
           category?: string | null
           created_at?: string | null
           description?: string | null
+          fuel_type?: string | null
           id?: string | null
           images?: string[] | null
           latitude?: number | null
           location?: string | null
           longitude?: number | null
-          phone?: never
+          phone?: string | null
+          price?: number | null
           rating?: number | null
           title?: string | null
           type?: string | null
           user_id?: string | null
+          year?: number | null
         }
         Relationships: []
       }
