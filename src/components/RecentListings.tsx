@@ -65,6 +65,14 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                 )}
               </AspectRatio>
               <div className="p-3 sm:p-4">
+                <div className="flex items-center gap-1.5 mb-1.5">
+                  {getCategoryIcon(listing.type) && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                      {getCategoryIcon(listing.type)}
+                      {getCategoryLabel(listing.type)}
+                    </span>
+                  )}
+                </div>
                 <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
                 {listing.price && listing.price > 0 && (
                   <p className="text-primary font-bold text-sm sm:text-base mb-1">
