@@ -193,6 +193,8 @@ const PostAd = () => {
       phone: phone.trim() || null,
       price: price || null,
       area: area || null,
+      year: category === "vehicles" && year ? year : null,
+      fuel_type: category === "vehicles" && fuelType ? fuelType : null,
       latitude: location.latitude,
       longitude: location.longitude,
       user_id: user.id,
