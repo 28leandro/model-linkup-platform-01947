@@ -66,6 +66,8 @@ const PostAd = () => {
       setPhone(editingListing.phone || "");
       setPrice((editingListing as any).price || "");
       setArea((editingListing as any).area || "");
+      setYear((editingListing as any).year || "");
+      setFuelType((editingListing as any).fuel_type || "");
       setPreviews(editingListing.images || []);
       setLocation({
         address: editingListing.location,
