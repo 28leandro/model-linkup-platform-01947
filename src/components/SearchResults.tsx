@@ -3,6 +3,29 @@ import { Link } from "react-router-dom";
 import { StarRating } from "@/components/StarRating";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { Car, Home, Wrench } from "lucide-react";
+
+const getCategoryIcon = (type?: string) => {
+  switch (type) {
+    case 'vehicles':
+      return <Car className="h-3.5 w-3.5" />;
+    case 'real-estate':
+      return <Home className="h-3.5 w-3.5" />;
+    case 'services':
+      return <Wrench className="h-3.5 w-3.5" />;
+    default:
+      return null;
+  }
+};
+
+const getCategoryLabel = (type?: string) => {
+  switch (type) {
+    case 'vehicles': return 'Veículos';
+    case 'real-estate': return 'Imóveis';
+    case 'services': return 'Serviços';
+    default: return '';
+  }
+};
 
 interface SearchResultsProps {
   listings: Listing[];
