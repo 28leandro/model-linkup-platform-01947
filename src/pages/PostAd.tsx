@@ -315,15 +315,26 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="price">{t('postAd.price')}</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
-                  placeholder={t('postAd.pricePlaceholder')}
-                  min="0"
-                  className="h-11 sm:h-10"
-                />
+                <div className="flex gap-2">
+                  <Select value={currency} onValueChange={setCurrency}>
+                    <SelectTrigger className="w-[100px] h-11 sm:h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="PYG">Gs.</SelectItem>
+                      <SelectItem value="USD">US$</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Input
+                    id="price"
+                    type="number"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
+                    placeholder={t('postAd.pricePlaceholder')}
+                    min="0"
+                    className="h-11 sm:h-10 flex-1"
+                  />
+                </div>
               </div>
 
               {category === "real-estate" && (
