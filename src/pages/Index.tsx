@@ -26,7 +26,25 @@ const Index = () => {
   });
 
   useEffect(() => {
-    // Get user's location
+    // Try IP-based geolocation (no permission needed, works everywhere)
+    const getLocationByIP = async () => {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeout);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.latitude && data.longitude) {
+            setUserLocation({ lat: data.latitude, lon: data.longitude });
+          }
+        }
+      } catch {
+        console.log('IP geolocation unavailable');
+      }
+    };
+
+    // Try browser geolocation first, fallback to IP
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -35,10 +53,14 @@ const Index = () => {
             lon: position.coords.longitude,
           });
         },
-        (error) => {
-          console.log('Location access denied or unavailable:', error);
-        }
+        () => {
+          // Browser geolocation denied/failed, try IP-based
+          getLocationByIP();
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
       );
+    } else {
+      getLocationByIP();
     }
 
     const fetchListings = async () => {
