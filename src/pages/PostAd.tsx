@@ -66,6 +66,7 @@ const PostAd = () => {
       setCategory(editingListing.type);
       setPhone(editingListing.phone || "");
       setPrice((editingListing as any).price || "");
+      setCurrency((editingListing as any).currency || "PYG");
       setArea((editingListing as any).area || "");
       setYear((editingListing as any).year || "");
       setFuelType((editingListing as any).fuel_type || "");
