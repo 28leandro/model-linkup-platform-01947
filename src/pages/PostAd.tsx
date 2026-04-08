@@ -194,6 +194,7 @@ const PostAd = () => {
       images: finalImages,
       phone: phone.trim() || null,
       price: price || null,
+      currency: currency,
       area: area || null,
       year: category === "vehicles" && year ? year : null,
       fuel_type: category === "vehicles" && fuelType ? fuelType : null,
