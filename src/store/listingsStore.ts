@@ -15,6 +15,7 @@ export interface Listing {
   images: string[];
   phone?: string;
   price?: number;
+  currency?: string;
   user_id?: string; // ID do usuário que criou o anúncio
   created_at?: string; // Data de criação do anúncio
   // Geolocalização

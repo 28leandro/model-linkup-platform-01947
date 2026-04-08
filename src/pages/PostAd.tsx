@@ -32,6 +32,7 @@ const PostAd = () => {
   const [category, setCategory] = useState("");
   const [phone, setPhone] = useState("");
   const [price, setPrice] = useState<number | "">("");
+  const [currency, setCurrency] = useState("PYG");
   const [area, setArea] = useState<number | "">("");
   const [year, setYear] = useState<number | "">("");
   const [fuelType, setFuelType] = useState("");
