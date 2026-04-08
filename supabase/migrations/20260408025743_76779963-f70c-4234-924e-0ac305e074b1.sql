@@ -1,0 +1,1 @@
+ALTER TABLE public.listings ADD COLUMN currency text NOT NULL DEFAULT 'PYG';

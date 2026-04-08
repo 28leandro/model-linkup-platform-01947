@@ -74,7 +74,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                 <h3 className="font-medium text-base sm:text-lg mb-2 line-clamp-2">{listing.title}</h3>
                 {listing.price && listing.price > 0 && (
                   <p className="text-primary font-bold text-sm sm:text-base mb-1">
-                    Gs. {listing.price.toLocaleString('es-PY')}
+                    {(listing as any).currency === 'USD' ? 'US$' : 'Gs.'} {listing.price.toLocaleString('es-PY')}
                   </p>
                 )}
                 <StarRating rating={listing.rating} />

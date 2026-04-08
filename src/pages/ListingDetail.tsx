@@ -301,7 +301,7 @@ const ListingDetail = () => {
                         {listing.realEstateType === 'rent' ? t('detail.rentPerMonth') : t('detail.price')}
                       </p>
                       <p className="text-base sm:text-lg font-semibold text-primary">
-                        ₲ {listing.price.toLocaleString('es-PY')}
+                        {(listing as any).currency === 'USD' ? 'US$' : '₲'} {listing.price.toLocaleString('es-PY')}
                       </p>
                     </div>
                   )}
