@@ -79,7 +79,7 @@ const Index = () => {
           description: item.description,
           type: item.type,
           category: item.category || item.type,
-          rating: item.rating || 5,
+          rating: item.rating || 0,
           location: item.location,
           phone: item.phone,
           images: item.images || [],
