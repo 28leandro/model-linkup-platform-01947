@@ -87,7 +87,8 @@ const Map = ({ listings, onMarkerClick, center = [-58.4438, -23.4425], zoom = 6 
 
           if (listing.price) {
             const price = document.createElement('p');
-            price.textContent = `₲ ${listing.price.toLocaleString('es-PY')}`;
+            const symbol = (listing as any).currency === 'USD' ? 'US$' : 'Gs.';
+            price.textContent = `${symbol} ${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(listing.price)}`;
             price.style.fontWeight = 'bold';
             price.style.color = '#10b981';
             price.style.marginTop = '4px';
