@@ -11,6 +11,7 @@ import { useFavorites } from "@/hooks/useFavorites";
 import { supabase } from "@/integrations/supabase/client";
 import { StarRating } from "@/components/StarRating";
 import FavoriteButton from "@/components/FavoriteButton";
+import { formatPrice } from "@/lib/formatPrice";
 
 interface FavoriteListing {
   id: string;
@@ -150,7 +151,7 @@ const FavoriteThings = () => {
                     <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
                     {listing.price && (
                       <p className="font-bold text-primary mt-2">
-                        ₲ {listing.price.toLocaleString('es-PY')}
+                        {formatPrice(listing.price, (listing as any).currency)}
                       </p>
                     )}
                   </div>
