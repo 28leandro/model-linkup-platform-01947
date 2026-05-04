@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { formatPrice } from "@/lib/formatPrice";
 
 const MapView = () => {
   const { t } = useLanguage();
@@ -82,7 +83,7 @@ const MapView = () => {
                   <p className="text-xs sm:text-sm text-muted-foreground mt-2">{selectedListingData.location}</p>
                   {selectedListingData.price && (
                     <p className="text-base sm:text-lg font-bold text-primary mt-2">
-                      ₲ {selectedListingData.price.toLocaleString('es-PY')}
+                      {formatPrice(selectedListingData.price, (selectedListingData as any).currency)}
                     </p>
                   )}
                   {selectedListingData.description && (
@@ -115,7 +116,7 @@ const MapView = () => {
                         <p className="text-xs text-muted-foreground truncate">{listing.location}</p>
                         {listing.price && (
                           <p className="text-xs sm:text-sm font-bold text-primary mt-1">
-                            ₲ {listing.price.toLocaleString('es-PY')}
+                            {formatPrice(listing.price, (listing as any).currency)}
                           </p>
                         )}
                       </div>
