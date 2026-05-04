@@ -24,6 +24,7 @@ import ShareButtons from "@/components/ShareButtons";
 import Header from "@/components/Header";
 import { LoginDialog } from "@/components/LoginDialog";
 import ListingMap from "@/components/ListingMap";
+import { formatPrice } from "@/lib/formatPrice";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -301,7 +302,7 @@ const ListingDetail = () => {
                         {listing.realEstateType === 'rent' ? t('detail.rentPerMonth') : t('detail.price')}
                       </p>
                       <p className="text-base sm:text-lg font-semibold text-primary">
-                        {(listing as any).currency === 'USD' ? 'US$' : '₲'} {listing.price.toLocaleString('es-PY')}
+                        {formatPrice(listing.price, (listing as any).currency)}
                       </p>
                     </div>
                   )}
