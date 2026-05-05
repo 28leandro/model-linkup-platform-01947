@@ -184,22 +184,28 @@ const PostAd = () => {
       ? [...(editingListing?.images || []).filter(img => previews.includes(img)), ...uploadedImageUrls]
       : uploadedImageUrls;
 
-    const listingData = {
-      title: title.trim(),
-      rating: null,
-      description: description.trim(),
-      category,
-      type: category as any,
-      location: location.address || "Asunción, Paraguay",
-      images: finalImages,
-      phone: phone.trim() || null,
-      price: price || null,
-      currency: currency,
-      area: area || null,
-      year: category === "vehicles" && year ? year : null,
-      fuel_type: category === "vehicles" && fuelType ? fuelType : null,
-      latitude: location.latitude,
-      longitude: location.longitude,
+    // When editing, preserve original values for any field the user left empty
+    // so the user does not lose data from the original post.
+    const orig: any = editingListing || {};
+    const pick = <T,>(newVal: T, oldVal: T): T =>
+      (newVal === "" || newVal === null || newVal === undefined) ? oldVal : newVal;
+
+    const listingData: any = {
+      title: pick(title.trim(), orig.title),
+      rating: isEditing ? (orig.rating ?? null) : null,
+      description: pick(description.trim(), orig.description),
+      category: pick(category, orig.category),
+      type: pick(category, orig.type) as any,
+      location: pick(location.address, orig.location) || "Asunción, Paraguay",
+      images: finalImages.length > 0 ? finalImages : (orig.images || []),
+      phone: pick(phone.trim(), orig.phone) || null,
+      price: pick(price, orig.price) ?? null,
+      currency: pick(currency, orig.currency),
+      area: pick(area, orig.area) ?? null,
+      year: category === "vehicles" ? pick(year, orig.year) ?? null : (isEditing ? orig.year ?? null : null),
+      fuel_type: category === "vehicles" ? pick(fuelType, orig.fuel_type) ?? null : (isEditing ? orig.fuel_type ?? null : null),
+      latitude: location.latitude ?? orig.latitude,
+      longitude: location.longitude ?? orig.longitude,
       user_id: user.id,
     };
 
