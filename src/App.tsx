@@ -5,6 +5,7 @@ import ListingDetail from "./pages/ListingDetail";
 import CategoryPage from "./pages/CategoryPage";
 import FavoriteThings from "./pages/FavoriteThings";
 import MapView from "./pages/MapView";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/category/:id" element={<CategoryPage />} />
         <Route path="/favorites" element={<FavoriteThings />} />
         <Route path="/map" element={<MapView />} />
+        <Route path="/payment/success" element={<PaymentSuccess />} />
       </Routes>
       <Toaster />
     </AuthProvider>
