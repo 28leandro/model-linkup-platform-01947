@@ -63,6 +63,7 @@ export type Database = {
           fuel_type: string | null
           id: string
           images: string[] | null
+          is_published: boolean
           latitude: number | null
           location: string | null
           longitude: number | null
@@ -83,6 +84,7 @@ export type Database = {
           fuel_type?: string | null
           id?: string
           images?: string[] | null
+          is_published?: boolean
           latitude?: number | null
           location?: string | null
           longitude?: number | null
@@ -103,6 +105,7 @@ export type Database = {
           fuel_type?: string | null
           id?: string
           images?: string[] | null
+          is_published?: boolean
           latitude?: number | null
           location?: string | null
           longitude?: number | null
@@ -115,6 +118,69 @@ export type Database = {
           year?: number | null
         }
         Relationships: []
+      }
+      payment_orders: {
+        Row: {
+          amount_pyg: number
+          created_at: string
+          external_order_number: string
+          id: string
+          listing_id: string | null
+          pagopar_hash: string | null
+          pagopar_token: string | null
+          paid_at: string | null
+          payment_method: string | null
+          photo_count: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_pyg: number
+          created_at?: string
+          external_order_number: string
+          id?: string
+          listing_id?: string | null
+          pagopar_hash?: string | null
+          pagopar_token?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          photo_count: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_pyg?: number
+          created_at?: string
+          external_order_number?: string
+          id?: string
+          listing_id?: string | null
+          pagopar_hash?: string | null
+          pagopar_token?: string | null
+          paid_at?: string | null
+          payment_method?: string | null
+          photo_count?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_favorites: {
         Row: {
