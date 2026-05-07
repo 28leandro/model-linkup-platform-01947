@@ -18,6 +18,9 @@ import { useAuth } from "@/contexts/AuthContext";
 import { listingSchema } from "@/lib/validations";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const MAX_PHOTOS = 12;
+const priceForPhotos = (n: number) => (n <= 3 ? 0 : n <= 8 ? 3500 : n <= 12 ? 4000 : -1);
+
 const PostAd = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -81,10 +84,10 @@ const PostAd = () => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + previews.length > 5) {
+    if (files.length + previews.length > MAX_PHOTOS) {
       toast({
         title: t('postAd.maxPhotos'),
-        description: t('postAd.maxPhotosDesc'),
+        description: `Máximo ${MAX_PHOTOS} fotos`,
         variant: "destructive",
       });
       return;
@@ -224,21 +227,40 @@ const PostAd = () => {
           title: t('postAd.updated'),
           description: t('postAd.updatedDesc'),
         });
+        navigate("/");
+        return;
       } else {
-        const { error } = await supabase
+        const totalPhotos = finalImages.length;
+        const requiresPayment = totalPhotos > 3;
+        const insertData = { ...listingData, is_published: !requiresPayment };
+
+        const { data: inserted, error } = await supabase
           .from('listings')
-          .insert([listingData]);
+          .insert([insertData])
+          .select()
+          .single();
         
         if (error) throw error;
 
         addListing(listingData);
-        toast({
-          title: t('postAd.published'),
-          description: t('postAd.publishedDesc'),
-        });
+
+        if (requiresPayment && inserted) {
+          toast({ title: "Pago necessário", description: `Gs. ${priceForPhotos(totalPhotos).toLocaleString('es-PY')} para liberar ${totalPhotos} fotos` });
+          const { data: orderData, error: fnErr } = await supabase.functions.invoke('pagopar-create-order', {
+            body: { listing_id: inserted.id, photo_count: totalPhotos },
+          });
+          if (fnErr || !orderData?.checkout_url) {
+            toast({ title: "Erro", description: fnErr?.message || "Falha ao gerar pago", variant: "destructive" });
+            return;
+          }
+          window.location.href = orderData.checkout_url;
+          return;
+        }
+
+        toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
+        navigate("/");
+        return;
       }
-      
-      navigate("/");
     } catch (error: any) {
       console.error('Database error:', error);
       
@@ -419,7 +441,14 @@ const PostAd = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="images">{t('postAd.photos')}</Label>
+                <Label htmlFor="images">
+                  {t('postAd.photos')} ({previews.length}/{MAX_PHOTOS})
+                </Label>
+                {previews.length > 3 && (
+                  <p className="text-sm text-muted-foreground">
+                    💳 Pago: Gs. {priceForPhotos(previews.length).toLocaleString('es-PY')} (3 grátis · 4-8: Gs. 3.500 · 9-12: Gs. 4.000)
+                  </p>
+                )}
                 <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 sm:gap-4">
                   {previews.map((preview, index) => (
                     <div key={index} className="relative aspect-square">
@@ -437,7 +466,7 @@ const PostAd = () => {
                       </button>
                     </div>
                   ))}
-                  {previews.length < 5 && (
+                  {previews.length < MAX_PHOTOS && (
                     <div className="aspect-square">
                       <Label
                         htmlFor="image-upload"
