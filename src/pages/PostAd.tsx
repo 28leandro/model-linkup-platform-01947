@@ -18,8 +18,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { listingSchema } from "@/lib/validations";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const MAX_PHOTOS = 12;
-const priceForPhotos = (n: number) => (n <= 3 ? 0 : n <= 8 ? 3500 : n <= 12 ? 4000 : -1);
+const FREE_PHOTOS = 3;
+const MAX_PHOTOS_UNLOCKED = 10;
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -47,6 +47,7 @@ const PostAd = () => {
     longitude: -57.5759 
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
+  const [photosUnlocked, setPhotosUnlocked] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -77,6 +78,7 @@ const PostAd = () => {
         .eq('id', id)
         .maybeSingle();
       if (!cancelled && !error && data) setOriginalListing(data);
+      if (!cancelled && data && (data as any).photos_unlocked) setPhotosUnlocked(true);
     })();
     return () => { cancelled = true; };
   }, [isEditing, id, user]);
@@ -93,6 +95,7 @@ const PostAd = () => {
       setYear((editingListing as any).year || "");
       setFuelType((editingListing as any).fuel_type || "");
       setPreviews(editingListing.images || []);
+      if ((editingListing as any).photos_unlocked) setPhotosUnlocked(true);
       setLocation({
         address: editingListing.location,
         latitude: editingListing.latitude || 0,
@@ -101,14 +104,29 @@ const PostAd = () => {
     }
   }, [editingListing?.id]);
 
+  const maxPhotos = photosUnlocked ? MAX_PHOTOS_UNLOCKED : FREE_PHOTOS;
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + previews.length > MAX_PHOTOS) {
+    const total = files.length + previews.length;
+    if (!photosUnlocked && total > FREE_PHOTOS) {
       toast({
-        title: t('postAd.maxPhotos'),
-        description: `Máximo ${MAX_PHOTOS} fotos`,
+        title: "Límite gratuito alcanzado",
+        description: "Solo puedes subir 3 fotos gratis. Desbloquea fotos ilimitadas para continuar.",
         variant: "destructive",
       });
+      const qs = id ? `?listing_id=${id}` : "";
+      navigate(`/photo-paywall${qs}`);
+      e.target.value = "";
+      return;
+    }
+    if (total > MAX_PHOTOS_UNLOCKED) {
+      toast({
+        title: t('postAd.maxPhotos'),
+        description: `Máximo ${MAX_PHOTOS_UNLOCKED} fotos`,
+        variant: "destructive",
+      });
+      e.target.value = "";
       return;
     }
 
@@ -294,8 +312,8 @@ const PostAd = () => {
         return;
       } else {
         const totalPhotos = finalImages.length;
-        const requiresPayment = totalPhotos > 3;
-        const insertData = { ...fullData, is_published: !requiresPayment };
+        const requiresPayment = totalPhotos > FREE_PHOTOS && !photosUnlocked;
+        const insertData = { ...fullData, is_published: !requiresPayment, photos_unlocked: photosUnlocked };
 
         const { data: inserted, error } = await supabase
           .from('listings')
@@ -308,15 +326,8 @@ const PostAd = () => {
         addListing(fullData);
 
         if (requiresPayment && inserted) {
-          toast({ title: "Pago necessário", description: `Gs. ${priceForPhotos(totalPhotos).toLocaleString('es-PY')} para liberar ${totalPhotos} fotos` });
-          const { data: orderData, error: fnErr } = await supabase.functions.invoke('pagopar-create-order', {
-            body: { listing_id: inserted.id, photo_count: totalPhotos },
-          });
-          if (fnErr || !orderData?.checkout_url) {
-            toast({ title: "Erro", description: fnErr?.message || "Falha ao gerar pago", variant: "destructive" });
-            return;
-          }
-          window.location.href = orderData.checkout_url;
+          toast({ title: "Pago necesario", description: "Desbloquea fotos ilimitadas para publicar este anuncio" });
+          navigate(`/photo-paywall?listing_id=${inserted.id}`);
           return;
         }
 
@@ -416,15 +427,20 @@ const PostAd = () => {
                       <SelectItem value="USD">US$</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
-                    placeholder={t('postAd.pricePlaceholder')}
-                    min="0"
-                    className="h-11 sm:h-10 flex-1"
-                  />
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                      {currency === "USD" ? "US$" : "Gs."}
+                    </span>
+                    <Input
+                      id="price"
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
+                      placeholder={currency === "USD" ? "Ej: 1500" : "Ej: 50000000"}
+                      min="0"
+                      className="h-11 sm:h-10 pl-12"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -505,12 +521,26 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="images">
-                  {t('postAd.photos')} ({previews.length}/{MAX_PHOTOS})
+                  {t('postAd.photos')} ({previews.length}/{maxPhotos})
+                  {!photosUnlocked && (
+                    <span className="ml-2 text-xs text-muted-foreground font-normal">
+                      · {Math.min(previews.length, FREE_PHOTOS)}/{FREE_PHOTOS} fotos gratuitas usadas
+                    </span>
+                  )}
                 </Label>
-                {previews.length > 3 && (
-                  <p className="text-sm text-muted-foreground">
-                    💳 Pago: Gs. {priceForPhotos(previews.length).toLocaleString('es-PY')} (3 grátis · 4-8: Gs. 3.500 · 9-12: Gs. 4.000)
-                  </p>
+                {!photosUnlocked && previews.length >= FREE_PHOTOS && (
+                  <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
+                    <p className="text-sm text-muted-foreground">
+                      💳 Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos.
+                    </p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => navigate(`/photo-paywall${id ? `?listing_id=${id}` : ""}`)}
+                    >
+                      Desbloquear
+                    </Button>
+                  </div>
                 )}
                 <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 sm:gap-4">
                   {previews.map((preview, index) => (
@@ -529,7 +559,7 @@ const PostAd = () => {
                       </button>
                     </div>
                   ))}
-                  {previews.length < MAX_PHOTOS && (
+                  {previews.length < maxPhotos && (
                     <div className="aspect-square">
                       <Label
                         htmlFor="image-upload"

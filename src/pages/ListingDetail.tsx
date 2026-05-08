@@ -24,12 +24,14 @@ import ShareButtons from "@/components/ShareButtons";
 import Header from "@/components/Header";
 import { LoginDialog } from "@/components/LoginDialog";
 import ListingMap from "@/components/ListingMap";
-import { formatPrice } from "@/lib/formatPrice";
+import { formatPrice, formatDisplayPrice } from "@/lib/formatPrice";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import EditableField from "@/components/EditableField";
 import { toast as sonnerToast } from "sonner";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
+  const { displayCurrency } = useCurrency();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -339,7 +341,7 @@ const ListingDetail = () => {
                           value={listing.price}
                           type="number"
                           canEdit={!!isOwner}
-                          display={<span>{formatPrice(listing.price, (listing as any).currency)}</span>}
+                          display={<span>{formatDisplayPrice(listing.price, (listing as any).currency, displayCurrency)}</span>}
                           onSave={(v) => updateField("price", Number(v))}
                           validate={(v) => {
                             const n = Number(v);

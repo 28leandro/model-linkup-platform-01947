@@ -1,0 +1,1 @@
+ALTER TABLE public.listings ADD COLUMN IF NOT EXISTS photos_unlocked boolean NOT NULL DEFAULT false;
