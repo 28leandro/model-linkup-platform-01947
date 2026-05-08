@@ -68,6 +68,7 @@ export type Database = {
           location: string | null
           longitude: number | null
           phone: string | null
+          photos_unlocked: boolean
           price: number | null
           rating: number | null
           title: string
@@ -89,6 +90,7 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           phone?: string | null
+          photos_unlocked?: boolean
           price?: number | null
           rating?: number | null
           title: string
@@ -110,6 +112,7 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           phone?: string | null
+          photos_unlocked?: boolean
           price?: number | null
           rating?: number | null
           title?: string
