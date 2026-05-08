@@ -3,6 +3,7 @@ import { Plus, LogIn, LogOut, Heart, MapPin, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
+import CurrencyToggle from "@/components/CurrencyToggle";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
@@ -76,12 +77,14 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-2 lg:gap-4">
+          <CurrencyToggle />
           <LanguageSelector />
           <NavItems />
         </div>
 
         {/* Mobile Navigation */}
         <div className="flex md:hidden items-center gap-2">
+          <CurrencyToggle />
           <LanguageSelector />
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
