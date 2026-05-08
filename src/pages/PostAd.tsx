@@ -46,6 +46,7 @@ const PostAd = () => {
     latitude: -25.2637, 
     longitude: -57.5759 
   });
+  const [originalListing, setOriginalListing] = useState<any>(null);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -60,13 +61,31 @@ const PostAd = () => {
   }, [user, loading, navigate, t]);
 
   const isEditing = !!id;
-  const editingListing = isEditing ? listings.find(l => l.id === id) : null;
+  const editingListing = isEditing
+    ? (originalListing || listings.find(l => l.id === id))
+    : null;
+
+  // Fetch the original listing from the backend so edits start with fresh,
+  // complete data (the local store may be stale or not yet hydrated).
+  useEffect(() => {
+    if (!isEditing || !id || !user) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase
+        .from('listings')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+      if (!cancelled && !error && data) setOriginalListing(data);
+    })();
+    return () => { cancelled = true; };
+  }, [isEditing, id, user]);
 
   useEffect(() => {
     if (editingListing) {
       setTitle(editingListing.title);
       setDescription(editingListing.description || "");
-      setCategory(editingListing.type);
+      setCategory((editingListing as any).category || editingListing.type || "");
       setPhone(editingListing.phone || "");
       setPrice((editingListing as any).price || "");
       setCurrency((editingListing as any).currency || "PYG");
@@ -80,7 +99,7 @@ const PostAd = () => {
         longitude: editingListing.longitude || 0
       });
     }
-  }, [editingListing]);
+  }, [editingListing?.id]);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -129,19 +148,39 @@ const PostAd = () => {
       return;
     }
 
-    // Validate input data
+    // Build full candidate values
+    const candidate = {
+      title: title.trim(),
+      description: description.trim(),
+      phone: phone.trim() || "",
+      category,
+      price: price || 0,
+      area: area || 0,
+      latitude: location.latitude || 0,
+      longitude: location.longitude || 0,
+      location: location.address.trim(),
+    };
+
+    // When editing, only validate fields that actually changed
+    let toValidate: any = candidate;
+    if (isEditing && editingListing) {
+      const o: any = editingListing;
+      const changed: any = {};
+      if (candidate.title !== (o.title || "")) changed.title = candidate.title;
+      if (candidate.description !== (o.description || "")) changed.description = candidate.description;
+      if (candidate.phone !== (o.phone || "")) changed.phone = candidate.phone;
+      if (candidate.category !== (o.category || o.type || "")) changed.category = candidate.category;
+      if (Number(candidate.price) !== Number(o.price || 0)) changed.price = candidate.price;
+      if (Number(candidate.area) !== Number(o.area || 0)) changed.area = candidate.area;
+      if (candidate.location !== (o.location || "")) changed.location = candidate.location;
+      if (candidate.latitude !== (o.latitude || 0)) changed.latitude = candidate.latitude;
+      if (candidate.longitude !== (o.longitude || 0)) changed.longitude = candidate.longitude;
+      toValidate = changed;
+    }
+
     try {
-      listingSchema.parse({
-        title: title.trim(),
-        description: description.trim(),
-        phone: phone.trim() || "",
-        category,
-        price: price || 0,
-        area: area || 0,
-        latitude: location.latitude || 0,
-        longitude: location.longitude || 0,
-        location: location.address.trim()
-      });
+      const partial = listingSchema.partial();
+      partial.parse(toValidate);
     } catch (error: any) {
       // Provide more specific error messages (Zod v4 uses 'issues' instead of 'errors')
       const issues = error.issues || error.errors || [];
@@ -187,52 +226,76 @@ const PostAd = () => {
       ? [...(editingListing?.images || []).filter(img => previews.includes(img)), ...uploadedImageUrls]
       : uploadedImageUrls;
 
-    // When editing, preserve original values for any field the user left empty
-    // so the user does not lose data from the original post.
+    // Build full base payload (for new listings) or compute a diff (for edits)
     const orig: any = editingListing || {};
-    const pick = <T,>(newVal: T, oldVal: T): T =>
-      (newVal === "" || newVal === null || newVal === undefined) ? oldVal : newVal;
-
-    const listingData: any = {
-      title: pick(title.trim(), orig.title),
+    const fullData: any = {
+      title: title.trim() || orig.title,
       rating: isEditing ? (orig.rating ?? null) : null,
-      description: pick(description.trim(), orig.description),
-      category: pick(category, orig.category),
-      type: pick(category, orig.type) as any,
-      location: pick(location.address, orig.location) || "Asunción, Paraguay",
+      description: description.trim() || orig.description,
+      category: category || orig.category,
+      type: (category || orig.type) as any,
+      location: location.address.trim() || orig.location || "Asunción, Paraguay",
       images: finalImages.length > 0 ? finalImages : (orig.images || []),
-      phone: pick(phone.trim(), orig.phone) || null,
-      price: pick(price, orig.price) ?? null,
-      currency: pick(currency, orig.currency),
-      area: pick(area, orig.area) ?? null,
-      year: category === "vehicles" ? pick(year, orig.year) ?? null : (isEditing ? orig.year ?? null : null),
-      fuel_type: category === "vehicles" ? pick(fuelType, orig.fuel_type) ?? null : (isEditing ? orig.fuel_type ?? null : null),
+      phone: (phone.trim() || orig.phone) || null,
+      price: (price === "" ? orig.price : price) ?? null,
+      currency: currency || orig.currency,
+      area: (area === "" ? orig.area : area) ?? null,
+      year: category === "vehicles" ? ((year === "" ? orig.year : year) ?? null) : (isEditing ? orig.year ?? null : null),
+      fuel_type: category === "vehicles" ? (fuelType || orig.fuel_type || null) : (isEditing ? orig.fuel_type ?? null : null),
       latitude: location.latitude ?? orig.latitude,
       longitude: location.longitude ?? orig.longitude,
       user_id: user.id,
     };
 
+    // Compute partial payload with only modified fields for updates
+    const buildDiff = () => {
+      const diff: any = {};
+      const keys = [
+        "title","description","category","type","location","phone","price",
+        "currency","area","year","fuel_type","latitude","longitude",
+      ];
+      for (const k of keys) {
+        const a = fullData[k];
+        const b = orig[k];
+        const eq = (a === b) || (a == null && b == null) ||
+          (typeof a === "number" && Number(a) === Number(b));
+        if (!eq) diff[k] = a;
+      }
+      // Images: only include if changed (added/removed)
+      const origImgs = orig.images || [];
+      const newImgs = fullData.images || [];
+      const imgsChanged = origImgs.length !== newImgs.length ||
+        origImgs.some((u: string, i: number) => u !== newImgs[i]);
+      if (imgsChanged) diff.images = newImgs;
+      return diff;
+    };
+
     // Save to backend database
     try {
       if (isEditing && editingListing) {
+        const diff = buildDiff();
+        if (Object.keys(diff).length === 0) {
+          toast({ title: t('postAd.updated'), description: "Sin cambios para guardar" });
+          navigate(-1);
+          return;
+        }
         const { error } = await supabase
           .from('listings')
-          .update(listingData)
+          .update(diff)
           .eq('id', String(editingListing.id));
-        
         if (error) throw error;
 
-        updateListing(editingListing.id, listingData);
+        updateListing(editingListing.id, diff);
         toast({
           title: t('postAd.updated'),
           description: t('postAd.updatedDesc'),
         });
-        navigate("/");
+        navigate(-1);
         return;
       } else {
         const totalPhotos = finalImages.length;
         const requiresPayment = totalPhotos > 3;
-        const insertData = { ...listingData, is_published: !requiresPayment };
+        const insertData = { ...fullData, is_published: !requiresPayment };
 
         const { data: inserted, error } = await supabase
           .from('listings')
@@ -242,7 +305,7 @@ const PostAd = () => {
         
         if (error) throw error;
 
-        addListing(listingData);
+        addListing(fullData);
 
         if (requiresPayment && inserted) {
           toast({ title: "Pago necessário", description: `Gs. ${priceForPhotos(totalPhotos).toLocaleString('es-PY')} para liberar ${totalPhotos} fotos` });
