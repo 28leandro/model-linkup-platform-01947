@@ -458,6 +458,19 @@ const PostAd = () => {
                 </Select>
               </div>
 
+              {category === "vehicles" && (
+                <div className="space-y-2">
+                  <Label>Tipo de vehículo</Label>
+                  <Select value={attributes.vehicleType || ""} onValueChange={(v) => setAttr("vehicleType", v)}>
+                    <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Carro / Moto" /></SelectTrigger>
+                    <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                      <SelectItem value="car">Carro</SelectItem>
+                      <SelectItem value="moto">Moto</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="price">{t('postAd.price')}</Label>
                 <div className="flex gap-2">
@@ -527,16 +540,6 @@ const PostAd = () => {
 
               {category === "vehicles" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-2 sm:col-span-2">
-                    <Label>Tipo de vehículo</Label>
-                    <Select value={attributes.vehicleType || ""} onValueChange={(v) => setAttr("vehicleType", v)}>
-                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Carro / Moto" /></SelectTrigger>
-                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                        <SelectItem value="car">Carro</SelectItem>
-                        <SelectItem value="moto">Moto</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
                   {attributes.vehicleType === "moto" ? (
                     <>
                       <div className="space-y-2">
@@ -698,6 +701,9 @@ const PostAd = () => {
                 <Label htmlFor="images">
                   {t('postAd.photos')}
                 </Label>
+                <p className="text-xs text-muted-foreground">
+                  {Math.min(previews.length, FREE_PHOTOS)}/{FREE_PHOTOS} fotos gratuito · {previews.length}/{MAX_PHOTOS_UNLOCKED} pago
+                </p>
                 {!photosUnlocked && previews.length >= FREE_PHOTOS && (
                   <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
                     <p className="text-sm text-muted-foreground">
