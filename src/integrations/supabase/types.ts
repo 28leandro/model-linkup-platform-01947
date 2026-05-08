@@ -229,6 +229,7 @@ export type Database = {
       listings_public: {
         Row: {
           area: number | null
+          attributes: Json | null
           category: string | null
           created_at: string | null
           currency: string | null
@@ -250,6 +251,7 @@ export type Database = {
         }
         Insert: {
           area?: number | null
+          attributes?: Json | null
           category?: string | null
           created_at?: string | null
           currency?: string | null
@@ -271,6 +273,7 @@ export type Database = {
         }
         Update: {
           area?: number | null
+          attributes?: Json | null
           category?: string | null
           created_at?: string | null
           currency?: string | null
