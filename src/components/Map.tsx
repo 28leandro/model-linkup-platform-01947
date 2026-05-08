@@ -4,8 +4,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Listing } from '@/store/listingsStore';
 
-// Default Asunción, Paraguay
-const DEFAULT_CENTER: [number, number] = [-25.2637, -57.5759];
+// Default Paraguay
+const DEFAULT_CENTER: [number, number] = [-23.4425, -58.4438];
 
 interface MapProps {
   listings: Listing[];
