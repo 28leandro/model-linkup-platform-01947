@@ -219,10 +219,28 @@ const ListingDetail = () => {
               />
             </h1>
             <div className="mb-3 sm:mb-4">
-              <RatingSystem 
-                listingId={listing.id} 
-                listingOwnerId={listing.user_id} 
-              />
+              <div className="bg-muted/40 border border-border rounded-lg p-3 sm:p-4 text-foreground text-sm sm:text-base leading-relaxed">
+                {isOwner ? (
+                  <EditableField
+                    value={listing.description ?? ""}
+                    type="textarea"
+                    canEdit={true}
+                    display={
+                      <span className="whitespace-pre-wrap">
+                        {listing.description || t('detail.noDescription')}
+                      </span>
+                    }
+                    onSave={(v) => updateField("description", v as string)}
+                    validate={(v) =>
+                      v.trim().length < 20 ? "A descrição deve ter pelo menos 20 caracteres" : null
+                    }
+                  />
+                ) : (
+                  <p className="whitespace-pre-wrap">
+                    {listing.description || t('detail.noDescription')}
+                  </p>
+                )}
+              </div>
             </div>
             
             <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
@@ -290,29 +308,10 @@ const ListingDetail = () => {
             </div>
 
             <div className="mt-4 sm:mt-6">
-              <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{t('detail.description')}</h2>
-              <div className="bg-muted/40 border border-border rounded-lg p-3 sm:p-4 text-foreground text-sm sm:text-base leading-relaxed">
-                {isOwner ? (
-                  <EditableField
-                    value={listing.description ?? ""}
-                    type="textarea"
-                    canEdit={true}
-                    display={
-                      <span className="whitespace-pre-wrap">
-                        {listing.description || t('detail.noDescription')}
-                      </span>
-                    }
-                    onSave={(v) => updateField("description", v as string)}
-                    validate={(v) =>
-                      v.trim().length < 20 ? "A descrição deve ter pelo menos 20 caracteres" : null
-                    }
-                  />
-                ) : (
-                  <p className="whitespace-pre-wrap">
-                    {listing.description || t('detail.noDescription')}
-                  </p>
-                )}
-              </div>
+              <RatingSystem
+                listingId={listing.id}
+                listingOwnerId={listing.user_id}
+              />
               
               {/* Informações adicionais para imóveis */}
               {listing.type === 'real-estate' && (
