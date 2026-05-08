@@ -513,28 +513,34 @@ const PostAd = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bedrooms">Habitaciones</Label>
-                    <Input id="bedrooms" type="number" min="0" value={attributes.bedrooms ?? ""} onChange={(e) => setAttr("bedrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bathrooms">Baños</Label>
-                    <Input id="bathrooms" type="number" min="0" value={attributes.bathrooms ?? ""} onChange={(e) => setAttr("bathrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
-                  </div>
+                  {attributes.propertyType !== "land" && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="bedrooms">Habitaciones</Label>
+                        <Input id="bedrooms" type="number" min="0" value={attributes.bedrooms ?? ""} onChange={(e) => setAttr("bedrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="bathrooms">Baños</Label>
+                        <Input id="bathrooms" type="number" min="0" value={attributes.bathrooms ?? ""} onChange={(e) => setAttr("bathrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
+                      </div>
+                    </>
+                  )}
                   <div className="space-y-2">
                     <Label htmlFor="area">Área total (m²)</Label>
                     <Input id="area" type="number" min="0" value={area} onChange={(e) => setArea(e.target.value ? Number(e.target.value) : "")} placeholder="m²" className="h-11 sm:h-10" />
                   </div>
-                  <div className="space-y-2">
-                    <Label>Estacionamiento</Label>
-                    <Select value={attributes.parking === undefined ? "" : (attributes.parking ? "yes" : "no")} onValueChange={(v) => setAttr("parking", v === "yes")}>
-                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
-                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                        <SelectItem value="yes">Sí</SelectItem>
-                        <SelectItem value="no">No</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                  {attributes.propertyType !== "land" && (
+                    <div className="space-y-2">
+                      <Label>Estacionamiento</Label>
+                      <Select value={attributes.parking === undefined ? "" : (attributes.parking ? "yes" : "no")} onValueChange={(v) => setAttr("parking", v === "yes")}>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                        <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                          <SelectItem value="yes">Sí</SelectItem>
+                          <SelectItem value="no">No</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                 </div>
               )}
 
