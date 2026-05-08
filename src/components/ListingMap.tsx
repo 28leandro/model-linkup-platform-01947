@@ -4,8 +4,8 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin } from 'lucide-react';
 
-// Default Asunción, Paraguay
-const DEFAULT_CENTER: [number, number] = [-25.2637, -57.5759];
+// Default Paraguay
+const DEFAULT_CENTER: [number, number] = [-23.4425, -58.4438];
 
 const icon = L.divIcon({
   className: 'custom-leaflet-marker',
@@ -43,7 +43,7 @@ const ListingMap = ({ latitude, longitude, title, location }: ListingMapProps) =
       </div>
       {!hasCoords && (
         <p className="text-xs text-muted-foreground mb-2">
-          Ubicación aproximada (Asunción, Paraguay)
+          Ubicación aproximada (Paraguay)
         </p>
       )}
       <div className="relative w-full h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-lg border">
