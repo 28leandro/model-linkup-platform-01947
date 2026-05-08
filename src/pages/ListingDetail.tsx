@@ -291,21 +291,27 @@ const ListingDetail = () => {
 
             <div className="mt-4 sm:mt-6">
               <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{t('detail.description')}</h2>
-              <div className="text-muted-foreground text-sm sm:text-base">
-                <EditableField
-                  value={listing.description ?? ""}
-                  type="textarea"
-                  canEdit={!!isOwner}
-                  display={
-                    <span className="whitespace-pre-wrap">
-                      {listing.description || t('detail.noDescription')}
-                    </span>
-                  }
-                  onSave={(v) => updateField("description", v as string)}
-                  validate={(v) =>
-                    v.trim().length < 20 ? "A descrição deve ter pelo menos 20 caracteres" : null
-                  }
-                />
+              <div className="bg-muted/40 border border-border rounded-lg p-3 sm:p-4 text-foreground text-sm sm:text-base leading-relaxed">
+                {isOwner ? (
+                  <EditableField
+                    value={listing.description ?? ""}
+                    type="textarea"
+                    canEdit={true}
+                    display={
+                      <span className="whitespace-pre-wrap">
+                        {listing.description || t('detail.noDescription')}
+                      </span>
+                    }
+                    onSave={(v) => updateField("description", v as string)}
+                    validate={(v) =>
+                      v.trim().length < 20 ? "A descrição deve ter pelo menos 20 caracteres" : null
+                    }
+                  />
+                ) : (
+                  <p className="whitespace-pre-wrap">
+                    {listing.description || t('detail.noDescription')}
+                  </p>
+                )}
               </div>
               
               {/* Informações adicionais para imóveis */}

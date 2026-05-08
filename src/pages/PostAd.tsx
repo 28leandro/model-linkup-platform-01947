@@ -615,7 +615,7 @@ const PostAd = () => {
                     <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
                       <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
                       <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                        {["Toyota","Volkswagen","Chevrolet","Ford","Nissan","Honda","Hyundai","Kia","Fiat","Renault","Peugeot","Mercedes-Benz","BMW","Audi","Otra"].map(b => (
+                        {["Toyota","Nissan","Chevrolet","Volkswagen","Hyundai","Kia","Mitsubishi","Suzuki","Honda","Mercedes-Benz","BMW","Ford","Mazda","Subaru","Lexus","Isuzu","Chery","JAC","Geely","Dongfeng","Great Wall","Renault","Peugeot","Fiat","Audi","Otra"].map(b => (
                           <SelectItem key={b} value={b}>{b}</SelectItem>
                         ))}
                       </SelectContent>
