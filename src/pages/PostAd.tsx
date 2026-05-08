@@ -250,9 +250,43 @@ const PostAd = () => {
 
     // Build full base payload (for new listings) or compute a diff (for edits)
     const orig: any = editingListing || {};
+    // Compute completeness rating (1-5) based on filled fields for the category
+    const computeRating = () => {
+      const base = [
+        !!title.trim(),
+        !!description.trim() && description.trim().length >= 20,
+        !!category,
+        !!location.address?.trim(),
+        !!phone.trim(),
+        Number(price) > 0,
+        finalImages.length > 0,
+      ];
+      let extra: boolean[] = [];
+      if (category === "vehicles") {
+        extra = [
+          !!attributes.brand, !!attributes.model, !!year,
+          !!attributes.mileage, !!fuelType, !!attributes.transmission,
+        ];
+      } else if (category === "real-estate") {
+        extra = [
+          !!attributes.propertyType, !!attributes.bedrooms,
+          !!attributes.bathrooms, !!area, attributes.parking !== undefined,
+        ];
+      } else if (category === "services") {
+        extra = [
+          !!attributes.schedule, !!attributes.coverage,
+          description.trim().length >= 80,
+        ];
+      }
+      const all = [...base, ...extra];
+      const filled = all.filter(Boolean).length;
+      const ratio = filled / all.length;
+      return Math.max(1, Math.min(5, Math.round(ratio * 5)));
+    };
+    const autoRating = computeRating();
     const fullData: any = {
       title: title.trim() || orig.title,
-      rating: isEditing ? (orig.rating ?? null) : null,
+      rating: autoRating,
       description: description.trim() || orig.description,
       category: category || orig.category,
       type: (category || orig.type) as any,
@@ -264,6 +298,7 @@ const PostAd = () => {
       area: (area === "" ? orig.area : area) ?? null,
       year: category === "vehicles" ? ((year === "" ? orig.year : year) ?? null) : (isEditing ? orig.year ?? null : null),
       fuel_type: category === "vehicles" ? (fuelType || orig.fuel_type || null) : (isEditing ? orig.fuel_type ?? null : null),
+      attributes: attributes || {},
       latitude: location.latitude ?? orig.latitude,
       longitude: location.longitude ?? orig.longitude,
       user_id: user.id,
@@ -274,7 +309,7 @@ const PostAd = () => {
       const diff: any = {};
       const keys = [
         "title","description","category","type","location","phone","price",
-        "currency","area","year","fuel_type","latitude","longitude",
+        "currency","area","year","fuel_type","latitude","longitude","rating",
       ];
       for (const k of keys) {
         const a = fullData[k];
@@ -283,6 +318,10 @@ const PostAd = () => {
           (typeof a === "number" && Number(a) === Number(b));
         if (!eq) diff[k] = a;
       }
+      // attributes (jsonb) - compare as JSON
+      const origAttrs = JSON.stringify(orig.attributes || {});
+      const newAttrs = JSON.stringify(fullData.attributes || {});
+      if (origAttrs !== newAttrs) diff.attributes = fullData.attributes;
       // Images: only include if changed (added/removed)
       const origImgs = orig.images || [];
       const newImgs = fullData.images || [];
