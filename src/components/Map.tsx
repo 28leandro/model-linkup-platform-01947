@@ -1,12 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { useEffect, useMemo } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { Listing } from '@/store/listingsStore';
-import { Card, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/use-toast';
+
+// Default Asunción, Paraguay
+const DEFAULT_CENTER: [number, number] = [-25.2637, -57.5759];
 
 interface MapProps {
   listings: Listing[];
@@ -15,188 +14,110 @@ interface MapProps {
   zoom?: number;
 }
 
-const Map = ({ listings, onMarkerClick, center = [-58.4438, -23.4425], zoom = 6 }: MapProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string>('');
-  const [tokenSubmitted, setTokenSubmitted] = useState(false);
-  const markers = useRef<mapboxgl.Marker[]>([]);
+const colorFor = (type?: string) => {
+  if (type === 'vehicles') return '#3b82f6';
+  if (type === 'real-estate') return '#10b981';
+  return '#f59e0b';
+};
+
+const makeIcon = (color: string) =>
+  L.divIcon({
+    className: 'custom-leaflet-marker',
+    html: `<div style="width:24px;height:24px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 2px 4px rgba(0,0,0,0.3);"></div>`,
+    iconSize: [24, 24],
+    iconAnchor: [12, 12],
+  });
+
+const FitBounds = ({ points }: { points: [number, number][] }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (points.length === 0) return;
+    if (points.length === 1) {
+      map.setView(points[0], 13);
+    } else {
+      map.fitBounds(L.latLngBounds(points), { padding: [40, 40] });
+    }
+  }, [points, map]);
+  return null;
+};
+
+const Map = ({ listings, onMarkerClick, center, zoom = 6 }: MapProps) => {
+  const points = useMemo(
+    () =>
+      listings
+        .filter((l) => l.latitude && l.longitude)
+        .map((l) => [l.latitude as number, l.longitude as number] as [number, number]),
+    [listings]
+  );
+
+  // Geolocation: try user, fallback to default
+  const initialCenter: [number, number] = center ?? DEFAULT_CENTER;
 
   useEffect(() => {
-    if (!mapContainer.current || !tokenSubmitted || !mapboxToken) return;
-
-    try {
-      // Initialize map
-      mapboxgl.accessToken = mapboxToken;
-      
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: center,
-        zoom: zoom,
-      });
-
-      // Add navigation controls
-      map.current.addControl(
-        new mapboxgl.NavigationControl(),
-        'top-right'
-      );
-
-      // Clear existing markers
-      markers.current.forEach(marker => marker.remove());
-      markers.current = [];
-
-      // Add markers for each listing
-      listings.forEach((listing) => {
-        if (listing.latitude && listing.longitude && map.current) {
-          // Create custom marker element
-          const el = document.createElement('div');
-          el.className = 'custom-marker';
-          el.style.width = '30px';
-          el.style.height = '30px';
-          el.style.borderRadius = '50%';
-          el.style.cursor = 'pointer';
-          
-          // Different colors for different types
-          if (listing.type === 'vehicles') {
-            el.style.backgroundColor = '#3b82f6';
-          } else if (listing.type === 'real-estate') {
-            el.style.backgroundColor = '#10b981';
-          } else {
-            el.style.backgroundColor = '#f59e0b';
-          }
-          
-          el.style.border = '2px solid white';
-          el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
-
-          // Create popup content using DOM elements to prevent XSS
-          const popupContent = document.createElement('div');
-          popupContent.style.padding = '8px';
-
-          const title = document.createElement('h3');
-          title.textContent = listing.title; // Safe - no HTML parsing
-          title.style.fontWeight = 'bold';
-          title.style.marginBottom = '4px';
-          popupContent.appendChild(title);
-
-          const location = document.createElement('p');
-          location.textContent = listing.location || '';
-          location.style.fontSize = '14px';
-          location.style.color = '#666';
-          popupContent.appendChild(location);
-
-          if (listing.price) {
-            const price = document.createElement('p');
-            const symbol = (listing as any).currency === 'USD' ? 'US$' : 'Gs.';
-            price.textContent = `${symbol} ${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(listing.price)}`;
-            price.style.fontWeight = 'bold';
-            price.style.color = '#10b981';
-            price.style.marginTop = '4px';
-            popupContent.appendChild(price);
-          }
-
-          const marker = new mapboxgl.Marker(el)
-            .setLngLat([listing.longitude, listing.latitude])
-            .setPopup(
-              new mapboxgl.Popup({ offset: 25 })
-                .setDOMContent(popupContent)
-            )
-            .addTo(map.current);
-
-          // Add click event
-          el.addEventListener('click', () => {
-            if (onMarkerClick) {
-              onMarkerClick(listing);
-            }
-          });
-
-          markers.current.push(marker);
-        }
-      });
-
-      // Cleanup
-      return () => {
-        markers.current.forEach(marker => marker.remove());
-        map.current?.remove();
-      };
-    } catch (error) {
-      toast({
-        title: "Erro ao carregar mapa",
-        description: "Verifique se o token do Mapbox está correto",
-        variant: "destructive",
-      });
-    }
-  }, [listings, onMarkerClick, center, zoom, tokenSubmitted, mapboxToken]);
-
-  if (!tokenSubmitted) {
-    return (
-      <Card className="w-full max-w-md mx-auto mt-8">
-        <CardContent className="pt-6">
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Configurar Mapbox</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Para visualizar os anúncios no mapa, você precisa de um token público do Mapbox.
-              </p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="mapbox-token">Token Público do Mapbox</Label>
-              <Input
-                id="mapbox-token"
-                type="text"
-                placeholder="pk.eyJ1..."
-                value={mapboxToken}
-                onChange={(e) => setMapboxToken(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Obtenha seu token em{' '}
-                <a 
-                  href="https://account.mapbox.com/access-tokens/" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-primary hover:underline"
-                >
-                  mapbox.com
-                </a>
-              </p>
-            </div>
-            <Button 
-              onClick={() => {
-                if (mapboxToken.trim()) {
-                  setTokenSubmitted(true);
-                } else {
-                  toast({
-                    title: "Token necessário",
-                    description: "Por favor, insira o token do Mapbox",
-                    variant: "destructive",
-                  });
-                }
-              }}
-              className="w-full"
-            >
-              Carregar Mapa
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+    if (center || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      () => {
+        // We don't auto-pan; FitBounds handles markers. User location is best-effort.
+      },
+      () => {
+        // Silent fallback to default Asunción
+      },
+      { enableHighAccuracy: true, timeout: 5000 }
     );
-  }
+  }, [center]);
 
   return (
     <div className="relative w-full h-[600px] rounded-lg overflow-hidden shadow-lg">
-      <div ref={mapContainer} className="absolute inset-0" />
-      <div className="absolute top-4 left-4 bg-white p-3 rounded-lg shadow-md">
+      <MapContainer
+        center={initialCenter}
+        zoom={zoom}
+        style={{ height: '100%', width: '100%' }}
+        scrollWheelZoom={true}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <FitBounds points={points} />
+        {listings.map((listing) => {
+          if (!listing.latitude || !listing.longitude) return null;
+          const symbol = (listing as any).currency === 'USD' ? 'US$' : 'Gs.';
+          return (
+            <Marker
+              key={listing.id}
+              position={[listing.latitude, listing.longitude]}
+              icon={makeIcon(colorFor(listing.type))}
+              eventHandlers={{
+                click: () => onMarkerClick?.(listing),
+              }}
+            >
+              <Popup>
+                <div style={{ padding: 4 }}>
+                  <strong>{listing.title}</strong>
+                  <div style={{ fontSize: 12, color: '#666' }}>{listing.location || ''}</div>
+                  {listing.price ? (
+                    <div style={{ fontWeight: 'bold', color: '#10b981', marginTop: 4 }}>
+                      {symbol} {new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(listing.price)}
+                    </div>
+                  ) : null}
+                </div>
+              </Popup>
+            </Marker>
+          );
+        })}
+      </MapContainer>
+      <div className="absolute top-4 left-4 z-[1000] bg-white p-3 rounded-lg shadow-md">
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-[#3b82f6]"></div>
+            <div className="w-4 h-4 rounded-full" style={{ background: '#3b82f6' }} />
             <span>Veículos</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-[#10b981]"></div>
+            <div className="w-4 h-4 rounded-full" style={{ background: '#10b981' }} />
             <span>Imóveis</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full bg-[#f59e0b]"></div>
+            <div className="w-4 h-4 rounded-full" style={{ background: '#f59e0b' }} />
             <span>Serviços</span>
           </div>
         </div>
