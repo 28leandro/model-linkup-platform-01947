@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Car, Bike } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, useMemo } from "react";
@@ -18,6 +18,7 @@ const CategoryPage = () => {
     sortOption: 'recent',
     fuelType: 'all',
   });
+  const [vehicleTypeFilter, setVehicleTypeFilter] = useState<'all' | 'auto' | 'moto'>('all');
   
   const categoryMap: Record<string, { type: string, titleKey: string }> = {
     "vehicles": { type: "vehicles", titleKey: "category.vehicles" },
@@ -50,6 +51,14 @@ const CategoryPage = () => {
   // Apply filters and sort listings
   const sortedListings = useMemo(() => {
     let filtered = [...categoryListings];
+
+    // Vehicle type filter (auto/moto) — only applies for vehicles category
+    if (category.type === 'vehicles' && vehicleTypeFilter !== 'all') {
+      filtered = filtered.filter(l => {
+        const vt = (l as any).attributes?.vehicleType;
+        return vt === vehicleTypeFilter;
+      });
+    }
     
     // Apply price filter
     if (filters.minPrice !== undefined) {
@@ -87,7 +96,7 @@ const CategoryPage = () => {
       default:
         return filtered;
     }
-  }, [categoryListings, sortOption, filters]);
+  }, [categoryListings, sortOption, filters, vehicleTypeFilter, category.type]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,6 +123,36 @@ const CategoryPage = () => {
             onFiltersChange={setFilters}
           />
         </div>
+
+        {category.type === 'vehicles' && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            <Button
+              variant={vehicleTypeFilter === 'all' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVehicleTypeFilter('all')}
+            >
+              {t('filter.allFuels') || 'Todos'}
+            </Button>
+            <Button
+              variant={vehicleTypeFilter === 'auto' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVehicleTypeFilter('auto')}
+              className="gap-2"
+            >
+              <Car className="h-4 w-4" />
+              Auto
+            </Button>
+            <Button
+              variant={vehicleTypeFilter === 'moto' ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setVehicleTypeFilter('moto')}
+              className="gap-2"
+            >
+              <Bike className="h-4 w-4" />
+              Moto
+            </Button>
+          </div>
+        )}
         
         {sortedListings.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
