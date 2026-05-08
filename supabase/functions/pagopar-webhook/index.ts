@@ -71,7 +71,10 @@ Deno.serve(async (req) => {
     }).eq("id", order.id);
 
     if (isPaid && order.listing_id) {
-      await supabase.from("listings").update({ is_published: true }).eq("id", order.listing_id);
+      await supabase
+        .from("listings")
+        .update({ is_published: true, photos_unlocked: true })
+        .eq("id", order.listing_id);
     }
 
     return new Response(JSON.stringify({ ok: true }), {
