@@ -5,6 +5,11 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+async function sha1Hex(s: string): Promise<string> {
+  const buf = await crypto.subtle.digest("SHA-1", new TextEncoder().encode(s));
+  return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
 // Pagopar webhook — receives payment confirmation
 // Expected payload (simplified): { hash_pagopar, numero_pedido, estado, forma_pago }
 Deno.serve(async (req) => {
@@ -23,6 +28,12 @@ Deno.serve(async (req) => {
     const hash = body.hash_pagopar ?? body.hash ?? null;
 
     if (!orderNumber) throw new Error("numero_pedido required");
+    if (!hash) {
+      return new Response(JSON.stringify({ error: "missing hash" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { data: order, error: getErr } = await supabase
       .from("payment_orders")
@@ -30,6 +41,18 @@ Deno.serve(async (req) => {
       .eq("external_order_number", orderNumber)
       .single();
     if (getErr || !order) throw new Error("Order not found");
+
+    // Verify Pagopar hash signature: SHA1(PRIVATE_KEY + orderNumber + amount + currency)
+    const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY") ?? "FAKE_PRIVATE_KEY";
+    const expected = await sha1Hex(
+      `${PRIVATE_KEY}${orderNumber}${order.amount_pyg}PYG`
+    );
+    if (hash.toLowerCase() !== expected.toLowerCase()) {
+      return new Response(JSON.stringify({ error: "invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const isPaid = status === "PAGO" || status === "PAID";
 
