@@ -225,6 +225,7 @@ export type Database = {
           area: number | null
           category: string | null
           created_at: string | null
+          currency: string | null
           description: string | null
           fuel_type: string | null
           id: string | null
@@ -245,6 +246,7 @@ export type Database = {
           area?: number | null
           category?: string | null
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           fuel_type?: string | null
           id?: string | null
@@ -265,6 +267,7 @@ export type Database = {
           area?: number | null
           category?: string | null
           created_at?: string | null
+          currency?: string | null
           description?: string | null
           fuel_type?: string | null
           id?: string | null
