@@ -427,15 +427,20 @@ const PostAd = () => {
                       <SelectItem value="USD">US$</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Input
-                    id="price"
-                    type="number"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
-                    placeholder={t('postAd.pricePlaceholder')}
-                    min="0"
-                    className="h-11 sm:h-10 flex-1"
-                  />
+                  <div className="relative flex-1">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                      {currency === "USD" ? "US$" : "Gs."}
+                    </span>
+                    <Input
+                      id="price"
+                      type="number"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
+                      placeholder={currency === "USD" ? "Ej: 1500" : "Ej: 50000000"}
+                      min="0"
+                      className="h-11 sm:h-10 pl-12"
+                    />
+                  </div>
                 </div>
               </div>
 
