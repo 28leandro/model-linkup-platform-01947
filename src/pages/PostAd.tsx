@@ -18,8 +18,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { listingSchema } from "@/lib/validations";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const MAX_PHOTOS = 12;
-const priceForPhotos = (n: number) => (n <= 3 ? 0 : n <= 8 ? 3500 : n <= 12 ? 4000 : -1);
+const FREE_PHOTOS = 3;
+const MAX_PHOTOS_UNLOCKED = 10;
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -47,6 +47,7 @@ const PostAd = () => {
     longitude: -57.5759 
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
+  const [photosUnlocked, setPhotosUnlocked] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -77,6 +78,7 @@ const PostAd = () => {
         .eq('id', id)
         .maybeSingle();
       if (!cancelled && !error && data) setOriginalListing(data);
+      if (!cancelled && data && (data as any).photos_unlocked) setPhotosUnlocked(true);
     })();
     return () => { cancelled = true; };
   }, [isEditing, id, user]);
@@ -93,6 +95,7 @@ const PostAd = () => {
       setYear((editingListing as any).year || "");
       setFuelType((editingListing as any).fuel_type || "");
       setPreviews(editingListing.images || []);
+      if ((editingListing as any).photos_unlocked) setPhotosUnlocked(true);
       setLocation({
         address: editingListing.location,
         latitude: editingListing.latitude || 0,
@@ -101,14 +104,29 @@ const PostAd = () => {
     }
   }, [editingListing?.id]);
 
+  const maxPhotos = photosUnlocked ? MAX_PHOTOS_UNLOCKED : FREE_PHOTOS;
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
-    if (files.length + previews.length > MAX_PHOTOS) {
+    const total = files.length + previews.length;
+    if (!photosUnlocked && total > FREE_PHOTOS) {
       toast({
-        title: t('postAd.maxPhotos'),
-        description: `Máximo ${MAX_PHOTOS} fotos`,
+        title: "Límite gratuito alcanzado",
+        description: "Solo puedes subir 3 fotos gratis. Desbloquea fotos ilimitadas para continuar.",
         variant: "destructive",
       });
+      const qs = id ? `?listing_id=${id}` : "";
+      navigate(`/photo-paywall${qs}`);
+      e.target.value = "";
+      return;
+    }
+    if (total > MAX_PHOTOS_UNLOCKED) {
+      toast({
+        title: t('postAd.maxPhotos'),
+        description: `Máximo ${MAX_PHOTOS_UNLOCKED} fotos`,
+        variant: "destructive",
+      });
+      e.target.value = "";
       return;
     }
 
@@ -505,12 +523,26 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="images">
-                  {t('postAd.photos')} ({previews.length}/{MAX_PHOTOS})
+                  {t('postAd.photos')} ({previews.length}/{maxPhotos})
+                  {!photosUnlocked && (
+                    <span className="ml-2 text-xs text-muted-foreground font-normal">
+                      · {Math.min(previews.length, FREE_PHOTOS)}/{FREE_PHOTOS} fotos gratuitas usadas
+                    </span>
+                  )}
                 </Label>
-                {previews.length > 3 && (
-                  <p className="text-sm text-muted-foreground">
-                    💳 Pago: Gs. {priceForPhotos(previews.length).toLocaleString('es-PY')} (3 grátis · 4-8: Gs. 3.500 · 9-12: Gs. 4.000)
-                  </p>
+                {!photosUnlocked && previews.length >= FREE_PHOTOS && (
+                  <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
+                    <p className="text-sm text-muted-foreground">
+                      💳 Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos.
+                    </p>
+                    <Button
+                      type="button"
+                      size="sm"
+                      onClick={() => navigate(`/photo-paywall${id ? `?listing_id=${id}` : ""}`)}
+                    >
+                      Desbloquear
+                    </Button>
+                  </div>
                 )}
                 <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 sm:gap-4">
                   {previews.map((preview, index) => (
@@ -529,7 +561,7 @@ const PostAd = () => {
                       </button>
                     </div>
                   ))}
-                  {previews.length < MAX_PHOTOS && (
+                  {previews.length < maxPhotos && (
                     <div className="aspect-square">
                       <Label
                         htmlFor="image-upload"
