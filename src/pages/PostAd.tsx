@@ -335,6 +335,16 @@ const PostAd = () => {
     try {
       if (isEditing && editingListing) {
         const diff = buildDiff();
+        // Guard: prevent saving more than free photos without unlock
+        if (!photosUnlocked && finalImages.length > FREE_PHOTOS) {
+          toast({
+            title: "Pago necesario",
+            description: "Desbloquea fotos ilimitadas para guardar más de 3 fotos.",
+            variant: "destructive",
+          });
+          navigate(`/photo-paywall?listing_id=${editingListing.id}`);
+          return;
+        }
         if (Object.keys(diff).length === 0) {
           toast({ title: t('postAd.updated'), description: "Sin cambios para guardar" });
           navigate(-1);
