@@ -527,6 +527,80 @@ const PostAd = () => {
 
               {category === "vehicles" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label>Tipo de vehículo</Label>
+                    <Select value={attributes.vehicleType || ""} onValueChange={(v) => setAttr("vehicleType", v)}>
+                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Carro / Moto" /></SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        <SelectItem value="car">Carro</SelectItem>
+                        <SelectItem value="moto">Moto</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {attributes.vehicleType === "moto" ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label>Marca</Label>
+                        <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
+                          <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
+                          <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                            {["Kenton","Star","Leopard","Taiga","Honda","Yamaha","Kawasaki","Suzuki","BMW","KTM","Harley-Davidson","Otra"].map(b => (
+                              <SelectItem key={b} value={b}>{b}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="model">Modelo</Label>
+                        <Input id="model" value={attributes.model || ""} onChange={(e) => setAttr("model", e.target.value)} placeholder="Ej: CG 150" className="h-11 sm:h-10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Cilindrada (CC)</Label>
+                        <Select value={attributes.engineCC || ""} onValueChange={(v) => setAttr("engineCC", v)}>
+                          <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                          <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                            {["110cc","125cc","150cc","200cc","250cc","600cc","1000cc+"].map(c => (
+                              <SelectItem key={c} value={c}>{c}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Tipo de moto</Label>
+                        <Select value={attributes.motoType || ""} onValueChange={(v) => setAttr("motoType", v)}>
+                          <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                          <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                            <SelectItem value="urban">Urbana</SelectItem>
+                            <SelectItem value="trail">Trail/Enduro</SelectItem>
+                            <SelectItem value="scooter">Motoneta/Scooter</SelectItem>
+                            <SelectItem value="sport">Deportiva</SelectItem>
+                            <SelectItem value="custom">Custom</SelectItem>
+                            <SelectItem value="quad">Cuatriciclo</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Tipo de partida</Label>
+                        <Select value={attributes.startType || ""} onValueChange={(v) => setAttr("startType", v)}>
+                          <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                          <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                            <SelectItem value="electric">Eléctrica</SelectItem>
+                            <SelectItem value="pedal">Pedal</SelectItem>
+                            <SelectItem value="both">Ambas</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="year">{t('postAd.year')}</Label>
+                        <Input id="year" type="number" value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")} placeholder={t('postAd.yearPlaceholder')} min="1900" max={new Date().getFullYear() + 1} className="h-11 sm:h-10" />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="mileage">Kilometraje (km)</Label>
+                        <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", e.target.value ? Number(e.target.value) : "")} placeholder="Ej: 10000" className="h-11 sm:h-10" />
+                      </div>
+                    </>
+                  ) : (
+                  <>
                   <div className="space-y-2">
                     <Label>Marca</Label>
                     <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
@@ -573,6 +647,8 @@ const PostAd = () => {
                       </SelectContent>
                     </Select>
                   </div>
+                  </>
+                  )}
                 </div>
               )}
 
@@ -620,12 +696,7 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="images">
-                  {t('postAd.photos')} ({previews.length}/{maxPhotos})
-                  {!photosUnlocked && (
-                    <span className="ml-2 text-xs text-muted-foreground font-normal">
-                      · {Math.min(previews.length, FREE_PHOTOS)}/{FREE_PHOTOS} fotos gratuitas usadas
-                    </span>
-                  )}
+                  {t('postAd.photos')}
                 </Label>
                 {!photosUnlocked && previews.length >= FREE_PHOTOS && (
                   <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
