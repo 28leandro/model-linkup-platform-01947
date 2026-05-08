@@ -269,7 +269,7 @@ const ListingDetail = () => {
               };
               const extras: Array<[string, any]> = [];
               if (listing.year) extras.push(["Año", listing.year]);
-              if (listing.fuel_type) extras.push(["Combustible", listing.fuel_type]);
+              if ((listing as any).fuel_type) extras.push(["Combustible", (listing as any).fuel_type]);
               if (listing.area) extras.push(["Área", `${listing.area} m²`]);
               const entries = Object.entries(attrs)
                 .filter(([, v]) => v !== null && v !== undefined && v !== "")
