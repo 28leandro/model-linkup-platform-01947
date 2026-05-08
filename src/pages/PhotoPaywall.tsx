@@ -13,30 +13,38 @@ const PhotoPaywall = () => {
   const listingId = params.get("listing_id");
   const { user, loading } = useAuth();
   const [processing, setProcessing] = useState(false);
-  const [done, setDone] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/");
   }, [user, loading, navigate]);
 
-  const simulatePayment = async () => {
+  const startPayment = async () => {
+    if (!listingId) {
+      toast({
+        title: "Anuncio no encontrado",
+        description: "Primero guarda el anuncio antes de pagar las fotos extra.",
+        variant: "destructive",
+      });
+      navigate("/post-ad");
+      return;
+    }
     setProcessing(true);
     try {
-      // Simulated checkout — flips photos_unlocked on the listing if provided
-      await new Promise((r) => setTimeout(r, 1200));
-      if (listingId) {
-        const { error } = await supabase
-          .from("listings")
-          .update({ photos_unlocked: true })
-          .eq("id", listingId);
-        if (error) throw error;
+      const { data, error } = await supabase.functions.invoke("pagopar-create-order", {
+        body: { listing_id: listingId, photo_count: 10 },
+      });
+      if (error) throw error;
+      if (data?.checkout_url) {
+        window.location.href = data.checkout_url;
+        return;
       }
-      setDone(true);
-      toast({ title: "Pago confirmado", description: "Fotos desbloqueadas — hasta 10 fotos" });
-      setTimeout(() => navigate(listingId ? `/post-ad/${listingId}` : "/post-ad"), 900);
+      throw new Error("No se recibió URL de pago");
     } catch (e: any) {
-      toast({ title: "Error", description: e.message || "No se pudo procesar el pago", variant: "destructive" });
-    } finally {
+      toast({
+        title: "Error",
+        description: e.message || "No se pudo iniciar el pago",
+        variant: "destructive",
+      });
       setProcessing(false);
     }
   };
@@ -71,9 +79,9 @@ const PhotoPaywall = () => {
                 <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Pago único</li>
               </ul>
             </div>
-            <Button className="w-full" onClick={simulatePayment} disabled={processing || done}>
+            <Button className="w-full" onClick={startPayment} disabled={processing}>
               {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              {done ? "¡Desbloqueado!" : "Confirmar pago (simulado)"}
+              Pagar con Pagopar
             </Button>
           </CardContent>
         </Card>
