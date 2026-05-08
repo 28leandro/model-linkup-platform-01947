@@ -55,8 +55,15 @@ const CategoryPage = () => {
     // Vehicle type filter (auto/moto) — only applies for vehicles category
     if (category.type === 'vehicles' && vehicleTypeFilter !== 'all') {
       filtered = filtered.filter(l => {
-        const vt = (l as any).attributes?.vehicleType;
-        return vt === vehicleTypeFilter;
+        const attrs = (l as any).attributes || {};
+        const vt = attrs.vehicleType;
+        const titleLower = (l.title || '').toLowerCase();
+        const isMoto =
+          vt === 'moto' ||
+          !!attrs.motoType ||
+          !!attrs.engineCC ||
+          /\bmoto\b|motocicl|scooter/i.test(titleLower);
+        return vehicleTypeFilter === 'moto' ? isMoto : !isMoto;
       });
     }
     
