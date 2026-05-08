@@ -1,7 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Car, Bike } from "lucide-react";
+import { ArrowLeft, Car, Bike, Home, Building2, Trees, Wrench, Sparkles, Scissors, MoreHorizontal } from "lucide-react";
 import { StarRating } from "@/components/StarRating";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, useMemo } from "react";
@@ -19,6 +19,8 @@ const CategoryPage = () => {
     fuelType: 'all',
   });
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<'all' | 'auto' | 'moto'>('all');
+  const [propertyTypeFilter, setPropertyTypeFilter] = useState<'all' | 'house' | 'apartment' | 'land'>('all');
+  const [serviceTypeFilter, setServiceTypeFilter] = useState<'all' | 'construction' | 'maintenance' | 'beauty' | 'other'>('all');
   
   const categoryMap: Record<string, { type: string, titleKey: string }> = {
     "vehicles": { type: "vehicles", titleKey: "category.vehicles" },
@@ -66,6 +68,34 @@ const CategoryPage = () => {
         return vehicleTypeFilter === 'moto' ? isMoto : !isMoto;
       });
     }
+
+    // Property type filter — only applies for real-estate
+    if (category.type === 'real-estate' && propertyTypeFilter !== 'all') {
+      filtered = filtered.filter(l => {
+        const attrs = (l as any).attributes || {};
+        const pt = attrs.propertyType;
+        const text = `${l.title || ''} ${l.description || ''}`.toLowerCase();
+        if (propertyTypeFilter === 'house') return pt === 'house' || /\bcasa\b/.test(text);
+        if (propertyTypeFilter === 'apartment') return pt === 'apartment' || /apartamento|departamento|\bdepto\b/.test(text);
+        if (propertyTypeFilter === 'land') return pt === 'land' || /terreno|lote/.test(text);
+        return true;
+      });
+    }
+
+    // Service type filter — only applies for services
+    if (category.type === 'services' && serviceTypeFilter !== 'all') {
+      filtered = filtered.filter(l => {
+        const text = `${l.title || ''} ${l.description || ''}`.toLowerCase();
+        const construction = /construc|albañil|obra|reform|pintur|electric|plomer|fontaner/.test(text);
+        const maintenance = /manteni|reparaci|limpiez|jardin|fumigaci|tecnic/.test(text);
+        const beauty = /belleza|peluquer|barber|estetic|manicur|spa|masaj/.test(text);
+        if (serviceTypeFilter === 'construction') return construction;
+        if (serviceTypeFilter === 'maintenance') return maintenance;
+        if (serviceTypeFilter === 'beauty') return beauty;
+        if (serviceTypeFilter === 'other') return !construction && !maintenance && !beauty;
+        return true;
+      });
+    }
     
     // Apply price filter
     if (filters.minPrice !== undefined) {
@@ -103,7 +133,7 @@ const CategoryPage = () => {
       default:
         return filtered;
     }
-  }, [categoryListings, sortOption, filters, vehicleTypeFilter, category.type]);
+  }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -157,6 +187,39 @@ const CategoryPage = () => {
             >
               <Bike className="h-4 w-4" />
               Moto
+            </Button>
+          </div>
+        )}
+
+        {category.type === 'real-estate' && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            <Button variant={propertyTypeFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setPropertyTypeFilter('all')}>Todos</Button>
+            <Button variant={propertyTypeFilter === 'house' ? 'default' : 'outline'} size="sm" onClick={() => setPropertyTypeFilter('house')} className="gap-2">
+              <Home className="h-4 w-4" /> Casa
+            </Button>
+            <Button variant={propertyTypeFilter === 'apartment' ? 'default' : 'outline'} size="sm" onClick={() => setPropertyTypeFilter('apartment')} className="gap-2">
+              <Building2 className="h-4 w-4" /> Apartamento
+            </Button>
+            <Button variant={propertyTypeFilter === 'land' ? 'default' : 'outline'} size="sm" onClick={() => setPropertyTypeFilter('land')} className="gap-2">
+              <Trees className="h-4 w-4" /> Terreno
+            </Button>
+          </div>
+        )}
+
+        {category.type === 'services' && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            <Button variant={serviceTypeFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('all')}>Todos</Button>
+            <Button variant={serviceTypeFilter === 'construction' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('construction')} className="gap-2">
+              <Wrench className="h-4 w-4" /> Construcción
+            </Button>
+            <Button variant={serviceTypeFilter === 'maintenance' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('maintenance')} className="gap-2">
+              <Sparkles className="h-4 w-4" /> Mantenimiento
+            </Button>
+            <Button variant={serviceTypeFilter === 'beauty' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('beauty')} className="gap-2">
+              <Scissors className="h-4 w-4" /> Belleza
+            </Button>
+            <Button variant={serviceTypeFilter === 'other' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('other')} className="gap-2">
+              <MoreHorizontal className="h-4 w-4" /> Otros
             </Button>
           </div>
         )}
