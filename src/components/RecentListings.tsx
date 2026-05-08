@@ -5,8 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Car, Home, Wrench } from "lucide-react";
-import { formatDisplayPrice } from "@/lib/formatPrice";
-import { useCurrency } from "@/contexts/CurrencyContext";
+import { formatPrice } from "@/lib/formatPrice";
 
 const getCategoryIcon = (type?: string) => {
   switch (type) {
@@ -37,7 +36,6 @@ interface RecentListingsProps {
 
 const RecentListings = ({ listings }: RecentListingsProps) => {
   const { t } = useLanguage();
-  const { displayCurrency } = useCurrency();
 
   return (
     <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
@@ -79,7 +77,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                 <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
                 {listing.price && listing.price > 0 && (
                   <p className="text-primary font-bold text-sm sm:text-base mb-1">
-                    {formatDisplayPrice(listing.price, (listing as any).currency, displayCurrency)}
+                    {formatPrice(listing.price, (listing as any).currency)}
                   </p>
                 )}
                 <StarRating rating={listing.rating} />
