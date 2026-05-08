@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -14,6 +15,8 @@ interface LocationPickerProps {
 const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPickerProps) => {
   const [address, setAddress] = useState(initialAddress);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const [locationError, setLocationError] = useState<string | null>(null);
   const { t } = useLanguage();
 
   // Try IP-based geolocation as a silent fallback on mount (no permission needed)
@@ -67,10 +70,12 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     }
 
     setIsGettingLocation(true);
+    setPermissionDenied(false);
+    setLocationError(null);
 
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     
-    // First try with high accuracy (GPS), then fallback to low accuracy (network/WiFi)
+    // Always start with high accuracy (GPS) enabled, then fallback to low accuracy
     const tryGeolocation = (highAccuracy: boolean) => {
       const options: PositionOptions = {
         enableHighAccuracy: highAccuracy,
@@ -122,7 +127,7 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
         },
         (error) => {
           // If high accuracy failed, retry with low accuracy
-          if (highAccuracy) {
+          if (highAccuracy && error.code !== error.PERMISSION_DENIED) {
             console.log('High accuracy failed, trying low accuracy...', error.message);
             tryGeolocation(false);
             return;
@@ -133,11 +138,14 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
           let errorMessage = t('location.errorDesc');
           if (error.code === error.PERMISSION_DENIED) {
             errorMessage = t('location.permissionDenied');
+            setPermissionDenied(true);
           } else if (error.code === error.POSITION_UNAVAILABLE) {
             errorMessage = t('location.unavailable');
           } else if (error.code === error.TIMEOUT) {
             errorMessage = t('location.timeout');
           }
+
+          setLocationError(errorMessage);
           
           toast({
             title: t('location.error'),
@@ -149,7 +157,8 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       );
     };
 
-    tryGeolocation(isMobile);
+    // Always enable high accuracy on first attempt for best precision
+    tryGeolocation(true);
   };
 
   return (
@@ -188,6 +197,23 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       <p className="text-xs text-muted-foreground">
         {t('postAd.locationHelper')}
       </p>
+
+      {permissionDenied && (
+        <Alert variant="destructive" className="mt-2">
+          <AlertTriangle className="w-4 h-4" />
+          <AlertTitle>{t('location.permissionDenied')}</AlertTitle>
+          <AlertDescription className="text-xs">
+            {t('location.permissionDeniedHelp') || 'Habilite o acesso à localização nas configurações do navegador (ícone de cadeado na barra de endereço) e tente novamente. Você também pode digitar o endereço manualmente.'}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {locationError && !permissionDenied && (
+        <Alert variant="destructive" className="mt-2">
+          <AlertTriangle className="w-4 h-4" />
+          <AlertDescription className="text-xs">{locationError}</AlertDescription>
+        </Alert>
+      )}
     </div>
   );
 };
