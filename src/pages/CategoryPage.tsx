@@ -21,12 +21,13 @@ const CategoryPage = () => {
   
   const categoryMap: Record<string, { type: string, titleKey: string }> = {
     "vehicles": { type: "vehicles", titleKey: "category.vehicles" },
+    "real-estate": { type: "real-estate", titleKey: "category.realEstate" },
     "real-estate-sale": { type: "real-estate", titleKey: "category.realEstateSale" },
     "real-estate-rent": { type: "real-estate", titleKey: "category.realEstateRent" },
     "services": { type: "services", titleKey: "category.services" }
   };
 
-  const category = categoryMap[id || "vehicles"];
+  const category = categoryMap[id || "vehicles"] ?? { type: id || "", titleKey: "category.vehicles" };
 
   useEffect(() => {
     const fetchListings = async () => {
