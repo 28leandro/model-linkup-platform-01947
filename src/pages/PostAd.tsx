@@ -80,7 +80,11 @@ const PostAd = () => {
         .select('*')
         .eq('id', id)
         .maybeSingle();
-      if (!cancelled && !error && data) setOriginalListing(data);
+      if (!cancelled && !error && data) {
+        // phone column is no longer readable directly; fetch via SECURITY DEFINER fn
+        const { data: phoneData } = await supabase.rpc('get_my_listing_phone', { listing_uuid: id });
+        setOriginalListing({ ...(data as any), phone: phoneData ?? null });
+      }
       if (!cancelled && data && (data as any).photos_unlocked) setPhotosUnlocked(true);
     })();
     return () => { cancelled = true; };
