@@ -43,7 +43,14 @@ Deno.serve(async (req) => {
     if (getErr || !order) throw new Error("Order not found");
 
     // Verify Pagopar hash signature: SHA1(PRIVATE_KEY + orderNumber + amount + currency)
-    const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY") ?? "FAKE_PRIVATE_KEY";
+    const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY");
+    if (!PRIVATE_KEY) {
+      console.error("PAGOPAR_PRIVATE_KEY not configured");
+      return new Response(JSON.stringify({ error: "server misconfigured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const expected = await sha1Hex(
       `${PRIVATE_KEY}${orderNumber}${order.amount_pyg}PYG`
     );
