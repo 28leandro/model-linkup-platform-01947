@@ -229,6 +229,7 @@ export type Database = {
           fuel_type: string | null
           id: string | null
           images: string[] | null
+          is_published: boolean | null
           latitude: number | null
           location: string | null
           longitude: number | null
@@ -248,10 +249,11 @@ export type Database = {
           fuel_type?: string | null
           id?: string | null
           images?: string[] | null
+          is_published?: boolean | null
           latitude?: number | null
           location?: string | null
           longitude?: number | null
-          phone?: string | null
+          phone?: never
           price?: number | null
           rating?: number | null
           title?: string | null
@@ -267,10 +269,11 @@ export type Database = {
           fuel_type?: string | null
           id?: string | null
           images?: string[] | null
+          is_published?: boolean | null
           latitude?: number | null
           location?: string | null
           longitude?: number | null
-          phone?: string | null
+          phone?: never
           price?: number | null
           rating?: number | null
           title?: string | null
