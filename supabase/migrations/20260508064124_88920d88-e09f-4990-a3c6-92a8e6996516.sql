@@ -1,0 +1,1 @@
+UPDATE public.listings l SET photos_unlocked = false WHERE photos_unlocked = true AND NOT EXISTS (SELECT 1 FROM public.payment_orders po WHERE po.listing_id = l.id AND po.status = 'paid');
