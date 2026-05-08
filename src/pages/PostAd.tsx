@@ -39,6 +39,9 @@ const PostAd = () => {
   const [area, setArea] = useState<number | "">("");
   const [year, setYear] = useState<number | "">("");
   const [fuelType, setFuelType] = useState("");
+  // Dynamic per-category attributes
+  const [attributes, setAttributes] = useState<Record<string, any>>({});
+  const setAttr = (k: string, v: any) => setAttributes((p) => ({ ...p, [k]: v }));
   const [previews, setPreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [location, setLocation] = useState({ 
@@ -94,6 +97,7 @@ const PostAd = () => {
       setArea((editingListing as any).area || "");
       setYear((editingListing as any).year || "");
       setFuelType((editingListing as any).fuel_type || "");
+      setAttributes(((editingListing as any).attributes as any) || {});
       setPreviews(editingListing.images || []);
       if ((editingListing as any).photos_unlocked) setPhotosUnlocked(true);
       setLocation({
@@ -246,9 +250,43 @@ const PostAd = () => {
 
     // Build full base payload (for new listings) or compute a diff (for edits)
     const orig: any = editingListing || {};
+    // Compute completeness rating (1-5) based on filled fields for the category
+    const computeRating = () => {
+      const base = [
+        !!title.trim(),
+        !!description.trim() && description.trim().length >= 20,
+        !!category,
+        !!location.address?.trim(),
+        !!phone.trim(),
+        Number(price) > 0,
+        finalImages.length > 0,
+      ];
+      let extra: boolean[] = [];
+      if (category === "vehicles") {
+        extra = [
+          !!attributes.brand, !!attributes.model, !!year,
+          !!attributes.mileage, !!fuelType, !!attributes.transmission,
+        ];
+      } else if (category === "real-estate") {
+        extra = [
+          !!attributes.propertyType, !!attributes.bedrooms,
+          !!attributes.bathrooms, !!area, attributes.parking !== undefined,
+        ];
+      } else if (category === "services") {
+        extra = [
+          !!attributes.schedule, !!attributes.coverage,
+          description.trim().length >= 80,
+        ];
+      }
+      const all = [...base, ...extra];
+      const filled = all.filter(Boolean).length;
+      const ratio = filled / all.length;
+      return Math.max(1, Math.min(5, Math.round(ratio * 5)));
+    };
+    const autoRating = computeRating();
     const fullData: any = {
       title: title.trim() || orig.title,
-      rating: isEditing ? (orig.rating ?? null) : null,
+      rating: autoRating,
       description: description.trim() || orig.description,
       category: category || orig.category,
       type: (category || orig.type) as any,
@@ -260,6 +298,7 @@ const PostAd = () => {
       area: (area === "" ? orig.area : area) ?? null,
       year: category === "vehicles" ? ((year === "" ? orig.year : year) ?? null) : (isEditing ? orig.year ?? null : null),
       fuel_type: category === "vehicles" ? (fuelType || orig.fuel_type || null) : (isEditing ? orig.fuel_type ?? null : null),
+      attributes: attributes || {},
       latitude: location.latitude ?? orig.latitude,
       longitude: location.longitude ?? orig.longitude,
       user_id: user.id,
@@ -270,7 +309,7 @@ const PostAd = () => {
       const diff: any = {};
       const keys = [
         "title","description","category","type","location","phone","price",
-        "currency","area","year","fuel_type","latitude","longitude",
+        "currency","area","year","fuel_type","latitude","longitude","rating",
       ];
       for (const k of keys) {
         const a = fullData[k];
@@ -279,6 +318,10 @@ const PostAd = () => {
           (typeof a === "number" && Number(a) === Number(b));
         if (!eq) diff[k] = a;
       }
+      // attributes (jsonb) - compare as JSON
+      const origAttrs = JSON.stringify(orig.attributes || {});
+      const newAttrs = JSON.stringify(fullData.attributes || {});
+      if (origAttrs !== newAttrs) diff.attributes = fullData.attributes;
       // Images: only include if changed (added/removed)
       const origImgs = orig.images || [];
       const newImgs = fullData.images || [];
@@ -445,49 +488,105 @@ const PostAd = () => {
               </div>
 
               {category === "real-estate" && (
-                <div className="space-y-2">
-                  <Label htmlFor="area">{t('postAd.area')}</Label>
-                  <Input
-                    id="area"
-                    type="number"
-                    value={area}
-                    onChange={(e) => setArea(e.target.value ? Number(e.target.value) : "")}
-                    placeholder={t('postAd.areaPlaceholder')}
-                    min="0"
-                    className="h-11 sm:h-10"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label>Tipo de inmueble</Label>
+                    <Select value={attributes.propertyType || ""} onValueChange={(v) => setAttr("propertyType", v)}>
+                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Casa / Apartamento / Terreno" /></SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        <SelectItem value="house">Casa</SelectItem>
+                        <SelectItem value="apartment">Apartamento</SelectItem>
+                        <SelectItem value="land">Terreno</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="bedrooms">Habitaciones</Label>
+                    <Input id="bedrooms" type="number" min="0" value={attributes.bedrooms ?? ""} onChange={(e) => setAttr("bedrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="bathrooms">Baños</Label>
+                    <Input id="bathrooms" type="number" min="0" value={attributes.bathrooms ?? ""} onChange={(e) => setAttr("bathrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="area">Área total (m²)</Label>
+                    <Input id="area" type="number" min="0" value={area} onChange={(e) => setArea(e.target.value ? Number(e.target.value) : "")} placeholder="m²" className="h-11 sm:h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Estacionamiento</Label>
+                    <Select value={attributes.parking === undefined ? "" : (attributes.parking ? "yes" : "no")} onValueChange={(v) => setAttr("parking", v === "yes")}>
+                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        <SelectItem value="yes">Sí</SelectItem>
+                        <SelectItem value="no">No</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
 
               {category === "vehicles" && (
-                <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label>Marca</Label>
+                    <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
+                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        {["Toyota","Volkswagen","Chevrolet","Ford","Nissan","Honda","Hyundai","Kia","Fiat","Renault","Peugeot","Mercedes-Benz","BMW","Audi","Otra"].map(b => (
+                          <SelectItem key={b} value={b}>{b}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="model">Modelo</Label>
+                    <Input id="model" value={attributes.model || ""} onChange={(e) => setAttr("model", e.target.value)} placeholder="Ej: Corolla" className="h-11 sm:h-10" />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="year">{t('postAd.year')}</Label>
-                    <Input
-                      id="year"
-                      type="number"
-                      value={year}
-                      onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")}
-                      placeholder={t('postAd.yearPlaceholder')}
-                      min="1900"
-                      max={new Date().getFullYear() + 1}
-                      className="h-11 sm:h-10"
-                    />
+                    <Input id="year" type="number" value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")} placeholder={t('postAd.yearPlaceholder')} min="1900" max={new Date().getFullYear() + 1} className="h-11 sm:h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="mileage">Kilometraje (km)</Label>
+                    <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", e.target.value ? Number(e.target.value) : "")} placeholder="Ej: 50000" className="h-11 sm:h-10" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="fuelType">{t('postAd.fuelType')}</Label>
                     <Select value={fuelType} onValueChange={setFuelType}>
-                      <SelectTrigger className="bg-card border-input h-11 sm:h-10">
-                        <SelectValue placeholder={t('postAd.fuelTypePlaceholder')} />
-                      </SelectTrigger>
+                      <SelectTrigger className="bg-card border-input h-11 sm:h-10"><SelectValue placeholder={t('postAd.fuelTypePlaceholder')} /></SelectTrigger>
                       <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
                         <SelectItem value="gasoline">{t('postAd.fuelGasoline')}</SelectItem>
                         <SelectItem value="diesel">{t('postAd.fuelDiesel')}</SelectItem>
                         <SelectItem value="electric">{t('postAd.fuelElectric')}</SelectItem>
+                        <SelectItem value="hybrid">Híbrido</SelectItem>
+                        <SelectItem value="flex">Flex</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                </>
+                  <div className="space-y-2">
+                    <Label>Cambio</Label>
+                    <Select value={attributes.transmission || ""} onValueChange={(v) => setAttr("transmission", v)}>
+                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Manual / Automático" /></SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        <SelectItem value="manual">Manual</SelectItem>
+                        <SelectItem value="automatic">Automático</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
+              {category === "services" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="schedule">Horario de atención</Label>
+                    <Input id="schedule" value={attributes.schedule || ""} onChange={(e) => setAttr("schedule", e.target.value)} placeholder="Ej: Lun-Vie 8-18h" className="h-11 sm:h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="coverage">Región de cobertura</Label>
+                    <Input id="coverage" value={attributes.coverage || ""} onChange={(e) => setAttr("coverage", e.target.value)} placeholder="Ej: Asunción y Gran Asunción" className="h-11 sm:h-10" />
+                  </div>
+                </div>
               )}
 
               <LocationPicker

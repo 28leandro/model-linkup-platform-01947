@@ -56,6 +56,7 @@ export type Database = {
       listings: {
         Row: {
           area: number | null
+          attributes: Json
           category: string | null
           created_at: string
           currency: string
@@ -78,6 +79,7 @@ export type Database = {
         }
         Insert: {
           area?: number | null
+          attributes?: Json
           category?: string | null
           created_at?: string
           currency?: string
@@ -100,6 +102,7 @@ export type Database = {
         }
         Update: {
           area?: number | null
+          attributes?: Json
           category?: string | null
           created_at?: string
           currency?: string
