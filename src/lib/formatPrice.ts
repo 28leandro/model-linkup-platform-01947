@@ -12,19 +12,3 @@ export const formatPrice = (value: number | null | undefined, currency?: string)
   const withDots = String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   return `Gs. ${withDots}`;
 };
-
-import { convertPrice, type DisplayCurrency, USD_TO_PYG } from "@/contexts/CurrencyContext";
-
-/**
- * Format a stored price for display, converting between currencies if needed.
- * `sourceCurrency` is the currency the price was stored as.
- * `displayCurrency` is the currency the user wants to view.
- */
-export const formatDisplayPrice = (
-  value: number | null | undefined,
-  sourceCurrency: string | undefined,
-  displayCurrency: DisplayCurrency
-) => {
-  const converted = convertPrice(value, sourceCurrency, displayCurrency, USD_TO_PYG);
-  return formatPrice(converted, displayCurrency);
-};
