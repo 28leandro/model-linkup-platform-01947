@@ -449,6 +449,7 @@ const translations = {
     
     // Category Page
     'category.vehicles': 'Vehículos',
+    'category.realEstate': 'Inmuebles',
     'category.realEstateSale': 'Inmuebles en Venta',
     'category.realEstateRent': 'Inmuebles en Alquiler',
     'category.services': 'Servicios',
