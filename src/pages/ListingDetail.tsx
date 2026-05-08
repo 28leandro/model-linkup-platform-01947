@@ -25,6 +25,8 @@ import Header from "@/components/Header";
 import { LoginDialog } from "@/components/LoginDialog";
 import ListingMap from "@/components/ListingMap";
 import { formatPrice } from "@/lib/formatPrice";
+import EditableField from "@/components/EditableField";
+import { toast as sonnerToast } from "sonner";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -56,6 +58,15 @@ const ListingDetail = () => {
   
   // Verificar se o usuário é o dono do anúncio
   const isOwner = user && listing && user.id === listing.user_id;
+
+  const updateField = async (field: "title" | "price" | "description", value: string | number) => {
+    if (!listing) return;
+    const payload: any = { [field]: value };
+    const { error } = await supabase.from("listings").update(payload).eq("id", listing.id);
+    if (error) throw new Error(error.message);
+    setListing({ ...listing, ...payload } as Listing);
+    sonnerToast.success("Alteração salva com sucesso");
+  };
 
   const handleDelete = async () => {
     if (listing) {
@@ -197,7 +208,16 @@ const ListingDetail = () => {
               </div>
             )}
             
-            <h1 className="text-xl sm:text-2xl font-bold mb-2">{listing.title}</h1>
+            <h1 className="text-xl sm:text-2xl font-bold mb-2">
+              <EditableField
+                value={listing.title}
+                canEdit={!!isOwner}
+                onSave={(v) => updateField("title", v as string)}
+                validate={(v) =>
+                  v.trim().length < 5 ? "O título deve ter no mínimo 5 caracteres" : null
+                }
+              />
+            </h1>
             <div className="mb-3 sm:mb-4">
               <RatingSystem 
                 listingId={listing.id} 
@@ -271,9 +291,22 @@ const ListingDetail = () => {
 
             <div className="mt-4 sm:mt-6">
               <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3">{t('detail.description')}</h2>
-              <p className="text-muted-foreground text-sm sm:text-base">
-                {listing.description || t('detail.noDescription')}
-              </p>
+              <div className="text-muted-foreground text-sm sm:text-base">
+                <EditableField
+                  value={listing.description ?? ""}
+                  type="textarea"
+                  canEdit={!!isOwner}
+                  display={
+                    <span className="whitespace-pre-wrap">
+                      {listing.description || t('detail.noDescription')}
+                    </span>
+                  }
+                  onSave={(v) => updateField("description", v as string)}
+                  validate={(v) =>
+                    v.trim().length < 20 ? "A descrição deve ter pelo menos 20 caracteres" : null
+                  }
+                />
+              </div>
               
               {/* Informações adicionais para imóveis */}
               {listing.type === 'real-estate' && (
@@ -301,9 +334,20 @@ const ListingDetail = () => {
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         {listing.realEstateType === 'rent' ? t('detail.rentPerMonth') : t('detail.price')}
                       </p>
-                      <p className="text-base sm:text-lg font-semibold text-primary">
-                        {formatPrice(listing.price, (listing as any).currency)}
-                      </p>
+                      <div className="text-base sm:text-lg font-semibold text-primary">
+                        <EditableField
+                          value={listing.price}
+                          type="number"
+                          canEdit={!!isOwner}
+                          display={<span>{formatPrice(listing.price, (listing as any).currency)}</span>}
+                          onSave={(v) => updateField("price", Number(v))}
+                          validate={(v) => {
+                            const n = Number(v);
+                            if (Number.isNaN(n) || n <= 0) return "O preço deve ser um número positivo";
+                            return null;
+                          }}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
