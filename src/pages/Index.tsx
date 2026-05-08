@@ -242,6 +242,7 @@ const Index = () => {
         open={loginDialogOpen} 
         onOpenChange={setLoginDialogOpen}
       />
+      <Footer />
     </div>
   );
 };
