@@ -13,15 +13,9 @@ const ServiceCategories = () => {
       type: "vehicles"
     },
     {
-      name: t('categories.realEstateSale'),
-      description: t('categories.realEstateSale.desc'),
-      link: "/category/real-estate-sale",
-      type: "real-estate"
-    },
-    {
-      name: t('categories.realEstateRent'),
-      description: t('categories.realEstateRent.desc'),
-      link: "/category/real-estate-rent",
+      name: t('categories.realEstate') || 'Inmuebles',
+      description: t('categories.realEstate.desc') || 'Venta y alquiler de propiedades',
+      link: "/category/real-estate",
       type: "real-estate"
     },
     {
