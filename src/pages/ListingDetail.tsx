@@ -163,7 +163,7 @@ const ListingDetail = () => {
               {listing.images && listing.images.length > 1 && (
                 <>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="icon"
                     className="absolute left-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 sm:h-10 sm:w-10"
                     onClick={prevImage}
@@ -171,7 +171,7 @@ const ListingDetail = () => {
                     <ChevronLeft className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant="secondary"
+                    variant="outline"
                     size="icon"
                     className="absolute right-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 sm:h-10 sm:w-10"
                     onClick={nextImage}
@@ -247,6 +247,53 @@ const ListingDetail = () => {
               <MapPin className="w-4 h-4 flex-shrink-0" />
               <span className="line-clamp-1">{listing.location}</span>
             </div>
+
+            {/* Detalhes do Produto */}
+            {(() => {
+              const attrs = ((listing as any).attributes || {}) as Record<string, any>;
+              const labels: Record<string, string> = {
+                brand: "Marca",
+                model: "Modelo",
+                vehicleType: "Tipo de vehículo",
+                motoType: "Tipo de moto",
+                engineCC: "Cilindrada",
+                startType: "Arranque",
+                mileage: "Kilometraje",
+                transmission: "Transmisión",
+                propertyType: "Tipo de propiedad",
+                bedrooms: "Habitaciones",
+                bathrooms: "Baños",
+                parking: "Estacionamiento",
+                schedule: "Horario",
+                coverage: "Cobertura",
+              };
+              const extras: Array<[string, any]> = [];
+              if (listing.year) extras.push(["Año", listing.year]);
+              if ((listing as any).fuel_type) extras.push(["Combustible", (listing as any).fuel_type]);
+              if (listing.area) extras.push(["Área", `${listing.area} m²`]);
+              const entries = Object.entries(attrs)
+                .filter(([, v]) => v !== null && v !== undefined && v !== "")
+                .map(([k, v]) => {
+                  const label = labels[k] || k;
+                  const value = typeof v === "boolean" ? (v ? "Sí" : "No") : String(v);
+                  return [label, value] as [string, string];
+                });
+              const all = [...extras, ...entries];
+              if (all.length === 0) return null;
+              return (
+                <div className="mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl font-semibold mb-3">Detalles del Producto</h2>
+                  <div className="grid grid-cols-2 gap-2 sm:gap-3">
+                    {all.map(([label, value]) => (
+                      <div key={label} className="bg-muted p-2.5 sm:p-3 rounded-lg">
+                        <p className="text-xs sm:text-sm text-muted-foreground">{label}</p>
+                        <p className="text-sm sm:text-base font-semibold break-words">{value}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             <div className="flex flex-wrap gap-2 mb-4">
               <Button className="flex-1 min-w-[120px] h-10 sm:h-11 text-sm sm:text-base">
