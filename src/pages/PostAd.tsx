@@ -462,9 +462,9 @@ const PostAd = () => {
                 <div className="space-y-2">
                   <Label>Tipo de vehículo</Label>
                   <Select value={attributes.vehicleType || ""} onValueChange={(v) => setAttr("vehicleType", v)}>
-                    <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Carro / Moto" /></SelectTrigger>
+                    <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Auto / Moto" /></SelectTrigger>
                     <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                      <SelectItem value="car">Carro</SelectItem>
+                      <SelectItem value="car">Auto</SelectItem>
                       <SelectItem value="moto">Moto</SelectItem>
                     </SelectContent>
                   </Select>
