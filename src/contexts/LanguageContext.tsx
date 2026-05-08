@@ -325,7 +325,7 @@ const translations = {
     'postAd.phonePlaceholder': 'Ej: (021) 123-456',
     'postAd.description': 'Descripción',
     'postAd.descriptionPlaceholder': 'Describa su anuncio en detalle...',
-    'postAd.photos': 'Fotos (máx 5)',
+    'postAd.photos': 'Fotos',
     'postAd.addPhoto': 'Agregar foto',
     'postAd.publish': 'Publicar anuncio',
     'postAd.saveChanges': 'Guardar cambios',
