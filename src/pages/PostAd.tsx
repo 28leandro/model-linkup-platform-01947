@@ -701,6 +701,11 @@ const PostAd = () => {
                 <Label htmlFor="images">
                   {t('postAd.photos')}
                 </Label>
+                <p className="text-xs text-muted-foreground">
+                  {Math.min(previews.length, FREE_PHOTOS)}/{FREE_PHOTOS} fotos gratuitas
+                  {" · "}
+                  {Math.max(previews.length - FREE_PHOTOS, 0)}/{MAX_PHOTOS_UNLOCKED - FREE_PHOTOS} pago
+                </p>
                 {!photosUnlocked && previews.length >= FREE_PHOTOS && (
                   <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
                     <p className="text-sm text-muted-foreground">
