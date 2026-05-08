@@ -7,6 +7,7 @@ import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
+import Footer from "@/components/Footer";
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
