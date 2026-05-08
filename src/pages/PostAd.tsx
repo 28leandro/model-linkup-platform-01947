@@ -39,6 +39,9 @@ const PostAd = () => {
   const [area, setArea] = useState<number | "">("");
   const [year, setYear] = useState<number | "">("");
   const [fuelType, setFuelType] = useState("");
+  // Dynamic per-category attributes
+  const [attributes, setAttributes] = useState<Record<string, any>>({});
+  const setAttr = (k: string, v: any) => setAttributes((p) => ({ ...p, [k]: v }));
   const [previews, setPreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [location, setLocation] = useState({ 
@@ -94,6 +97,7 @@ const PostAd = () => {
       setArea((editingListing as any).area || "");
       setYear((editingListing as any).year || "");
       setFuelType((editingListing as any).fuel_type || "");
+      setAttributes(((editingListing as any).attributes as any) || {});
       setPreviews(editingListing.images || []);
       if ((editingListing as any).photos_unlocked) setPhotosUnlocked(true);
       setLocation({
