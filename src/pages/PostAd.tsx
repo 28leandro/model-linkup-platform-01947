@@ -312,8 +312,8 @@ const PostAd = () => {
         return;
       } else {
         const totalPhotos = finalImages.length;
-        const requiresPayment = totalPhotos > 3;
-        const insertData = { ...fullData, is_published: !requiresPayment };
+        const requiresPayment = totalPhotos > FREE_PHOTOS && !photosUnlocked;
+        const insertData = { ...fullData, is_published: !requiresPayment, photos_unlocked: photosUnlocked };
 
         const { data: inserted, error } = await supabase
           .from('listings')
@@ -326,15 +326,8 @@ const PostAd = () => {
         addListing(fullData);
 
         if (requiresPayment && inserted) {
-          toast({ title: "Pago necessário", description: `Gs. ${priceForPhotos(totalPhotos).toLocaleString('es-PY')} para liberar ${totalPhotos} fotos` });
-          const { data: orderData, error: fnErr } = await supabase.functions.invoke('pagopar-create-order', {
-            body: { listing_id: inserted.id, photo_count: totalPhotos },
-          });
-          if (fnErr || !orderData?.checkout_url) {
-            toast({ title: "Erro", description: fnErr?.message || "Falha ao gerar pago", variant: "destructive" });
-            return;
-          }
-          window.location.href = orderData.checkout_url;
+          toast({ title: "Pago necesario", description: "Desbloquea fotos ilimitadas para publicar este anuncio" });
+          navigate(`/photo-paywall?listing_id=${inserted.id}`);
           return;
         }
 
