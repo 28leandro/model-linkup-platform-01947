@@ -39,6 +39,16 @@ Deno.serve(async (req) => {
       throw new Error("listing_id and photo_count required");
     }
 
+    // Ownership check: ensure listing belongs to caller
+    const { data: ownedListing, error: ownErr } = await supabase
+      .from("listings")
+      .select("id")
+      .eq("id", listing_id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (ownErr) throw ownErr;
+    if (!ownedListing) throw new Error("listing not found or not owned by user");
+
     const amount = priceFor(photo_count);
     if (amount < 0) throw new Error("Maximum 12 photos");
     if (amount === 0) {
@@ -50,8 +60,11 @@ Deno.serve(async (req) => {
     }
 
     // Pagopar credentials (fictitious for now — replace later)
-    const PUBLIC_KEY = Deno.env.get("PAGOPAR_PUBLIC_KEY") ?? "FAKE_PUBLIC_KEY";
-    const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY") ?? "FAKE_PRIVATE_KEY";
+    const PUBLIC_KEY = Deno.env.get("PAGOPAR_PUBLIC_KEY");
+    const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY");
+    if (!PUBLIC_KEY || !PRIVATE_KEY) {
+      throw new Error("Pagopar keys not configured");
+    }
 
     const orderNumber = `LST-${listing_id.slice(0, 8)}-${Date.now()}`;
     // Pagopar token signature: SHA1(private_key + orderNumber + amount + currency)

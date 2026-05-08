@@ -289,6 +289,7 @@ export type Database = {
         Args: { listing_uuid: string }
         Returns: number
       }
+      get_my_listing_phone: { Args: { listing_uuid: string }; Returns: string }
     }
     Enums: {
       [_ in never]: never
