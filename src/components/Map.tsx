@@ -1,5 +1,4 @@
-import { useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Listing } from '@/store/listingsStore';
@@ -28,20 +27,37 @@ const makeIcon = (color: string) =>
     iconAnchor: [12, 12],
   });
 
-const FitBounds = ({ points }: { points: [number, number][] }) => {
-  const map = useMap();
-  useEffect(() => {
-    if (points.length === 0) return;
-    if (points.length === 1) {
-      map.setView(points[0], 13);
-    } else {
-      map.fitBounds(L.latLngBounds(points), { padding: [40, 40] });
-    }
-  }, [points, map]);
-  return null;
+const createPopupContent = (listing: Listing) => {
+  const symbol = (listing as any).currency === 'USD' ? 'US$' : 'Gs.';
+  const content = document.createElement('div');
+  content.style.padding = '4px';
+
+  const title = document.createElement('strong');
+  title.textContent = listing.title;
+  content.appendChild(title);
+
+  const location = document.createElement('div');
+  location.style.fontSize = '12px';
+  location.style.color = 'hsl(var(--muted-foreground))';
+  location.textContent = listing.location || '';
+  content.appendChild(location);
+
+  if (listing.price) {
+    const price = document.createElement('div');
+    price.style.fontWeight = 'bold';
+    price.style.color = 'hsl(var(--primary))';
+    price.style.marginTop = '4px';
+    price.textContent = `${symbol} ${new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(listing.price)}`;
+    content.appendChild(price);
+  }
+
+  return content;
 };
 
 const Map = ({ listings, onMarkerClick, center, zoom = 6 }: MapProps) => {
+  const mapElementRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
   const points = useMemo(
     () =>
       listings
@@ -52,6 +68,26 @@ const Map = ({ listings, onMarkerClick, center, zoom = 6 }: MapProps) => {
 
   // Geolocation: try user, fallback to default
   const initialCenter: [number, number] = center ?? DEFAULT_CENTER;
+
+  useEffect(() => {
+    if (!mapElementRef.current || mapRef.current) return;
+
+    mapRef.current = L.map(mapElementRef.current, {
+      center: initialCenter,
+      zoom,
+      scrollWheelZoom: true,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(mapRef.current);
+
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+      markersRef.current = [];
+    };
+  }, []);
 
   useEffect(() => {
     if (center || !navigator.geolocation) return;
@@ -66,46 +102,35 @@ const Map = ({ listings, onMarkerClick, center, zoom = 6 }: MapProps) => {
     );
   }, [center]);
 
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    markersRef.current.forEach((marker) => marker.remove());
+    markersRef.current = listings.flatMap((listing) => {
+      if (!listing.latitude || !listing.longitude || !mapRef.current) return [];
+
+      const marker = L.marker([listing.latitude, listing.longitude], {
+        icon: makeIcon(colorFor(listing.type)),
+      })
+        .bindPopup(createPopupContent(listing))
+        .on('click', () => onMarkerClick?.(listing))
+        .addTo(mapRef.current);
+
+      return [marker];
+    });
+
+    if (points.length === 1) {
+      mapRef.current.setView(points[0], 13);
+    } else if (points.length > 1) {
+      mapRef.current.fitBounds(L.latLngBounds(points), { padding: [40, 40] });
+    } else {
+      mapRef.current.setView(initialCenter, zoom);
+    }
+  }, [initialCenter, listings, onMarkerClick, points, zoom]);
+
   return (
     <div className="relative w-full h-[600px] rounded-lg overflow-hidden shadow-lg">
-      <MapContainer
-        center={initialCenter}
-        zoom={zoom}
-        style={{ height: '100%', width: '100%' }}
-        scrollWheelZoom={true}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <FitBounds points={points} />
-        {listings.map((listing) => {
-          if (!listing.latitude || !listing.longitude) return null;
-          const symbol = (listing as any).currency === 'USD' ? 'US$' : 'Gs.';
-          return (
-            <Marker
-              key={listing.id}
-              position={[listing.latitude, listing.longitude]}
-              icon={makeIcon(colorFor(listing.type))}
-              eventHandlers={{
-                click: () => onMarkerClick?.(listing),
-              }}
-            >
-              <Popup>
-                <div style={{ padding: 4 }}>
-                  <strong>{listing.title}</strong>
-                  <div style={{ fontSize: 12, color: '#666' }}>{listing.location || ''}</div>
-                  {listing.price ? (
-                    <div style={{ fontWeight: 'bold', color: '#10b981', marginTop: 4 }}>
-                      {symbol} {new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 }).format(listing.price)}
-                    </div>
-                  ) : null}
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
-      </MapContainer>
+      <div ref={mapElementRef} className="h-full w-full" />
       <div className="absolute top-4 left-4 z-[1000] bg-white p-3 rounded-lg shadow-md">
         <div className="flex items-center gap-4 text-sm">
           <div className="flex items-center gap-2">
