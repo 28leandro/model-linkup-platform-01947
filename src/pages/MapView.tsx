@@ -10,6 +10,7 @@ import { ArrowLeft } from "lucide-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
+import { getCityFromLocation } from "@/lib/utils";
 
 const MapView = () => {
   const { t } = useLanguage();
@@ -86,7 +87,7 @@ const MapView = () => {
                     mileage={(selectedListingData as any).mileage ?? (selectedListingData as any).attributes?.mileage}
                     fuelType={(selectedListingData as any).fuel_type ?? (selectedListingData as any).fuelType}
                   />
-                  <p className="text-xs sm:text-sm text-muted-foreground mt-2">{selectedListingData.location}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground mt-2">{getCityFromLocation(selectedListingData.location)}</p>
                   {selectedListingData.price && (
                     <p className="text-base sm:text-lg font-bold text-primary mt-2">
                       {formatPrice(selectedListingData.price, (selectedListingData as any).currency)}
@@ -121,7 +122,7 @@ const MapView = () => {
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-xs sm:text-sm truncate">{listing.title}</h4>
-                        <p className="text-xs text-muted-foreground truncate">{listing.location}</p>
+                        <p className="text-xs text-muted-foreground truncate">{getCityFromLocation(listing.location)}</p>
                         {listing.price && (
                           <p className="text-xs sm:text-sm font-bold text-primary mt-1">
                             {formatPrice(listing.price, (listing as any).currency)}
