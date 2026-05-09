@@ -7,7 +7,7 @@ const Logo = () => {
         className="tracking-tighter bg-clip-text text-transparent"
         style={{
           backgroundImage:
-            "linear-gradient(90deg, #632D48 0%, #EDA04E 40%, #4DC47F 70%, #3B82F6 100%)",
+            "linear-gradient(90deg, hsl(var(--primary)) 0%, hsl(var(--primary-glow)) 50%, hsl(var(--accent)) 100%)",
         }}
       >
         NΞMU
@@ -16,7 +16,7 @@ const Logo = () => {
         className="text-sm bg-clip-text text-transparent"
         style={{
           backgroundImage:
-            "linear-gradient(90deg, #3B82F6 0%, #632D48 100%)",
+            "linear-gradient(90deg, hsl(var(--accent)) 0%, hsl(var(--secondary)) 100%)",
         }}
       >
         .py
