@@ -152,6 +152,8 @@ const ListingDetail = () => {
               <img
                 src={listing.images && listing.images[currentImageIndex] ? listing.images[currentImageIndex] : "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"}
                 alt={`${listing.title} - Foto ${currentImageIndex + 1}`}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -201,6 +203,8 @@ const ListingDetail = () => {
                     <img
                       src={image}
                       alt={`Miniatura ${index + 1}`}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </button>
