@@ -41,7 +41,7 @@ const Index = () => {
           }
         }
       } catch {
-        console.log('IP geolocation unavailable');
+        // IP geolocation unavailable - silent fallback
       }
     };
 
