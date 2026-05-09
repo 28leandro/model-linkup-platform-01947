@@ -20,8 +20,19 @@ class LocationError extends Error {
   }
 }
 
+export interface LocationDetails {
+  address: string;
+  latitude: number;
+  longitude: number;
+  street?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
+  country?: string;
+}
+
 interface LocationPickerProps {
-  onLocationSelect: (location: { address: string; latitude: number; longitude: number }) => void;
+  onLocationSelect: (location: LocationDetails) => void;
   initialAddress?: string;
 }
 
@@ -49,12 +60,20 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       // Compose a clean structured address: Rua, Bairro, Cidade - CEP
       const street = [a.road || a.pedestrian || a.footway, a.house_number].filter(Boolean).join(', ');
       const neighborhood = a.suburb || a.neighbourhood || a.quarter || a.village;
-      const city = a.city || a.town || a.municipality || a.county;
-      const postcode = a.postcode;
+      // Carefully separate city from neighborhood and state. Prefer fields that
+      // explicitly represent a city/town/municipality and never fall back to
+      // state-level fields here.
+      const city =
+        a.city || a.town || a.municipality || a.village || a.hamlet || a.county || '';
+      const state = a.state || a.region || a.state_district || '';
+      const postcode = a.postcode || '';
+      const country = a.country || '';
       const parts = [street, neighborhood, city].filter(Boolean);
       let formatted = parts.join(' - ');
       if (postcode) formatted = formatted ? `${formatted}, CEP ${postcode}` : `CEP ${postcode}`;
-      return formatted || data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      const finalFormatted =
+        formatted || data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      return { formatted: finalFormatted, street, city, state, postcode, country };
     } finally {
       window.clearTimeout(fetchTimeout);
     }
@@ -200,12 +219,22 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
 
     try {
       const { latitude, longitude } = await getCurrentCoordinates();
-      const formattedAddress = await resolveAddress(latitude, longitude).catch(
-        () => `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
-      );
+      const details = await resolveAddress(latitude, longitude).catch(() => null);
+
+      const formattedAddress =
+        details?.formatted || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
 
       setAddress(formattedAddress);
-      onLocationSelect({ address: formattedAddress, latitude, longitude });
+      onLocationSelect({
+        address: formattedAddress,
+        latitude,
+        longitude,
+        street: details?.street || undefined,
+        city: details?.city || undefined,
+        state: details?.state || undefined,
+        postcode: details?.postcode || undefined,
+        country: details?.country || undefined,
+      });
 
       toast({
         title: t('location.obtained'),
