@@ -11,11 +11,13 @@ import PhotoPaywall from "./pages/PhotoPaywall";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import { ThemeProvider } from "next-themes";
 
 function App() {
   return (
     <ErrorBoundary>
-      <AuthProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+        <AuthProvider>
         <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/post-ad" element={<PostAd />} />
@@ -30,7 +32,8 @@ function App() {
           <Route path="/photo-paywall" element={<PhotoPaywall />} />
         </Routes>
         <Toaster />
-      </AuthProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </ErrorBoundary>
   );
 }
