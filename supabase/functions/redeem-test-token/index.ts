@@ -26,7 +26,16 @@ Deno.serve(async (req) => {
 
     const expected = Deno.env.get("TEST_PHOTO_TOKEN");
     if (!expected) throw new Error("Test token not configured");
-    if (String(code).trim() !== expected) {
+    const provided = String(code).trim();
+    const expectedClean = expected.trim();
+    if (
+      provided !== expectedClean &&
+      provided.toLowerCase() !== expectedClean.toLowerCase()
+    ) {
+      console.log("redeem-test-token: mismatch", {
+        providedLen: provided.length,
+        expectedLen: expectedClean.length,
+      });
       return new Response(JSON.stringify({ error: "Código inválido" }), {
         status: 403,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
