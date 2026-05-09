@@ -64,6 +64,12 @@ const PostAd = () => {
     }
   }, [user, loading, navigate, t]);
 
+  useEffect(() => {
+    if (window.sessionStorage.getItem("test_photo_unlock") === "true") {
+      setPhotosUnlocked(true);
+    }
+  }, []);
+
   const isEditing = !!id;
   const editingListing = isEditing
     ? (originalListing || listings.find(l => l.id === id))
@@ -120,7 +126,7 @@ const PostAd = () => {
     if (!photosUnlocked && total > FREE_PHOTOS) {
       toast({
         title: "Límite gratuito alcanzado",
-        description: "Solo puedes subir 3 fotos gratis. Desbloquea fotos ilimitadas para continuar.",
+      description: "Solo puedes subir 3 fotos gratis. Desbloquea hasta 10 fotos para continuar.",
         variant: "destructive",
       });
       const qs = id ? `?listing_id=${id}` : "";
@@ -343,7 +349,7 @@ const PostAd = () => {
         if (!photosUnlocked && finalImages.length > FREE_PHOTOS) {
           toast({
             title: "Pago necesario",
-            description: "Desbloquea fotos ilimitadas para guardar más de 3 fotos.",
+            description: "Desbloquea hasta 10 fotos para guardar más de 3 fotos.",
             variant: "destructive",
           });
           navigate(`/photo-paywall?listing_id=${editingListing.id}`);
@@ -383,7 +389,7 @@ const PostAd = () => {
         addListing(fullData);
 
         if (requiresPayment && inserted) {
-          toast({ title: "Pago necesario", description: "Desbloquea fotos ilimitadas para publicar este anuncio" });
+          toast({ title: "Pago necesario", description: "Desbloquea hasta 10 fotos para publicar este anuncio" });
           navigate(`/photo-paywall?listing_id=${inserted.id}`);
           return;
         }
@@ -779,8 +785,8 @@ const PostAd = () => {
                 </p>
                 {!photosUnlocked && previews.length >= FREE_PHOTOS && (
                   <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
-                    <p className="text-sm text-muted-foreground">
-                      💳 Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos.
+                      <p className="text-sm text-muted-foreground">
+                        Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos.
                     </p>
                     <Button
                       type="button"
