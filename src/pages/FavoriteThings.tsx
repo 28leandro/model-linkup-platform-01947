@@ -149,7 +149,7 @@ const FavoriteThings = () => {
                     <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
                     <VehicleInfo
                       year={(listing as any).year}
-                      mileage={(listing as any).mileage}
+                      mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
                       fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                     />
                     <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>

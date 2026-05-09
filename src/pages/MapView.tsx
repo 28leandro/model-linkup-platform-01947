@@ -83,7 +83,7 @@ const MapView = () => {
                   <h3 className="font-medium text-base sm:text-lg mb-2">{selectedListingData.title}</h3>
                   <VehicleInfo
                     year={(selectedListingData as any).year}
-                    mileage={(selectedListingData as any).mileage}
+                    mileage={(selectedListingData as any).mileage ?? (selectedListingData as any).attributes?.mileage}
                     fuelType={(selectedListingData as any).fuel_type ?? (selectedListingData as any).fuelType}
                   />
                   <p className="text-xs sm:text-sm text-muted-foreground mt-2">{selectedListingData.location}</p>

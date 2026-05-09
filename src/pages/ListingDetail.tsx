@@ -363,7 +363,7 @@ const ListingDetail = () => {
                 <div className="bg-muted/40 border border-border rounded-lg p-3 sm:p-4">
                   <VehicleInfo
                     year={listing.year}
-                    mileage={listing.mileage}
+                    mileage={listing.mileage ?? (listing as any).attributes?.mileage}
                     fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                     className="text-sm"
                   />
