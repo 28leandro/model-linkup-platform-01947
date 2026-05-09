@@ -140,7 +140,11 @@ const PostAd = () => {
       if ((data as any)?.error) throw new Error((data as any).error);
       setPhotosUnlocked(true);
       window.sessionStorage.setItem("test_photo_unlock", "true");
-      window.sessionStorage.setItem("test_photo_code", testCode.trim());
+      if (id) {
+        window.sessionStorage.removeItem("test_photo_code");
+      } else {
+        window.sessionStorage.setItem("test_photo_code", testCode.trim());
+      }
       toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
     } catch (error: any) {
       toast({
