@@ -26,3 +26,14 @@ export function getCityFromLocation(location?: string | null): string {
     /\b(av|avda|avenida|calle|rua|r\.|ruta|km|n[ºo°]|esq|esquina)\b/i.test(first);
   return looksLikeStreet && parts[1] ? parts[1] : first;
 }
+
+/**
+ * Resolves the public city for a listing. Prefers an explicit `city`
+ * attribute set by the seller; otherwise falls back to a heuristic on the
+ * full location string.
+ */
+export function getPublicCity(listing: any): string {
+  const explicit = listing?.attributes?.city;
+  if (typeof explicit === "string" && explicit.trim()) return explicit.trim();
+  return getCityFromLocation(listing?.location);
+}
