@@ -20,7 +20,11 @@ const PhotoPaywall = () => {
 
   const rememberUnlockedTestCode = (validCode: string) => {
     window.sessionStorage.setItem("test_photo_unlock", "true");
-    window.sessionStorage.setItem("test_photo_code", validCode);
+    if (listingId) {
+      window.sessionStorage.removeItem("test_photo_code");
+    } else {
+      window.sessionStorage.setItem("test_photo_code", validCode);
+    }
   };
 
   useEffect(() => {
