@@ -8,6 +8,7 @@ import MapView from "./pages/MapView";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import RefundPolicy from "./pages/RefundPolicy";
 import PhotoPaywall from "./pages/PhotoPaywall";
+import Inbox from "./pages/Inbox";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -28,6 +29,7 @@ function App() {
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/photo-paywall" element={<PhotoPaywall />} />
+        <Route path="/inbox" element={<Inbox />} />
         </Routes>
         <Toaster />
       </AuthProvider>

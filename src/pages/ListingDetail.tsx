@@ -28,6 +28,8 @@ import { formatPrice } from "@/lib/formatPrice";
 import EditableField from "@/components/EditableField";
 import { toast as sonnerToast } from "sonner";
 import { getPublicCity } from "@/lib/utils";
+import ContactSellerChat from "@/components/ContactSellerChat";
+import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -407,10 +409,21 @@ const ListingDetail = () => {
                   location={listing.location}
                 />
               )}
+
+              {!isOwner && listing.user_id && (
+                <ContactSellerChat
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                  sellerId={listing.user_id}
+                  currentUserId={user?.id || ""}
+                  onLoginRequired={() => setShowLoginDialog(true)}
+                />
+              )}
             </div>
           </CardContent>
         </Card>
       </div>
+      {!isOwner && <WhatsAppContactButton listingId={listing.id} listingTitle={listing.title} />}
     </div>
     </>
   );
