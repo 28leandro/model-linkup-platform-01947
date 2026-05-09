@@ -6,6 +6,19 @@ import { MapPin, Loader2, AlertTriangle } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from '@/components/ui/use-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Capacitor } from '@capacitor/core';
+import { Geolocation } from '@capacitor/geolocation';
+
+type LocationErrorCode = 'PERMISSION_DENIED' | 'POSITION_UNAVAILABLE' | 'TIMEOUT' | 'NOT_SUPPORTED';
+
+class LocationError extends Error {
+  code: LocationErrorCode;
+
+  constructor(code: LocationErrorCode, message?: string) {
+    super(message || code);
+    this.code = code;
+  }
+}
 
 interface LocationPickerProps {
   onLocationSelect: (location: { address: string; latitude: number; longitude: number }) => void;
@@ -106,8 +119,118 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     }
   };
 
-  const handleGetCurrentLocation = () => {
-    if (!navigator.geolocation) {
+  const resolveAddress = async (latitude: number, longitude: number) => {
+    const controller = new AbortController();
+    const fetchTimeout = window.setTimeout(() => controller.abort(), 8000);
+
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt`,
+        { signal: controller.signal }
+      );
+
+      if (!response.ok) throw new Error('Geocoding failed');
+
+      const data = await response.json();
+      return data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+    } finally {
+      window.clearTimeout(fetchTimeout);
+    }
+  };
+
+  const getBrowserPosition = (options: PositionOptions) =>
+    new Promise<GeolocationPosition>((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(resolve, reject, options);
+    });
+
+  const getBrowserWatchPosition = (options: PositionOptions) =>
+    new Promise<GeolocationPosition>((resolve, reject) => {
+      let watchId: number | null = null;
+      const timeoutId = window.setTimeout(() => {
+        if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+        reject(new LocationError('TIMEOUT'));
+      }, options.timeout || 20000);
+
+      watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          window.clearTimeout(timeoutId);
+          if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+          resolve(position);
+        },
+        (error) => {
+          window.clearTimeout(timeoutId);
+          if (watchId !== null) navigator.geolocation.clearWatch(watchId);
+          reject(error);
+        },
+        options
+      );
+    });
+
+  const getCurrentCoordinates = async () => {
+    if (Capacitor.isNativePlatform()) {
+      const permissions = await Geolocation.checkPermissions().catch(() => null);
+      let permissionStatus = permissions;
+
+      if (!permissionStatus || ['prompt', 'prompt-with-rationale'].includes(permissionStatus.location)) {
+        permissionStatus = await Geolocation.requestPermissions({ permissions: ['location', 'coarseLocation'] });
+      }
+
+      if (permissionStatus.location === 'denied') {
+        throw new LocationError('PERMISSION_DENIED');
+      }
+
+      try {
+        const position = await Geolocation.getCurrentPosition({
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 30000,
+        });
+        return position.coords;
+      } catch (error) {
+        const position = await Geolocation.getCurrentPosition({
+          enableHighAccuracy: false,
+          timeout: 20000,
+          maximumAge: 120000,
+        });
+        return position.coords;
+      }
+    }
+
+    if (!navigator.geolocation || !window.isSecureContext) {
+      throw new LocationError('NOT_SUPPORTED');
+    }
+
+    try {
+      const position = await getBrowserPosition({
+        enableHighAccuracy: true,
+        timeout: 12000,
+        maximumAge: 30000,
+      });
+      return position.coords;
+    } catch (error) {
+      const geoError = error as GeolocationPositionError;
+      if (geoError.code === geoError.PERMISSION_DENIED) throw new LocationError('PERMISSION_DENIED');
+
+      try {
+        const position = await getBrowserPosition({
+          enableHighAccuracy: false,
+          timeout: 18000,
+          maximumAge: 120000,
+        });
+        return position.coords;
+      } catch {
+        const position = await getBrowserWatchPosition({
+          enableHighAccuracy: false,
+          timeout: 22000,
+          maximumAge: 300000,
+        });
+        return position.coords;
+      }
+    }
+  };
+
+  const handleGetCurrentLocation = async () => {
+    if (!Capacitor.isNativePlatform() && (!navigator.geolocation || !window.isSecureContext)) {
       toast({
         title: t('location.notSupported'),
         description: t('location.notSupportedDesc'),
@@ -120,92 +243,43 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     setPermissionDenied(false);
     setLocationError(null);
 
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    // Always start with high accuracy (GPS) enabled, then fallback to low accuracy
-    const tryGeolocation = (highAccuracy: boolean) => {
-      const options: PositionOptions = {
-        enableHighAccuracy: highAccuracy,
-        timeout: highAccuracy ? 10000 : 15000,
-        maximumAge: 60000,
-      };
-
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-          
-          try {
-            const controller = new AbortController();
-            const fetchTimeout = setTimeout(() => controller.abort(), 8000);
-            
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt`,
-              {
-                headers: { 'User-Agent': 'LinkUpPlatform/1.0' },
-                signal: controller.signal,
-              }
-            );
-            clearTimeout(fetchTimeout);
-            
-            if (!response.ok) throw new Error('Geocoding failed');
-            
-            const data = await response.json();
-            const formattedAddress = data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-            
-            setAddress(formattedAddress);
-            onLocationSelect({ address: formattedAddress, latitude, longitude });
-            
-            toast({
-              title: t('location.obtained'),
-              description: t('location.obtainedDesc'),
-            });
-          } catch {
-            const fallbackAddress = `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
-            setAddress(fallbackAddress);
-            onLocationSelect({ address: fallbackAddress, latitude, longitude });
-            
-            toast({
-              title: t('location.obtained'),
-              description: t('location.obtainedDesc'),
-            });
-          } finally {
-            setIsGettingLocation(false);
-          }
-        },
-        (error) => {
-          // If high accuracy failed, retry with low accuracy
-          if (highAccuracy && error.code !== error.PERMISSION_DENIED) {
-            console.log('High accuracy failed, trying low accuracy...', error.message);
-            tryGeolocation(false);
-            return;
-          }
-          
-          setIsGettingLocation(false);
-          
-          let errorMessage = t('location.errorDesc');
-          if (error.code === error.PERMISSION_DENIED) {
-            errorMessage = t('location.permissionDenied');
-            setPermissionDenied(true);
-          } else if (error.code === error.POSITION_UNAVAILABLE) {
-            errorMessage = t('location.unavailable');
-          } else if (error.code === error.TIMEOUT) {
-            errorMessage = t('location.timeout');
-          }
-
-          setLocationError(errorMessage);
-          
-          toast({
-            title: t('location.error'),
-            description: errorMessage,
-            variant: "destructive",
-          });
-        },
-        options
+    try {
+      const { latitude, longitude } = await getCurrentCoordinates();
+      const formattedAddress = await resolveAddress(latitude, longitude).catch(
+        () => `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`
       );
-    };
 
-    // Always enable high accuracy on first attempt for best precision
-    tryGeolocation(true);
+      setAddress(formattedAddress);
+      onLocationSelect({ address: formattedAddress, latitude, longitude });
+
+      toast({
+        title: t('location.obtained'),
+        description: t('location.obtainedDesc'),
+      });
+    } catch (error) {
+      const locationErrorCode = error instanceof LocationError ? error.code : undefined;
+      let errorMessage = t('location.errorDesc');
+
+      if (locationErrorCode === 'PERMISSION_DENIED') {
+        errorMessage = t('location.permissionDenied');
+        setPermissionDenied(true);
+      } else if (locationErrorCode === 'TIMEOUT') {
+        errorMessage = t('location.timeout');
+      } else if (locationErrorCode === 'NOT_SUPPORTED') {
+        errorMessage = t('location.notSupportedDesc');
+      } else {
+        errorMessage = t('location.unavailable');
+      }
+
+      setLocationError(errorMessage);
+      toast({
+        title: t('location.error'),
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsGettingLocation(false);
+    }
   };
 
   return (
