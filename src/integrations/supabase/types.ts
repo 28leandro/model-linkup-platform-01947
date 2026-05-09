@@ -130,28 +130,34 @@ export type Database = {
           ad_id: string
           content: string
           created_at: string
+          guest_contact: string | null
+          guest_name: string | null
           id: string
           read_at: string | null
           receiver_id: string
-          sender_id: string
+          sender_id: string | null
         }
         Insert: {
           ad_id: string
           content: string
           created_at?: string
+          guest_contact?: string | null
+          guest_name?: string | null
           id?: string
           read_at?: string | null
           receiver_id: string
-          sender_id: string
+          sender_id?: string | null
         }
         Update: {
           ad_id?: string
           content?: string
           created_at?: string
+          guest_contact?: string | null
+          guest_name?: string | null
           id?: string
           read_at?: string | null
           receiver_id?: string
-          sender_id?: string
+          sender_id?: string | null
         }
         Relationships: []
       }
