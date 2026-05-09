@@ -125,6 +125,36 @@ export type Database = {
         }
         Relationships: []
       }
+      messages: {
+        Row: {
+          ad_id: string
+          content: string
+          created_at: string
+          id: string
+          read_at: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Insert: {
+          ad_id: string
+          content: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          receiver_id: string
+          sender_id: string
+        }
+        Update: {
+          ad_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          receiver_id?: string
+          sender_id?: string
+        }
+        Relationships: []
+      }
       payment_orders: {
         Row: {
           amount_pyg: number
@@ -301,6 +331,11 @@ export type Database = {
         Args: { listing_uuid: string }
         Returns: number
       }
+      get_listing_contact_phone: {
+        Args: { listing_uuid: string }
+        Returns: string
+      }
+      get_listing_owner: { Args: { listing_uuid: string }; Returns: string }
       get_my_listing_phone: { Args: { listing_uuid: string }; Returns: string }
     }
     Enums: {
