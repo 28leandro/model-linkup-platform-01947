@@ -90,6 +90,9 @@ const Index = () => {
           currency: item.currency,
           year: item.year,
           fuelType: item.fuel_type,
+          fuel_type: item.fuel_type,
+          mileage: item.attributes?.mileage,
+          attributes: item.attributes,
           created_at: item.created_at,
         }));
         setAllListings(formattedListings);
