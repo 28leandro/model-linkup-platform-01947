@@ -7,7 +7,7 @@ import Map from "@/components/Map";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { StarRating } from "@/components/StarRating";
+import VehicleInfo from "@/components/VehicleInfo";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
 
@@ -81,7 +81,11 @@ const MapView = () => {
                 </div>
                 <CardContent className="p-3 sm:p-4">
                   <h3 className="font-medium text-base sm:text-lg mb-2">{selectedListingData.title}</h3>
-                  <StarRating rating={selectedListingData.rating} />
+                  <VehicleInfo
+                    year={(selectedListingData as any).year}
+                    mileage={(selectedListingData as any).mileage}
+                    fuelType={(selectedListingData as any).fuel_type ?? (selectedListingData as any).fuelType}
+                  />
                   <p className="text-xs sm:text-sm text-muted-foreground mt-2">{selectedListingData.location}</p>
                   {selectedListingData.price && (
                     <p className="text-base sm:text-lg font-bold text-primary mt-2">

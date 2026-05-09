@@ -2,7 +2,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle, Trash2, ArrowLeft } from "lucide-react";
-import { RatingSystem } from "@/components/RatingSystem";
+import VehicleInfo from "@/components/VehicleInfo";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -359,10 +359,16 @@ const ListingDetail = () => {
             </div>
 
             <div className="mt-4 sm:mt-6">
-              <RatingSystem
-                listingId={listing.id}
-                listingOwnerId={listing.user_id}
-              />
+              {listing.type === 'vehicles' && (
+                <div className="bg-muted/40 border border-border rounded-lg p-3 sm:p-4">
+                  <VehicleInfo
+                    year={listing.year}
+                    mileage={listing.mileage}
+                    fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
+                    className="text-sm"
+                  />
+                </div>
+              )}
               
               {/* Informações adicionais para imóveis */}
               {listing.type === 'real-estate' && (

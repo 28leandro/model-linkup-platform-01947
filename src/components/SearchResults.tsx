@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { StarRating } from "@/components/StarRating";
+import VehicleInfo from "@/components/VehicleInfo";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Car, Home, Wrench } from "lucide-react";
@@ -78,7 +78,11 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                     {formatPrice(listing.price, (listing as any).currency)}
                   </p>
                 )}
-                <StarRating rating={listing.rating} />
+                <VehicleInfo
+                  year={(listing as any).year}
+                  mileage={(listing as any).mileage}
+                  fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
+                />
                 <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
               </CardContent>
             </Link>
