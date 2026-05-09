@@ -18,6 +18,15 @@ const PhotoPaywall = () => {
   const [code, setCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
 
+  const rememberUnlockedTestCode = (validCode: string) => {
+    window.sessionStorage.setItem("test_photo_unlock", "true");
+    if (listingId) {
+      window.sessionStorage.removeItem("test_photo_code");
+    } else {
+      window.sessionStorage.setItem("test_photo_code", validCode);
+    }
+  };
+
   useEffect(() => {
     if (!loading && !user) navigate("/");
   }, [user, loading, navigate]);
@@ -54,15 +63,6 @@ const PhotoPaywall = () => {
   };
 
   const redeemToken = async () => {
-    if (!listingId) {
-      toast({
-        title: "Anuncio no encontrado",
-        description: "Primero guarda el anuncio antes de canjear el código.",
-        variant: "destructive",
-      });
-      navigate("/post-ad");
-      return;
-    }
     if (!code.trim()) {
       toast({ title: "Ingresa un código", variant: "destructive" });
       return;
@@ -74,8 +74,9 @@ const PhotoPaywall = () => {
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
+      rememberUnlockedTestCode(code.trim());
       toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
-      navigate(`/post-ad/${listingId}`);
+      navigate(listingId ? `/post-ad/${listingId}` : "/post-ad");
     } catch (e: any) {
       toast({
         title: "Código inválido",

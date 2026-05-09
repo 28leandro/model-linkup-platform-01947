@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { ImagePlus, X, ArrowLeft } from "lucide-react";
+import { ImagePlus, X, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
@@ -51,6 +51,8 @@ const PostAd = () => {
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
   const [photosUnlocked, setPhotosUnlocked] = useState(false);
+  const [testCode, setTestCode] = useState("");
+  const [redeemingCode, setRedeemingCode] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -63,6 +65,15 @@ const PostAd = () => {
       navigate("/");
     }
   }, [user, loading, navigate, t]);
+
+  useEffect(() => {
+    if (
+      window.sessionStorage.getItem("test_photo_unlock") === "true" &&
+      window.sessionStorage.getItem("test_photo_code")
+    ) {
+      setPhotosUnlocked(true);
+    }
+  }, []);
 
   const isEditing = !!id;
   const editingListing = isEditing
@@ -114,17 +125,47 @@ const PostAd = () => {
 
   const maxPhotos = photosUnlocked ? MAX_PHOTOS_UNLOCKED : FREE_PHOTOS;
 
+  const redeemTestCode = async () => {
+    if (!testCode.trim()) {
+      toast({ title: "Ingresa un código", variant: "destructive" });
+      return;
+    }
+
+    setRedeemingCode(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("redeem-test-token", {
+        body: { listing_id: id, code: testCode.trim() },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      setPhotosUnlocked(true);
+      window.sessionStorage.setItem("test_photo_unlock", "true");
+      if (id) {
+        window.sessionStorage.removeItem("test_photo_code");
+      } else {
+        window.sessionStorage.setItem("test_photo_code", testCode.trim());
+      }
+      toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
+    } catch (error: any) {
+      toast({
+        title: "Código inválido",
+        description: error.message || "No se pudo aplicar el código",
+        variant: "destructive",
+      });
+    } finally {
+      setRedeemingCode(false);
+    }
+  };
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const total = files.length + previews.length;
     if (!photosUnlocked && total > FREE_PHOTOS) {
       toast({
         title: "Límite gratuito alcanzado",
-        description: "Solo puedes subir 3 fotos gratis. Desbloquea fotos ilimitadas para continuar.",
+        description: "Aplica un código de prueba o paga para subir hasta 10 fotos.",
         variant: "destructive",
       });
-      const qs = id ? `?listing_id=${id}` : "";
-      navigate(`/photo-paywall${qs}`);
       e.target.value = "";
       return;
     }
@@ -343,7 +384,7 @@ const PostAd = () => {
         if (!photosUnlocked && finalImages.length > FREE_PHOTOS) {
           toast({
             title: "Pago necesario",
-            description: "Desbloquea fotos ilimitadas para guardar más de 3 fotos.",
+            description: "Desbloquea hasta 10 fotos para guardar más de 3 fotos.",
             variant: "destructive",
           });
           navigate(`/photo-paywall?listing_id=${editingListing.id}`);
@@ -370,6 +411,7 @@ const PostAd = () => {
       } else {
         const totalPhotos = finalImages.length;
         const requiresPayment = totalPhotos > FREE_PHOTOS && !photosUnlocked;
+        const savedTestCode = totalPhotos > FREE_PHOTOS ? window.sessionStorage.getItem("test_photo_code") : null;
         const insertData = { ...fullData, is_published: !requiresPayment, photos_unlocked: photosUnlocked };
 
         const { data: inserted, error } = await supabase
@@ -382,8 +424,21 @@ const PostAd = () => {
 
         addListing(fullData);
 
+        if (inserted && savedTestCode) {
+          const { data: redeemData, error: redeemError } = await supabase.functions.invoke("redeem-test-token", {
+            body: { listing_id: inserted.id, code: savedTestCode },
+          });
+          if (redeemError) throw redeemError;
+          if ((redeemData as any)?.error) throw new Error((redeemData as any).error);
+          window.sessionStorage.removeItem("test_photo_code");
+          window.sessionStorage.removeItem("test_photo_unlock");
+          toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
+          navigate("/");
+          return;
+        }
+
         if (requiresPayment && inserted) {
-          toast({ title: "Pago necesario", description: "Desbloquea fotos ilimitadas para publicar este anuncio" });
+          toast({ title: "Pago necesario", description: "Desbloquea hasta 10 fotos para publicar este anuncio" });
           navigate(`/photo-paywall?listing_id=${inserted.id}`);
           return;
         }
@@ -775,19 +830,36 @@ const PostAd = () => {
                   {t('postAd.photos')}
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  {Math.min(previews.length, FREE_PHOTOS)}/{FREE_PHOTOS} fotos gratuito · hasta {MAX_PHOTOS_UNLOCKED} fotos pago
+                  {photosUnlocked
+                    ? `${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos liberadas`
+                    : `${Math.min(previews.length, FREE_PHOTOS)}/${FREE_PHOTOS} fotos gratuito · hasta ${MAX_PHOTOS_UNLOCKED} fotos con código o pago`}
                 </p>
-                {!photosUnlocked && previews.length >= FREE_PHOTOS && (
-                  <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
-                    <p className="text-sm text-muted-foreground">
-                      💳 Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos.
+                {!photosUnlocked && (
+                  <div className="space-y-3 p-3 rounded-md border bg-muted/30">
+                      <p className="text-sm text-muted-foreground">
+                      {previews.length >= FREE_PHOTOS
+                        ? "Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos."
+                        : "¿Tienes un código de prueba? Aplícalo para subir hasta 10 fotos."}
                     </p>
+                    <div className="flex gap-2">
+                      <Input
+                        value={testCode}
+                        onChange={(e) => setTestCode(e.target.value)}
+                        placeholder="Código de prueba"
+                        className="h-11 sm:h-10"
+                      />
+                      <Button type="button" variant="outline" onClick={redeemTestCode} disabled={redeemingCode}>
+                        {redeemingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        Aplicar
+                      </Button>
+                    </div>
                     <Button
                       type="button"
                       size="sm"
+                      className="w-full"
                       onClick={() => navigate(`/photo-paywall${id ? `?listing_id=${id}` : ""}`)}
                     >
-                      Desbloquear
+                      Pagar con Pagopar
                     </Button>
                   </div>
                 )}
