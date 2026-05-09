@@ -67,7 +67,10 @@ const PostAd = () => {
   }, [user, loading, navigate, t]);
 
   useEffect(() => {
-    if (window.sessionStorage.getItem("test_photo_unlock") === "true") {
+    if (
+      window.sessionStorage.getItem("test_photo_unlock") === "true" &&
+      window.sessionStorage.getItem("test_photo_code")
+    ) {
       setPhotosUnlocked(true);
     }
   }, []);
@@ -156,11 +159,9 @@ const PostAd = () => {
     if (!photosUnlocked && total > FREE_PHOTOS) {
       toast({
         title: "Límite gratuito alcanzado",
-      description: "Solo puedes subir 3 fotos gratis. Desbloquea hasta 10 fotos para continuar.",
+        description: "Aplica un código de prueba o paga para subir hasta 10 fotos.",
         variant: "destructive",
       });
-      const qs = id ? `?listing_id=${id}` : "";
-      navigate(`/photo-paywall${qs}`);
       e.target.value = "";
       return;
     }
