@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { ArrowLeft, Camera, Check, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -13,6 +15,8 @@ const PhotoPaywall = () => {
   const listingId = params.get("listing_id");
   const { user, loading } = useAuth();
   const [processing, setProcessing] = useState(false);
+  const [code, setCode] = useState("");
+  const [redeeming, setRedeeming] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate("/");
@@ -46,6 +50,40 @@ const PhotoPaywall = () => {
         variant: "destructive",
       });
       setProcessing(false);
+    }
+  };
+
+  const redeemToken = async () => {
+    if (!listingId) {
+      toast({
+        title: "Anuncio no encontrado",
+        description: "Primero guarda el anuncio antes de canjear el código.",
+        variant: "destructive",
+      });
+      navigate("/post-ad");
+      return;
+    }
+    if (!code.trim()) {
+      toast({ title: "Ingresa un código", variant: "destructive" });
+      return;
+    }
+    setRedeeming(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("redeem-test-token", {
+        body: { listing_id: listingId, code: code.trim() },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
+      navigate(`/post-ad/${listingId}`);
+    } catch (e: any) {
+      toast({
+        title: "Código inválido",
+        description: e.message || "No se pudo aplicar el código",
+        variant: "destructive",
+      });
+    } finally {
+      setRedeeming(false);
     }
   };
 
@@ -83,6 +121,31 @@ const PhotoPaywall = () => {
               {processing && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
               Pagar con Pagopar
             </Button>
+
+            <div className="relative py-2">
+              <div className="absolute inset-0 flex items-center"><span className="w-full border-t" /></div>
+              <div className="relative flex justify-center"><span className="bg-card px-2 text-xs text-muted-foreground">o</span></div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="test-code">Código promocional (fase de prueba)</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="test-code"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
+                  placeholder="Ingresa tu código"
+                  className="h-11 sm:h-10"
+                />
+                <Button variant="outline" onClick={redeemToken} disabled={redeeming}>
+                  {redeeming && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                  Aplicar
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Durante la fase de prueba, usa un código válido para subir hasta 10 fotos sin pagar.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
