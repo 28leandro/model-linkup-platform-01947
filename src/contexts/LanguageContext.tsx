@@ -212,6 +212,7 @@ const translations = {
     
     // Location errors
     'location.permissionDenied': 'Permissão de localização negada. Verifique as configurações do navegador.',
+    'location.permissionDeniedHelp': 'Habilite a localização para este app nas configurações do telefone ou navegador e tente novamente. Você também pode digitar o endereço manualmente.',
     'location.unavailable': 'Localização indisponível. Verifique sua conexão ou GPS.',
     'location.timeout': 'Tempo esgotado. Tente novamente.',
     
@@ -457,6 +458,7 @@ const translations = {
     
     // Location errors
     'location.permissionDenied': 'Permiso de ubicación denegado. Verifique la configuración del navegador.',
+    'location.permissionDeniedHelp': 'Habilite la ubicación para esta app en la configuración del teléfono o navegador e intente nuevamente. También puede escribir la dirección manualmente.',
     'location.unavailable': 'Ubicación no disponible. Verifique su conexión o GPS.',
     'location.timeout': 'Tiempo agotado. Intente nuevamente.',
     
