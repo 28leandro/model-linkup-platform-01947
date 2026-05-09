@@ -230,6 +230,19 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
   };
 
   const handleGetCurrentLocation = async () => {
+    if (
+      !Capacitor.isNativePlatform() &&
+      typeof window !== 'undefined' &&
+      window.location.protocol !== 'https:' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      const msg = t('location.httpsRequired');
+      setLocationError(msg);
+      toast({ title: t('location.error'), description: msg, variant: 'destructive' });
+      return;
+    }
+
     if (!Capacitor.isNativePlatform() && (!navigator.geolocation || !window.isSecureContext)) {
       toast({
         title: t('location.notSupported'),
@@ -258,17 +271,9 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       });
     } catch (error) {
       const locationErrorCode = error instanceof LocationError ? error.code : undefined;
-      let errorMessage = t('location.errorDesc');
-
+      const errorMessage = t('location.enableOrTypeManually');
       if (locationErrorCode === 'PERMISSION_DENIED') {
-        errorMessage = t('location.permissionDenied');
         setPermissionDenied(true);
-      } else if (locationErrorCode === 'TIMEOUT') {
-        errorMessage = t('location.timeout');
-      } else if (locationErrorCode === 'NOT_SUPPORTED') {
-        errorMessage = t('location.notSupportedDesc');
-      } else {
-        errorMessage = t('location.unavailable');
       }
 
       setLocationError(errorMessage);
