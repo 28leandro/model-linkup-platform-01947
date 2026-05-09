@@ -689,23 +689,61 @@ const PostAd = () => {
               )}
 
               <LocationPicker
-                onLocationSelect={setLocation}
+                onLocationSelect={(loc) => {
+                  setLocation({
+                    address: loc.address,
+                    latitude: loc.latitude,
+                    longitude: loc.longitude,
+                  });
+                  // Auto-fill structured fields when reverse geocoding returned them.
+                  setAttributes((prev) => {
+                    const next = { ...prev };
+                    if (loc.city) next.city = loc.city;
+                    if (loc.state) next.state = loc.state;
+                    if (loc.postcode) next.postcode = loc.postcode;
+                    if (loc.street) next.street = loc.street;
+                    return next;
+                  });
+                }}
                 initialAddress={location.address}
               />
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ciudad *</Label>
+                  <Input
+                    id="city"
+                    value={attributes.city || ""}
+                    onChange={(e) => setAttr("city", e.target.value)}
+                    placeholder="Ej: Asunción"
+                    required
+                    className="h-11 sm:h-10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="state">Departamento / Estado</Label>
+                  <Input
+                    id="state"
+                    value={attributes.state || ""}
+                    onChange={(e) => setAttr("state", e.target.value)}
+                    placeholder="Ej: Central"
+                    className="h-11 sm:h-10"
+                  />
+                </div>
+              </div>
+              <p className="-mt-1 text-xs text-muted-foreground">
+                Solo la ciudad será mostrada públicamente. La dirección detallada permanece privada.
+              </p>
+
               <div className="space-y-2">
-                <Label htmlFor="city">Ciudad *</Label>
+                <Label htmlFor="postcode">Código Postal (CEP)</Label>
                 <Input
-                  id="city"
-                  value={attributes.city || ""}
-                  onChange={(e) => setAttr("city", e.target.value)}
-                  placeholder="Ej: Asunción, Encarnación, Ciudad del Este"
-                  required
+                  id="postcode"
+                  value={attributes.postcode || ""}
+                  onChange={(e) => setAttr("postcode", e.target.value)}
+                  placeholder="Ej: 1209"
                   className="h-11 sm:h-10"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Solo la ciudad será mostrada públicamente. La dirección detallada permanece privada.
-                </p>
               </div>
 
               <div className="space-y-2">
