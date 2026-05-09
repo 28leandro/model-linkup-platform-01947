@@ -169,10 +169,11 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
   const getCurrentCoordinates = async () => {
     if (Capacitor.isNativePlatform()) {
       const permissions = await Geolocation.checkPermissions().catch(() => null);
-      const needsPermission = !permissions || ['prompt', 'prompt-with-rationale'].includes(permissions.location);
-      const permissionStatus = needsPermission
-        ? await Geolocation.requestPermissions({ permissions: ['location', 'coarseLocation'] })
-        : permissions;
+      let permissionStatus = permissions;
+
+      if (!permissionStatus || ['prompt', 'prompt-with-rationale'].includes(permissionStatus.location)) {
+        permissionStatus = await Geolocation.requestPermissions({ permissions: ['location', 'coarseLocation'] });
+      }
 
       if (permissionStatus.location === 'denied') {
         throw new LocationError('PERMISSION_DENIED');
