@@ -215,6 +215,9 @@ const translations = {
     'location.permissionDeniedHelp': 'Habilite a localização para este app nas configurações do telefone ou navegador e tente novamente. Você também pode digitar o endereço manualmente.',
     'location.unavailable': 'Localização indisponível. Verifique sua conexão ou GPS.',
     'location.timeout': 'Tempo esgotado. Tente novamente.',
+    'location.enableOrTypeManually': 'Por favor, ative a localização ou digite o endereço manualmente.',
+    'location.httpsRequired': 'A geolocalização requer uma conexão segura (HTTPS).',
+    'location.gettingLocation': 'Obtendo localização...',
     
     // Rating System
     'rating.title': 'Avaliação',
@@ -461,6 +464,9 @@ const translations = {
     'location.permissionDeniedHelp': 'Habilite la ubicación para esta app en la configuración del teléfono o navegador e intente nuevamente. También puede escribir la dirección manualmente.',
     'location.unavailable': 'Ubicación no disponible. Verifique su conexión o GPS.',
     'location.timeout': 'Tiempo agotado. Intente nuevamente.',
+    'location.enableOrTypeManually': 'Por favor, active la ubicación o escriba la dirección manualmente.',
+    'location.httpsRequired': 'La geolocalización requiere una conexión segura (HTTPS).',
+    'location.gettingLocation': 'Obteniendo ubicación...',
     
     // Rating System
     'rating.title': 'Evaluación',

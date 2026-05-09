@@ -203,8 +203,8 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     try {
       const position = await getBrowserPosition({
         enableHighAccuracy: true,
-        timeout: 12000,
-        maximumAge: 30000,
+        timeout: 10000,
+        maximumAge: 0,
       });
       return position.coords;
     } catch (error) {
@@ -230,6 +230,19 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
   };
 
   const handleGetCurrentLocation = async () => {
+    if (
+      !Capacitor.isNativePlatform() &&
+      typeof window !== 'undefined' &&
+      window.location.protocol !== 'https:' &&
+      window.location.hostname !== 'localhost' &&
+      window.location.hostname !== '127.0.0.1'
+    ) {
+      const msg = t('location.httpsRequired');
+      setLocationError(msg);
+      toast({ title: t('location.error'), description: msg, variant: 'destructive' });
+      return;
+    }
+
     if (!Capacitor.isNativePlatform() && (!navigator.geolocation || !window.isSecureContext)) {
       toast({
         title: t('location.notSupported'),
@@ -258,17 +271,9 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       });
     } catch (error) {
       const locationErrorCode = error instanceof LocationError ? error.code : undefined;
-      let errorMessage = t('location.errorDesc');
-
+      const errorMessage = t('location.enableOrTypeManually');
       if (locationErrorCode === 'PERMISSION_DENIED') {
-        errorMessage = t('location.permissionDenied');
         setPermissionDenied(true);
-      } else if (locationErrorCode === 'TIMEOUT') {
-        errorMessage = t('location.timeout');
-      } else if (locationErrorCode === 'NOT_SUPPORTED') {
-        errorMessage = t('location.notSupportedDesc');
-      } else {
-        errorMessage = t('location.unavailable');
       }
 
       setLocationError(errorMessage);
@@ -303,8 +308,9 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
               window.setTimeout(() => setShowSuggestions(false), 150);
             }}
             onKeyDown={handleKeyDown}
-            placeholder={t('postAd.locationPlaceholder')}
+            placeholder={isGettingLocation ? t('location.gettingLocation') : t('postAd.locationPlaceholder')}
             required
+            disabled={isGettingLocation}
             autoComplete="off"
             inputMode="search"
             enterKeyHint="search"
@@ -313,7 +319,7 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
             aria-expanded={showSuggestions}
             aria-controls="location-suggestions"
           />
-          {isSearching && (
+          {(isSearching || isGettingLocation) && (
             <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
           )}
           {showSuggestions && suggestions.length > 0 && (
