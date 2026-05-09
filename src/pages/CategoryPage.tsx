@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Car, Bike, Home, Building2, Trees, Wrench, Sparkles, Scissors, MoreHorizontal } from "lucide-react";
-import { StarRating } from "@/components/StarRating";
+import VehicleInfo from "@/components/VehicleInfo";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, useMemo } from "react";
 import type { Listing } from "@/store/listingsStore";
@@ -246,7 +246,11 @@ const CategoryPage = () => {
                     <div className="p-3 sm:p-4">
                       <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
                       <div className="mb-2">
-                        <StarRating rating={listing.rating} />
+                        <VehicleInfo
+                          year={(listing as any).year}
+                          mileage={(listing as any).mileage}
+                          fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
+                        />
                       </div>
                       <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
                     </div>

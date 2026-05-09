@@ -9,7 +9,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useFavorites } from "@/hooks/useFavorites";
 import { supabase } from "@/integrations/supabase/client";
-import { StarRating } from "@/components/StarRating";
+import VehicleInfo from "@/components/VehicleInfo";
 import FavoriteButton from "@/components/FavoriteButton";
 import { formatPrice } from "@/lib/formatPrice";
 
@@ -147,7 +147,11 @@ const FavoriteThings = () => {
                   </AspectRatio>
                   <div className="p-3 sm:p-4">
                     <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
-                    {listing.rating && <StarRating rating={listing.rating} />}
+                    <VehicleInfo
+                      year={(listing as any).year}
+                      mileage={(listing as any).mileage}
+                      fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
+                    />
                     <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
                     {listing.price && (
                       <p className="font-bold text-primary mt-2">

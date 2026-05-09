@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { StarRating } from "@/components/StarRating";
+import VehicleInfo from "@/components/VehicleInfo";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -80,7 +80,11 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                     {formatPrice(listing.price, (listing as any).currency)}
                   </p>
                 )}
-                <StarRating rating={listing.rating} />
+                <VehicleInfo
+                  year={(listing as any).year}
+                  mileage={(listing as any).mileage}
+                  fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
+                />
                 <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{listing.location}</p>
               </div>
             </Link>
