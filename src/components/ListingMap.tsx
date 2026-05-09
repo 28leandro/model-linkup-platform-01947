@@ -1,5 +1,4 @@
-import { useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin } from 'lucide-react';
@@ -21,19 +20,68 @@ interface ListingMapProps {
   location?: string;
 }
 
-const Recenter = ({ position }: { position: [number, number] }) => {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(position, map.getZoom());
-  }, [position, map]);
-  return null;
+const createPopupContent = (title: string, location?: string) => {
+  const content = document.createElement('div');
+  content.style.padding = '4px';
+  content.style.maxWidth = '200px';
+
+  const titleElement = document.createElement('strong');
+  titleElement.textContent = title;
+  content.appendChild(titleElement);
+
+  if (location) {
+    const locationElement = document.createElement('div');
+    locationElement.style.fontSize = '12px';
+    locationElement.style.color = 'hsl(var(--muted-foreground))';
+    locationElement.textContent = location;
+    content.appendChild(locationElement);
+  }
+
+  return content;
 };
 
 const ListingMap = ({ latitude, longitude, title, location }: ListingMapProps) => {
+  const mapElementRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markerRef = useRef<L.Marker | null>(null);
   const hasCoords = typeof latitude === 'number' && typeof longitude === 'number';
   const position: [number, number] = hasCoords
     ? [latitude as number, longitude as number]
     : DEFAULT_CENTER;
+
+  useEffect(() => {
+    if (!mapElementRef.current || mapRef.current) return;
+
+    mapRef.current = L.map(mapElementRef.current, {
+      center: position,
+      zoom: hasCoords ? 14 : 11,
+      scrollWheelZoom: false,
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(mapRef.current);
+
+    return () => {
+      mapRef.current?.remove();
+      mapRef.current = null;
+      markerRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    mapRef.current.setView(position, hasCoords ? 14 : 11);
+
+    if (!markerRef.current) {
+      markerRef.current = L.marker(position, { icon }).addTo(mapRef.current);
+    } else {
+      markerRef.current.setLatLng(position);
+    }
+
+    markerRef.current.bindPopup(createPopupContent(title, location));
+  }, [hasCoords, location, position, title]);
 
   return (
     <div className="mt-6">
@@ -46,28 +94,7 @@ const ListingMap = ({ latitude, longitude, title, location }: ListingMapProps) =
           Ubicación aproximada (Paraguay)
         </p>
       )}
-      <div className="relative w-full h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-lg border">
-        <MapContainer
-          center={position}
-          zoom={hasCoords ? 14 : 11}
-          style={{ height: '100%', width: '100%' }}
-          scrollWheelZoom={false}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <Recenter position={position} />
-          <Marker position={position} icon={icon}>
-            <Popup>
-              <div style={{ padding: '4px', maxWidth: '200px' }}>
-                <strong>{title}</strong>
-                {location && <div style={{ fontSize: 12, color: '#666' }}>{location}</div>}
-              </div>
-            </Popup>
-          </Marker>
-        </MapContainer>
-      </div>
+      <div ref={mapElementRef} className="relative w-full h-[300px] sm:h-[400px] rounded-lg overflow-hidden shadow-lg border" />
     </div>
   );
 };
