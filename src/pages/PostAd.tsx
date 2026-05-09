@@ -744,6 +744,8 @@ const PostAd = () => {
                       <img
                         src={preview}
                         alt={`Preview ${index + 1}`}
+                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full rounded-lg object-cover"
                       />
                       <button

@@ -38,14 +38,23 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
 
     try {
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&accept-language=pt`,
+        `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json&addressdetails=1&accept-language=pt`,
         { signal: controller.signal }
       );
 
       if (!response.ok) throw new Error('Geocoding failed');
 
       const data = await response.json();
-      return data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
+      const a = data.address || {};
+      // Compose a clean structured address: Rua, Bairro, Cidade - CEP
+      const street = [a.road || a.pedestrian || a.footway, a.house_number].filter(Boolean).join(', ');
+      const neighborhood = a.suburb || a.neighbourhood || a.quarter || a.village;
+      const city = a.city || a.town || a.municipality || a.county;
+      const postcode = a.postcode;
+      const parts = [street, neighborhood, city].filter(Boolean);
+      let formatted = parts.join(' - ');
+      if (postcode) formatted = formatted ? `${formatted}, CEP ${postcode}` : `CEP ${postcode}`;
+      return formatted || data.display_name || `${latitude.toFixed(6)}, ${longitude.toFixed(6)}`;
     } finally {
       window.clearTimeout(fetchTimeout);
     }
@@ -165,6 +174,26 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       return;
     }
 
+    // Check Permissions API upfront (browsers that support it)
+    if (
+      !Capacitor.isNativePlatform() &&
+      typeof navigator !== 'undefined' &&
+      'permissions' in navigator
+    ) {
+      try {
+        const status = await (navigator as Navigator).permissions.query({ name: 'geolocation' as PermissionName });
+        if (status.state === 'denied') {
+          setPermissionDenied(true);
+          const msg = t('location.permissionDeniedHelp');
+          setLocationError(msg);
+          toast({ title: t('location.permissionDenied'), description: msg, variant: 'destructive' });
+          return;
+        }
+      } catch {
+        // Permissions API not available — proceed and let getCurrentPosition handle it
+      }
+    }
+
     setIsGettingLocation(true);
     setPermissionDenied(false);
     setLocationError(null);
@@ -183,10 +212,25 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
         description: t('location.obtainedDesc'),
       });
     } catch (error) {
-      const locationErrorCode = error instanceof LocationError ? error.code : undefined;
-      const errorMessage = t('location.enableOrTypeManually');
+      let locationErrorCode: LocationErrorCode | undefined =
+        error instanceof LocationError ? error.code : undefined;
+      // Map raw GeolocationPositionError numeric codes
+      if (!locationErrorCode && error && typeof error === 'object' && 'code' in error) {
+        const code = (error as GeolocationPositionError).code;
+        if (code === 1) locationErrorCode = 'PERMISSION_DENIED';
+        else if (code === 2) locationErrorCode = 'POSITION_UNAVAILABLE';
+        else if (code === 3) locationErrorCode = 'TIMEOUT';
+      }
+      let errorMessage = t('location.enableOrTypeManually');
       if (locationErrorCode === 'PERMISSION_DENIED') {
         setPermissionDenied(true);
+        errorMessage = t('location.permissionDeniedHelp');
+      } else if (locationErrorCode === 'TIMEOUT') {
+        errorMessage = t('location.timeout');
+      } else if (locationErrorCode === 'POSITION_UNAVAILABLE') {
+        errorMessage = t('location.unavailable');
+      } else if (locationErrorCode === 'NOT_SUPPORTED') {
+        errorMessage = t('location.notSupportedDesc');
       }
 
       setLocationError(errorMessage);

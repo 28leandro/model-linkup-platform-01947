@@ -73,6 +73,8 @@ const MapView = () => {
                     <img
                       src={selectedListingData.images[0]}
                       alt={selectedListingData.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   )}
@@ -107,6 +109,8 @@ const MapView = () => {
                           <img
                             src={listing.images[0]}
                             alt={listing.title}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover"
                           />
                         )}

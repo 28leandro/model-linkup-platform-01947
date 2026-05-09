@@ -10,11 +10,13 @@ import RefundPolicy from "./pages/RefundPolicy";
 import PhotoPaywall from "./pages/PhotoPaywall";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 function App() {
   return (
-    <AuthProvider>
-      <Routes>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/post-ad" element={<PostAd />} />
         <Route path="/post-ad/:id" element={<PostAd />} />
@@ -25,10 +27,11 @@ function App() {
         <Route path="/payment/success" element={<PaymentSuccess />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/refund-policy" element={<RefundPolicy />} />
-        <Route path="/photo-paywall" element={<PhotoPaywall />} />
-      </Routes>
-      <Toaster />
-    </AuthProvider>
+          <Route path="/photo-paywall" element={<PhotoPaywall />} />
+        </Routes>
+        <Toaster />
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
