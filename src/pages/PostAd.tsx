@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { ImagePlus, X, ArrowLeft } from "lucide-react";
+import { ImagePlus, X, ArrowLeft, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
@@ -51,6 +51,8 @@ const PostAd = () => {
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
   const [photosUnlocked, setPhotosUnlocked] = useState(false);
+  const [testCode, setTestCode] = useState("");
+  const [redeemingCode, setRedeemingCode] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
