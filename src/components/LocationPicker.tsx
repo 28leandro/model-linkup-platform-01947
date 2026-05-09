@@ -212,7 +212,15 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
         description: t('location.obtainedDesc'),
       });
     } catch (error) {
-      const locationErrorCode = error instanceof LocationError ? error.code : undefined;
+      let locationErrorCode: LocationErrorCode | undefined =
+        error instanceof LocationError ? error.code : undefined;
+      // Map raw GeolocationPositionError numeric codes
+      if (!locationErrorCode && error && typeof error === 'object' && 'code' in error) {
+        const code = (error as GeolocationPositionError).code;
+        if (code === 1) locationErrorCode = 'PERMISSION_DENIED';
+        else if (code === 2) locationErrorCode = 'POSITION_UNAVAILABLE';
+        else if (code === 3) locationErrorCode = 'TIMEOUT';
+      }
       let errorMessage = t('location.enableOrTypeManually');
       if (locationErrorCode === 'PERMISSION_DENIED') {
         setPermissionDenied(true);
