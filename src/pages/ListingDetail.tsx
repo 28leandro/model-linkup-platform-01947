@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Phone, MapPin, ChevronLeft, ChevronRight, Edit, MessageCircle, Trash2, ArrowLeft } from "lucide-react";
+import { MapPin, ChevronLeft, ChevronRight, Edit, Trash2, ArrowLeft } from "lucide-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -27,6 +27,7 @@ import ListingMap from "@/components/ListingMap";
 import { formatPrice } from "@/lib/formatPrice";
 import EditableField from "@/components/EditableField";
 import { toast as sonnerToast } from "sonner";
+import { getCityFromLocation } from "@/lib/utils";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -249,7 +250,7 @@ const ListingDetail = () => {
             
             <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
               <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span className="line-clamp-1">{listing.location}</span>
+              <span className="line-clamp-1">{getCityFromLocation(listing.location)}</span>
             </div>
 
             {/* Detalhes do Produto */}
@@ -300,24 +301,6 @@ const ListingDetail = () => {
             })()}
 
             <div className="flex flex-wrap gap-2 mb-4">
-              <Button className="flex-1 min-w-[120px] h-10 sm:h-11 text-sm sm:text-base">
-                <Phone className="w-4 h-4 mr-2 flex-shrink-0" />
-                <span className="truncate">{listing.phone || t('detail.contact')}</span>
-              </Button>
-              <Button
-                variant="secondary"
-                className="flex-1 min-w-[120px] bg-green-500 hover:bg-green-600 text-white h-10 sm:h-11 text-sm sm:text-base"
-                asChild
-              >
-                <a 
-                  href={`https://wa.me/${listing.phone?.replace(/\D/g, '')}?text=${encodeURIComponent(`Hola! Me interesa tu anuncio: ${listing.title}`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <MessageCircle className="w-4 h-4 mr-2 flex-shrink-0" />
-                  WhatsApp
-                </a>
-              </Button>
               <ShareButtons title={listing.title} />
               {isOwner && (
                 <div className="flex gap-2 w-full xs:w-auto">
