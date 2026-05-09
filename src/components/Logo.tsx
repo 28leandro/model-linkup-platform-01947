@@ -10,7 +10,7 @@ const Logo = () => {
             "linear-gradient(90deg, #632D48 0%, #EDA04E 40%, #4DC47F 70%, #3B82F6 100%)",
         }}
       >
-        TROC
+        NΞMU
       </span>
       <span
         className="text-sm bg-clip-text text-transparent"
