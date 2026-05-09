@@ -749,7 +749,8 @@ const PostAd = () => {
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute -right-2 -top-2 rounded-full bg-destructive text-destructive-foreground p-1 shadow-md hover:bg-destructive/90"
+                        aria-label="Remove image"
+                        className="absolute -right-2 -top-2 flex h-11 w-11 items-center justify-center rounded-full bg-destructive text-destructive-foreground shadow-md hover:bg-destructive/90"
                       >
                         <X className="h-4 w-4" />
                       </button>
