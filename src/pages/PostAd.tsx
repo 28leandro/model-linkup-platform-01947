@@ -830,10 +830,12 @@ const PostAd = () => {
                     ? `${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos liberadas`
                     : `${Math.min(previews.length, FREE_PHOTOS)}/${FREE_PHOTOS} fotos gratuito · hasta ${MAX_PHOTOS_UNLOCKED} fotos con código o pago`}
                 </p>
-                {!photosUnlocked && previews.length >= FREE_PHOTOS && (
+                {!photosUnlocked && (
                   <div className="space-y-3 p-3 rounded-md border bg-muted/30">
                       <p className="text-sm text-muted-foreground">
-                        Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos.
+                      {previews.length >= FREE_PHOTOS
+                        ? "Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos."
+                        : "¿Tienes un código de prueba? Aplícalo para subir hasta 10 fotos."}
                     </p>
                     <div className="flex gap-2">
                       <Input
