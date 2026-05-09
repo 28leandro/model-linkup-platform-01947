@@ -694,6 +694,21 @@ const PostAd = () => {
               />
 
               <div className="space-y-2">
+                <Label htmlFor="city">Ciudad *</Label>
+                <Input
+                  id="city"
+                  value={attributes.city || ""}
+                  onChange={(e) => setAttr("city", e.target.value)}
+                  placeholder="Ej: Asunción, Encarnación, Ciudad del Este"
+                  required
+                  className="h-11 sm:h-10"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Solo la ciudad será mostrada públicamente. La dirección detallada permanece privada.
+                </p>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="phone">{t('postAd.phone')}</Label>
                 <Input
                   id="phone"

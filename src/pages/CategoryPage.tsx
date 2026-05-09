@@ -8,7 +8,7 @@ import { useEffect, useState, useMemo } from "react";
 import type { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ListingFilter, { SortOption, FilterOptions } from "@/components/ListingFilter";
-import { getCityFromLocation } from "@/lib/utils";
+import { getPublicCity } from "@/lib/utils";
 
 const CategoryPage = () => {
   const { id } = useParams();
@@ -253,7 +253,7 @@ const CategoryPage = () => {
                           fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                         />
                       </div>
-                      <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getCityFromLocation(listing.location)}</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getPublicCity(listing)}</p>
                     </div>
                   </Link>
                 </CardContent>
