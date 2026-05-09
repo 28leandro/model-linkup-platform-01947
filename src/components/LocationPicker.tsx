@@ -308,8 +308,9 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
               window.setTimeout(() => setShowSuggestions(false), 150);
             }}
             onKeyDown={handleKeyDown}
-            placeholder={t('postAd.locationPlaceholder')}
+            placeholder={isGettingLocation ? t('location.gettingLocation') : t('postAd.locationPlaceholder')}
             required
+            disabled={isGettingLocation}
             autoComplete="off"
             inputMode="search"
             enterKeyHint="search"
@@ -318,7 +319,7 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
             aria-expanded={showSuggestions}
             aria-controls="location-suggestions"
           />
-          {isSearching && (
+          {(isSearching || isGettingLocation) && (
             <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
           )}
           {showSuggestions && suggestions.length > 0 && (
