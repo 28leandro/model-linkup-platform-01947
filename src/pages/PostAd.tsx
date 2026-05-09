@@ -137,6 +137,7 @@ const PostAd = () => {
       if ((data as any)?.error) throw new Error((data as any).error);
       setPhotosUnlocked(true);
       window.sessionStorage.setItem("test_photo_unlock", "true");
+      window.sessionStorage.setItem("test_photo_code", testCode.trim());
       toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
     } catch (error: any) {
       toast({
@@ -418,6 +419,19 @@ const PostAd = () => {
         addListing(fullData);
 
         if (requiresPayment && inserted) {
+          const savedTestCode = window.sessionStorage.getItem("test_photo_code");
+          if (savedTestCode) {
+            const { data: redeemData, error: redeemError } = await supabase.functions.invoke("redeem-test-token", {
+              body: { listing_id: inserted.id, code: savedTestCode },
+            });
+            if (redeemError) throw redeemError;
+            if ((redeemData as any)?.error) throw new Error((redeemData as any).error);
+            window.sessionStorage.removeItem("test_photo_code");
+            window.sessionStorage.removeItem("test_photo_unlock");
+            toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
+            navigate("/");
+            return;
+          }
           toast({ title: "Pago necesario", description: "Desbloquea hasta 10 fotos para publicar este anuncio" });
           navigate(`/photo-paywall?listing_id=${inserted.id}`);
           return;
