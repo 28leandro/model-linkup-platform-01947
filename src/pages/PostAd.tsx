@@ -810,19 +810,34 @@ const PostAd = () => {
                   {t('postAd.photos')}
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  {Math.min(previews.length, FREE_PHOTOS)}/{FREE_PHOTOS} fotos gratuito · hasta {MAX_PHOTOS_UNLOCKED} fotos pago
+                  {photosUnlocked
+                    ? `${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos liberadas`
+                    : `${Math.min(previews.length, FREE_PHOTOS)}/${FREE_PHOTOS} fotos gratuito · hasta ${MAX_PHOTOS_UNLOCKED} fotos con código o pago`}
                 </p>
                 {!photosUnlocked && previews.length >= FREE_PHOTOS && (
-                  <div className="flex items-center justify-between gap-2 p-3 rounded-md border bg-muted/30">
+                  <div className="space-y-3 p-3 rounded-md border bg-muted/30">
                       <p className="text-sm text-muted-foreground">
                         Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos.
                     </p>
+                    <div className="flex gap-2">
+                      <Input
+                        value={testCode}
+                        onChange={(e) => setTestCode(e.target.value)}
+                        placeholder="Código de prueba"
+                        className="h-11 sm:h-10"
+                      />
+                      <Button type="button" variant="outline" onClick={redeemTestCode} disabled={redeemingCode}>
+                        {redeemingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                        Aplicar
+                      </Button>
+                    </div>
                     <Button
                       type="button"
                       size="sm"
+                      className="w-full"
                       onClick={() => navigate(`/photo-paywall${id ? `?listing_id=${id}` : ""}`)}
                     >
-                      Desbloquear
+                      Pagar con Pagopar
                     </Button>
                   </div>
                 )}
