@@ -203,8 +203,8 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     try {
       const position = await getBrowserPosition({
         enableHighAccuracy: true,
-        timeout: 12000,
-        maximumAge: 30000,
+        timeout: 10000,
+        maximumAge: 0,
       });
       return position.coords;
     } catch (error) {
