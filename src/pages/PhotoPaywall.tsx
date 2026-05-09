@@ -18,8 +18,9 @@ const PhotoPaywall = () => {
   const [code, setCode] = useState("");
   const [redeeming, setRedeeming] = useState(false);
 
-  const rememberUnlockedTestCode = () => {
+  const rememberUnlockedTestCode = (validCode: string) => {
     window.sessionStorage.setItem("test_photo_unlock", "true");
+    window.sessionStorage.setItem("test_photo_code", validCode);
   };
 
   useEffect(() => {
@@ -69,7 +70,7 @@ const PhotoPaywall = () => {
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
-      rememberUnlockedTestCode();
+      rememberUnlockedTestCode(code.trim());
       toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
       navigate(listingId ? `/post-ad/${listingId}` : "/post-ad");
     } catch (e: any) {
