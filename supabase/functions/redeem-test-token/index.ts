@@ -22,13 +22,19 @@ Deno.serve(async (req) => {
     if (!user) throw new Error("Not authenticated");
 
     const { listing_id, code } = await req.json();
-    if (!listing_id || !code) throw new Error("listing_id and code required");
+    if (!code) throw new Error("code required");
 
     const expected = Deno.env.get("TEST_PHOTO_TOKEN");
     if (!expected) throw new Error("Test token not configured");
     if (String(code).trim() !== expected) {
       return new Response(JSON.stringify({ error: "Código inválido" }), {
         status: 403,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (!listing_id) {
+      return new Response(JSON.stringify({ success: true, valid_only: true }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
