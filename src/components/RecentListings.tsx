@@ -6,7 +6,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import FavoriteButton from "@/components/FavoriteButton";
 import { Car, Home, Wrench } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
-import { getCityFromLocation } from "@/lib/utils";
+import { getPublicCity } from "@/lib/utils";
 
 const getCategoryIcon = (type?: string) => {
   switch (type) {
@@ -86,7 +86,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                   mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
                   fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                 />
-                <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getCityFromLocation(listing.location)}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getPublicCity(listing)}</p>
               </div>
             </Link>
           </div>

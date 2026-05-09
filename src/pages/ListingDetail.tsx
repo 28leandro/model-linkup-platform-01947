@@ -27,7 +27,7 @@ import ListingMap from "@/components/ListingMap";
 import { formatPrice } from "@/lib/formatPrice";
 import EditableField from "@/components/EditableField";
 import { toast as sonnerToast } from "sonner";
-import { getCityFromLocation } from "@/lib/utils";
+import { getPublicCity } from "@/lib/utils";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -250,7 +250,7 @@ const ListingDetail = () => {
             
             <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
               <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span className="line-clamp-1">{getCityFromLocation(listing.location)}</span>
+              <span className="line-clamp-1">{getPublicCity(listing)}</span>
             </div>
 
             {/* Detalhes do Produto */}
