@@ -248,7 +248,7 @@ const CategoryPage = () => {
                       <div className="mb-2">
                         <VehicleInfo
                           year={(listing as any).year}
-                          mileage={(listing as any).mileage}
+                          mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
                           fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                         />
                       </div>
