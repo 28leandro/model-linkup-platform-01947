@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -12,50 +12,97 @@ interface LocationPickerProps {
   initialAddress?: string;
 }
 
+interface NominatimSuggestion {
+  display_name: string;
+  lat: string;
+  lon: string;
+  place_id: number;
+}
+
 const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPickerProps) => {
   const [address, setAddress] = useState(initialAddress);
   const [isGettingLocation, setIsGettingLocation] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
+  const [suggestions, setSuggestions] = useState<NominatimSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [highlightIdx, setHighlightIdx] = useState<number>(-1);
+  const abortRef = useRef<AbortController | null>(null);
+  const debounceRef = useRef<number | null>(null);
+  const suppressNextSearchRef = useRef(false);
   const { t } = useLanguage();
 
-  // Try IP-based geolocation as a silent fallback on mount (no permission needed)
+  // Typeahead: query Nominatim with debounce when user types
   useEffect(() => {
-    if (!initialAddress) {
-      getLocationByIP();
+    if (suppressNextSearchRef.current) {
+      suppressNextSearchRef.current = false;
+      return;
     }
-  }, []);
+    const query = address.trim();
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    if (query.length < 3) {
+      setSuggestions([]);
+      setIsSearching(false);
+      return;
+    }
+    debounceRef.current = window.setTimeout(() => {
+      fetchSuggestions(query);
+    }, 350);
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [address]);
 
-  const getLocationByIP = async () => {
+  const fetchSuggestions = async (query: string) => {
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setIsSearching(true);
     try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch('https://ipapi.co/json/', {
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      
-      if (!response.ok) throw new Error('IP geolocation failed');
-      
-      const data = await response.json();
-      if (data.latitude && data.longitude) {
-        const cityAddress = [data.city, data.region, data.country_name]
-          .filter(Boolean)
-          .join(', ');
-        
-        if (cityAddress && !address) {
-          setAddress(cityAddress);
-          onLocationSelect({
-            address: cityAddress,
-            latitude: data.latitude,
-            longitude: data.longitude,
-          });
-        }
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        query
+      )}&format=json&addressdetails=1&limit=6&countrycodes=py,br,ar&accept-language=pt`;
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) throw new Error('search failed');
+      const data: NominatimSuggestion[] = await response.json();
+      setSuggestions(data);
+      setShowSuggestions(true);
+      setHighlightIdx(-1);
+    } catch (err) {
+      if ((err as any)?.name !== 'AbortError') {
+        setSuggestions([]);
       }
-    } catch {
-      // Silent fail - IP geolocation is just a convenience fallback
-      console.log('IP geolocation unavailable, user can set location manually');
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleSelectSuggestion = (s: NominatimSuggestion) => {
+    suppressNextSearchRef.current = true;
+    setAddress(s.display_name);
+    setShowSuggestions(false);
+    setSuggestions([]);
+    onLocationSelect({
+      address: s.display_name,
+      latitude: parseFloat(s.lat),
+      longitude: parseFloat(s.lon),
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!showSuggestions || suggestions.length === 0) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightIdx((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightIdx((i) => Math.max(i - 1, 0));
+    } else if (e.key === 'Enter' && highlightIdx >= 0) {
+      e.preventDefault();
+      handleSelectSuggestion(suggestions[highlightIdx]);
+    } else if (e.key === 'Escape') {
+      setShowSuggestions(false);
     }
   };
 
@@ -165,18 +212,61 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
     <div className="space-y-2">
       <Label htmlFor="location">{t('postAd.location')}</Label>
       <div className="flex flex-col sm:flex-row gap-2">
-        <Input
-          id="location"
-          type="text"
-          value={address}
-          onChange={(e) => {
-            setAddress(e.target.value);
-            onLocationSelect({ address: e.target.value, latitude: 0, longitude: 0 });
-          }}
-          placeholder={t('postAd.locationPlaceholder')}
-          required
-          className="h-11 sm:h-10"
-        />
+        <div className="relative flex-1">
+          <Input
+            id="location"
+            type="text"
+            value={address}
+            onChange={(e) => {
+              setAddress(e.target.value);
+              onLocationSelect({ address: e.target.value, latitude: 0, longitude: 0 });
+            }}
+            onFocus={() => {
+              if (suggestions.length > 0) setShowSuggestions(true);
+            }}
+            onBlur={() => {
+              // delay so click on suggestion still fires
+              window.setTimeout(() => setShowSuggestions(false), 150);
+            }}
+            onKeyDown={handleKeyDown}
+            placeholder={t('postAd.locationPlaceholder')}
+            required
+            autoComplete="off"
+            inputMode="search"
+            enterKeyHint="search"
+            className="h-11 sm:h-10 pr-9"
+            aria-autocomplete="list"
+            aria-expanded={showSuggestions}
+            aria-controls="location-suggestions"
+          />
+          {isSearching && (
+            <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 animate-spin text-muted-foreground" />
+          )}
+          {showSuggestions && suggestions.length > 0 && (
+            <ul
+              id="location-suggestions"
+              role="listbox"
+              className="absolute z-50 mt-1 w-full max-h-72 overflow-auto rounded-md border bg-popover text-popover-foreground shadow-lg"
+            >
+              {suggestions.map((s, idx) => (
+                <li
+                  key={s.place_id}
+                  role="option"
+                  aria-selected={idx === highlightIdx}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    handleSelectSuggestion(s);
+                  }}
+                  className={`cursor-pointer px-3 py-2 text-sm ${
+                    idx === highlightIdx ? 'bg-accent text-accent-foreground' : 'hover:bg-accent hover:text-accent-foreground'
+                  }`}
+                >
+                  {s.display_name}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
         <Button
           type="button"
           variant="outline"
