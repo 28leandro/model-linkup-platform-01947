@@ -6,7 +6,6 @@ import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import HeroCarousel from "@/components/HeroCarousel";
-import AdSlot from "@/components/AdSlot";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
 import Footer from "@/components/Footer";
