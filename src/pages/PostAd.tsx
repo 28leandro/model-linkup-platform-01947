@@ -648,19 +648,6 @@ const PostAd = () => {
                 );
               })()}
 
-              {category === "vehicles" && (
-                <div className="space-y-2">
-                  <Label>Tipo de vehículo</Label>
-                  <Select value={attributes.vehicleType || ""} onValueChange={(v) => setAttr("vehicleType", v)}>
-                    <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Auto / Moto" /></SelectTrigger>
-                    <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                      <SelectItem value="car">Auto</SelectItem>
-                      <SelectItem value="moto">Moto</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-
               <div className="space-y-2">
                 <Label htmlFor="price">{t('postAd.price')}</Label>
                 <div className="flex gap-2">
