@@ -1,5 +1,7 @@
 import {
   Car,
+  Bike,
+  Truck,
   Home,
   Wrench,
   Sofa,
@@ -61,6 +63,11 @@ export const CATEGORIES: Category[] = [
     desc_pt: "Carros, motos, caminhões",
     icon: Car,
     accent: "from-blue-500/15 to-indigo-500/10 text-blue-700 dark:text-blue-300",
+    subcategories: [
+      { id: "autos",     label_es: "Autos",      label_pt: "Carros",     icon: Car,   brands: ["Toyota","Volkswagen","Chevrolet","Ford","Hyundai","Kia","Nissan","Honda","Renault","Peugeot","Fiat","Mitsubishi","Mercedes-Benz","BMW","Audi","Suzuki","Mazda","Jeep"] },
+      { id: "motos",     label_es: "Motos",      label_pt: "Motos",      icon: Bike,  brands: ["Honda","Yamaha","Suzuki","Kawasaki","Bajaj","KTM","Kenton","Star","Leopard","Zanella"] },
+      { id: "camiones",  label_es: "Camiones",   label_pt: "Caminhões",  icon: Truck, brands: ["Mercedes-Benz","Volvo","Scania","Iveco","MAN","Volkswagen","Ford","Hyundai","JAC","Foton"] },
+    ],
   },
   {
     id: "real-estate",
