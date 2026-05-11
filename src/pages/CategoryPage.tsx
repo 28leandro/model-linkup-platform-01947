@@ -9,7 +9,7 @@ import type { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ListingFilter, { SortOption, FilterOptions } from "@/components/ListingFilter";
 import { getPublicCity } from "@/lib/utils";
-import { getCategoryById, getConditionMeta, CONDITIONS } from "@/lib/categories";
+import { getCategoryById } from "@/lib/categories";
 import { Badge } from "@/components/ui/badge";
 
 const CategoryPage = () => {
@@ -38,7 +38,6 @@ const CategoryPage = () => {
   const category = categoryMap[id || "vehicles"] ?? { type: id || "", titleKey: "category.vehicles" };
   const meta = getCategoryById(id || "");
   const [subFilter, setSubFilter] = useState<string>("all");
-  const [conditionFilter, setConditionFilter] = useState<string>("all");
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -64,9 +63,6 @@ const CategoryPage = () => {
 
     if (meta?.subcategories && subFilter !== "all") {
       filtered = filtered.filter((l: any) => l.subcategory === subFilter);
-    }
-    if (conditionFilter !== "all") {
-      filtered = filtered.filter((l: any) => l.condition === conditionFilter);
     }
 
     // Vehicle type filter (auto/moto) — only applies for vehicles category
@@ -148,7 +144,7 @@ const CategoryPage = () => {
       default:
         return filtered;
     }
-  }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type, subFilter, conditionFilter, meta]);
+  }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type, subFilter, meta]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -262,24 +258,6 @@ const CategoryPage = () => {
           </div>
         )}
 
-        {(meta?.id === "home-garden" || meta?.id === "tech") && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            <Button variant={conditionFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setConditionFilter("all")}>
-              Todos los estados
-            </Button>
-            {CONDITIONS.map((c) => (
-              <Button
-                key={c.id}
-                variant={conditionFilter === c.id ? "default" : "outline"}
-                size="sm"
-                onClick={() => setConditionFilter(c.id)}
-              >
-                {c.label_es}
-              </Button>
-            ))}
-          </div>
-        )}
-        
         {sortedListings.length === 0 ? (
           <div className="text-center py-8 sm:py-12">
             <p className="text-muted-foreground text-sm sm:text-base">{t('common.noListingsInCategory')}</p>

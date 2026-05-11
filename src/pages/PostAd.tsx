@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { listingSchema } from "@/lib/validations";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { CATEGORIES, CONDITIONS, getCategoryById } from "@/lib/categories";
 
 const FREE_PHOTOS = 3;
 const MAX_PHOTOS_UNLOCKED = 10;
@@ -39,6 +40,8 @@ const PostAd = () => {
   const [area, setArea] = useState<number | "">("");
   const [year, setYear] = useState<number | "">("");
   const [fuelType, setFuelType] = useState("");
+  const [subcategory, setSubcategory] = useState<string>("");
+  const [condition, setCondition] = useState<string>("");
   // Dynamic per-category attributes
   const [attributes, setAttributes] = useState<Record<string, any>>({});
   const setAttr = (k: string, v: any) => setAttributes((p) => ({ ...p, [k]: v }));
@@ -112,6 +115,8 @@ const PostAd = () => {
       setArea((editingListing as any).area || "");
       setYear((editingListing as any).year || "");
       setFuelType((editingListing as any).fuel_type || "");
+      setSubcategory((editingListing as any).subcategory || "");
+      setCondition((editingListing as any).condition || "");
       setAttributes(((editingListing as any).attributes as any) || {});
       setPreviews(editingListing.images || []);
       if ((editingListing as any).photos_unlocked) setPhotosUnlocked(true);
@@ -343,6 +348,8 @@ const PostAd = () => {
       area: (area === "" ? orig.area : area) ?? null,
       year: category === "vehicles" ? ((year === "" ? orig.year : year) ?? null) : (isEditing ? orig.year ?? null : null),
       fuel_type: category === "vehicles" ? (fuelType || orig.fuel_type || null) : (isEditing ? orig.fuel_type ?? null : null),
+      subcategory: subcategory || orig.subcategory || null,
+      condition: condition || orig.condition || null,
       attributes: attributes || {},
       latitude: location.latitude ?? orig.latitude,
       longitude: location.longitude ?? orig.longitude,
@@ -354,7 +361,7 @@ const PostAd = () => {
       const diff: any = {};
       const keys = [
         "title","description","category","type","location","phone","price",
-        "currency","area","year","fuel_type","latitude","longitude","rating",
+        "currency","area","year","fuel_type","subcategory","condition","latitude","longitude","rating",
       ];
       for (const k of keys) {
         const a = fullData[k];
@@ -520,12 +527,60 @@ const PostAd = () => {
                     position="popper"
                     sideOffset={4}
                   >
-                    <SelectItem value="vehicles">{t('postAd.categoryVehicles')}</SelectItem>
-                    <SelectItem value="real-estate">{t('postAd.categoryRealEstate')}</SelectItem>
-                    <SelectItem value="services">{t('postAd.categoryServices')}</SelectItem>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.label_es}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
+
+              {(() => {
+                const meta = getCategoryById(category);
+                if (!meta?.subcategories) return null;
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label>Subcategoría</Label>
+                      <Select value={subcategory} onValueChange={(v) => { setSubcategory(v); setAttr("brand", ""); }}>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar subcategoría" /></SelectTrigger>
+                        <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                          {meta.subcategories.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>{s.label_es}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Estado</Label>
+                      <Select value={condition} onValueChange={setCondition}>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar estado" /></SelectTrigger>
+                        <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                          {CONDITIONS.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>{c.label_es}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {(() => {
+                      const sub = meta.subcategories?.find((s) => s.id === subcategory);
+                      if (!sub?.brands?.length) return null;
+                      return (
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label>Marca</Label>
+                          <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
+                            <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
+                            <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                              {sub.brands.map((b) => (
+                                <SelectItem key={b} value={b}>{b}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                );
+              })()}
 
               {category === "vehicles" && (
                 <div className="space-y-2">
