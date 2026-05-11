@@ -1,118 +1,40 @@
-# Plan: Rediseño completo del marketplace estilo Leboncoin (PY)
+## Ajuste no campo Marca + novo campo Modelo (Veículos)
 
-Este es un cambio amplio. Lo dividimos en **5 fases** para entregar valor incrementalmente y evitar romper lo existente. Podés aprobar todo o pedirme ejecutar solo algunas fases.
+### Objetivo
+Na página de publicação, quando a categoria for **Vehículos**, expandir a lista de marcas (incluindo marcas chinesas como Geely, BYD, Chery, JAC, Great Wall, Haval, MG, Changan, Dongfeng, Foton, etc.) e adicionar um novo campo **Modelo** que mostra automaticamente os modelos da marca selecionada (apenas modelos comercializados de **2005 até o presente**).
 
-## Fase 1 — Taxonomía de categorías (base)
+### Mudanças
 
-Crear un archivo central `src/lib/categories.ts` con la estructura jerárquica del Paraguay:
+**1. `src/lib/categories.ts`**
+- Manter a estrutura atual de `subcategories` (autos / motos / camiones).
+- Substituir o array simples `brands: string[]` por uma estrutura `brandModels: Record<string, string[]>` em cada subcategoria de veículos, mapeando cada marca para sua lista de modelos (2005–atualidade).
+- Adicionar marcas chinesas:
+  - **Autos**: Geely, BYD, Chery, JAC, Great Wall, Haval, MG, Changan, Dongfeng, GAC, Lifan, DFSK
+  - **Camiones**: JAC, Foton, Sinotruk, Dongfeng, Shacman, FAW, Higer, Yutong, Golden Dragon
+  - **Motos**: Loncin, Lifan, Zongshen, Haojue, Jianshe (já existem Bajaj/Kenton/Star/Leopard)
+- Helper `getBrandsFor(subId)` e `getModelsFor(subId, brand)`.
 
-- **Vehículos** (ya existe)
-- **Inmuebles** (ya existe)
-- **Servicios** (ya existe)
-- **Hogar y Jardín** (NUEVO)
-  - Muebles (Sofás, Mesas, Camas)
-  - Electrodomésticos (Heladeras, Lavarropas, Microondas)
-  - Decoración (Alfombras, Iluminación, Cuadros)
-  - Jardín y Bricolaje
-- **Tecnología y Electrónica** (NUEVO)
-  - Informática y Tablets (Apple, Samsung, Lenovo, HP, Dell, Asus)
-  - Celulares y Smartphones (iPhone, Samsung Galaxy, Xiaomi, Motorola)
-  - Consolas y Videojuegos (PS5, Xbox Series, Nintendo Switch, PC Gamer)
-  - Objetos Conectados / IoT (Smartwatches, Alexa, Cámaras Wi-Fi)
-  - Accesorios (Teclados, Mouses, Cables, Fundas)
+**2. `src/pages/PostAd.tsx`**
+- O `Select` de Marca passa a ler de `getBrandsFor(subcategory)`.
+- Ao mudar a marca, limpar `attributes.model`.
+- Adicionar novo `Select` de **Modelo** logo abaixo da Marca, populado com `getModelsFor(subcategory, attributes.brand)`.
+  - Só aparece se houver marca selecionada.
+  - Inclui opção "Otro" que troca para um `Input` de texto livre (`modelCustom`), igual ao padrão já usado para "Otra" marca.
+- Aplica-se apenas à categoria `vehicles` (Hogar/Tech mantêm o comportamento atual com `brands` flat).
 
-Cada categoría con: `id`, `label_es`, `label_pt`, `icon` (lucide), subcategorías, marcas sugeridas.
-
-Lista de ciudades PY en `src/lib/cities.ts`: Asunción, Ciudad del Este, Encarnación, San Lorenzo, Luque, Capiatá, Lambaré, Fernando de la Mora, Pedro Juan Caballero, Coronel Oviedo, Villarrica, Concepción, etc.
-
-**Migración DB:** añadir columnas opcionales `subcategory`, `brand`, `model`, `condition` (`nuevo` | `como_nuevo` | `usado_excelente` | `usado_funcional`) a `listings`. Sin breaking changes (todo nullable).
-
-## Fase 2 — Home rediseñado (Bento + Banners + Ad slots)
-
-Reemplazo de `Index.tsx` por un layout limpio:
+### Detalhes técnicos
 
 ```text
-┌──────────────────────────────────────────────┐
-│  Header con búsqueda global prominente       │
-├──────────────────────────────────────────────┤
-│  Banner carrusel (max-h 250px)               │
-├──────────────────────────────────────────────┤
-│  Bento grid de 5 categorías (iconos lucide)  │
-├──────────────────────────────────────────────┤
-│  [Sidebar Ad]  Grid de productos  [Ad slot]  │
-├──────────────────────────────────────────────┤
-│  Footer                                       │
-└──────────────────────────────────────────────┘
+Subcategoria: Autos
+└─ Marca: [Toyota ▼]   ← lista expandida c/ chinesas
+   └─ Modelo: [Corolla ▼]   ← novo, filtrado por marca
+      ou "Otro" → input livre
 ```
 
-- Cartas con `rounded-2xl`, `shadow-sm hover:shadow-md`, mucho whitespace
-- Lazy-loading de imágenes (`loading="lazy"` ya existe, reforzar)
-- Componentes nuevos: `CategoryBento`, `HeroCarousel`, `AdSlot` (placeholder)
-- Soporte modo oscuro suave vía `next-themes` ya existente o toggle simple
+- Modelos cobertos: gerações comercializadas no Paraguai entre 2005 e 2026 (ex.: Toyota → Corolla, Hilux, Yaris, Etios, RAV4, Land Cruiser, Fortuner, Camry, Prius, Avanza, Innova, 4Runner, Tacoma, Hiace; BYD → F0, F3, Song, Tang, Yuan, Dolphin, Atto 3, Han, Seal; Geely → Emgrand, Coolray, Tugella, Atlas; etc.).
+- Lista grande ⇒ ficará num arquivo dedicado se ultrapassar ~400 linhas em `categories.ts` (extrair para `src/lib/vehicleBrands.ts`).
+- Sem alterações de schema / backend — `attributes.brand` e `attributes.model` já são salvos como JSONB.
 
-## Fase 3 — Filtros inteligentes + búsqueda
-
-Extender `ListingFilter`:
-- Rango de precio (PYG / USD)
-- Radio de KM desde ubicación del usuario (slider 5–500 km)
-- Fecha de publicación (Hoy, 7 días, 30 días)
-- Filtro por subcategoría dinámico según categoría
-- Filtro por marca (cuando aplica a tech)
-- Filtro por estado (Nuevo / Como Nuevo / Usado…) con badges de color
-
-Badges de estado en cada card:
-- Nuevo → verde
-- Como Nuevo → azul
-- Usado Excelente → ámbar
-- Usado Funcional → gris
-
-## Fase 4 — Flujo de publicación step-by-step
-
-Refactor de `PostAd.tsx` a wizard de pasos:
-
-1. **Categoría** → bento grid de categorías
-2. **Subcategoría** → grid de subcategorías
-3. **Detalles** → título, descripción, marca/modelo si tech, estado
-4. **Fotos** → drag-and-drop con preview, optimizado mobile
-5. **Precio + Ubicación** → currency toggle, ciudad PY, mapa
-6. **Revisar y publicar**
-
-Barra de progreso superior, transiciones suaves con `framer-motion` (ya en el proyecto si está, sino CSS transitions).
-
-## Fase 5 — VDP + Chat estilo iMessage
-
-**Listing Detail (VDP):**
-- Carrusel de fotos moderno (swipe en mobile, flechas en desktop)
-- Botón flotante "Contactar vendedor" fijo en mobile bottom
-- Mapa con ubicación aproximada (radio 500m, no exacta) — ya existe parcialmente
-- Sección de specs (marca, modelo, año, estado) según categoría
-
-**Chat (`ContactSellerChat` + `Inbox`):**
-- Burbujas estilo iMessage: emisor a la derecha azul, receptor a la izquierda gris
-- `rounded-2xl`, esquinas asimétricas en última burbuja del grupo
-- Timestamps agrupados, indicador "leído"
-- Input fijo abajo, autoexpansible
-- Sin headers pesados — minimalista
-
----
-
-## Detalles técnicos
-
-- **Stack:** React + Tailwind + lucide-react (ya en proyecto). Sin nuevas dependencias salvo que falte `framer-motion`.
-- **DB:** una sola migración aditiva (columnas nullable) — no rompe datos existentes.
-- **i18n:** todas las strings vía `t()` en `LanguageContext` (PT + ES).
-- **Performance:** lazy-load images, `React.lazy` para páginas pesadas, memoization en filtros.
-- **Responsive:** mobile-first, touch targets ≥44px, inputs 16px (regla iOS ya en `index.css`).
-- **Modo oscuro:** tokens HSL en `index.css` con variante `.dark`.
-
----
-
-## Pregunta antes de ejecutar
-
-Este trabajo es grande (~15–20 archivos nuevos/modificados + 1 migración). Sugiero:
-
-**Opción A — Ejecutar todo de corrido** (1 entrega grande, ~muchos pasos)
-**Opción B — Fase por fase** con tu aprobación entre cada una (más seguro)
-**Opción C — Solo fases priorizadas** (decime cuáles)
-
-Mi recomendación: **Opción B**, empezando por Fase 1 (taxonomía + migración) y Fase 2 (home rediseñado), que es donde el cambio visual es más impactante. Decime cómo seguimos.
+### Arquivos afetados
+- `src/lib/categories.ts` (ou novo `src/lib/vehicleBrands.ts` + import)
+- `src/pages/PostAd.tsx`
