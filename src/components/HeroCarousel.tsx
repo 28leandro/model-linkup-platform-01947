@@ -111,6 +111,45 @@ const HeroCarousel = () => {
               )}
             >
               <div className="absolute inset-0 bg-black/10" aria-hidden />
+              {s.confetti && (
+                <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+                  {Array.from({ length: 28 }).map((_, i) => {
+                    const colors = ["#FFD700", "#FF6B9A", "#7CE7FF", "#A8FF8C", "#FFB347", "#FFFFFF"];
+                    const color = colors[i % colors.length];
+                    const left = (i * 37) % 100;
+                    const top = (i * 53) % 100;
+                    const rotate = (i * 47) % 360;
+                    const size = 6 + (i % 4) * 3;
+                    const delay = (i % 6) * 0.4;
+                    return (
+                      <span
+                        key={i}
+                        className="absolute animate-bounce"
+                        style={{
+                          left: `${left}%`,
+                          top: `${top}%`,
+                          width: size,
+                          height: size * 0.4,
+                          background: color,
+                          transform: `rotate(${rotate}deg)`,
+                          animationDelay: `${delay}s`,
+                          animationDuration: `${2 + (i % 3)}s`,
+                          borderRadius: 2,
+                          opacity: 0.85,
+                        }}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+              {s.logo && (
+                <img
+                  src={s.logo}
+                  alt={`${s.id} logo`}
+                  loading="lazy"
+                  className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 h-24 sm:h-36 md:h-44 w-auto drop-shadow-xl object-contain hidden sm:block"
+                />
+              )}
               <div className="relative h-full w-full flex flex-col justify-center px-6 sm:px-10 max-w-3xl">
                 <h2 className="text-xl sm:text-3xl md:text-4xl font-bold leading-tight drop-shadow-sm">
                   {isPt ? s.title_pt : s.title_es}
