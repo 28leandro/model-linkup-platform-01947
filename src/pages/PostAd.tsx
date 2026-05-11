@@ -574,7 +574,7 @@ const PostAd = () => {
                         : [];
                       return (
                         <>
-                          <div className="space-y-2 sm:col-span-2">
+                          <div className="space-y-2">
                             <Label>Marca</Label>
                             <Select
                               value={attributes.brand || ""}
@@ -604,7 +604,7 @@ const PostAd = () => {
                             )}
                           </div>
                           {isVehicles && attributes.brand && attributes.brand !== "Otra" && (
-                            <div className="space-y-2 sm:col-span-2">
+                            <div className="space-y-2">
                               <Label>Modelo</Label>
                               <Select
                                 value={attributes.model || ""}
@@ -631,7 +631,7 @@ const PostAd = () => {
                             </div>
                           )}
                           {isVehicles && attributes.brand === "Otra" && (
-                            <div className="space-y-2 sm:col-span-2">
+                            <div className="space-y-2">
                               <Label>Modelo</Label>
                               <Input
                                 value={attributes.modelCustom || ""}
