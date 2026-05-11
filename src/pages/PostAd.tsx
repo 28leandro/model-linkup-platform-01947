@@ -541,9 +541,9 @@ const PostAd = () => {
                 return (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div className="space-y-2">
-                      <Label>Subcategoría</Label>
+                      <Label>{category === "vehicles" ? "Tipo de vehículo" : "Subcategoría"}</Label>
                       <Select value={subcategory} onValueChange={(v) => { setSubcategory(v); setAttr("brand", ""); }}>
-                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar subcategoría" /></SelectTrigger>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder={category === "vehicles" ? "Seleccionar tipo de vehículo" : "Seleccionar subcategoría"} /></SelectTrigger>
                         <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
                           {meta.subcategories.map((s) => (
                             <SelectItem key={s.id} value={s.id}>{s.label_es}</SelectItem>
