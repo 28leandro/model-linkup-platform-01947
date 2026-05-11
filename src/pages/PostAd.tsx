@@ -564,22 +564,31 @@ const PostAd = () => {
                     {(() => {
                       const sub = meta.subcategories?.find((s) => s.id === subcategory);
                       if (!sub?.brands?.length) return null;
-                      const listId = `brands-${meta.id}-${sub.id}`;
                       return (
                         <div className="space-y-2 sm:col-span-2">
                           <Label>Marca</Label>
-                          <Input
-                            list={listId}
+                          <Select
                             value={attributes.brand || ""}
-                            onChange={(e) => setAttr("brand", e.target.value)}
-                            placeholder="Escribí o elegí una marca"
-                            className="h-11 sm:h-10"
-                          />
-                          <datalist id={listId}>
-                            {sub.brands.map((b) => (
-                              <option key={b} value={b} />
-                            ))}
-                          </datalist>
+                            onValueChange={(v) => setAttr("brand", v)}
+                          >
+                            <SelectTrigger className="h-11 sm:h-10">
+                              <SelectValue placeholder="Seleccioná una marca" />
+                            </SelectTrigger>
+                            <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl z-50 max-h-72">
+                              {sub.brands.map((b) => (
+                                <SelectItem key={b} value={b}>{b}</SelectItem>
+                              ))}
+                              <SelectItem value="Otra">Otra</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          {attributes.brand === "Otra" && (
+                            <Input
+                              value={attributes.brandCustom || ""}
+                              onChange={(e) => setAttr("brandCustom", e.target.value)}
+                              placeholder="Escribí la marca"
+                              className="h-11 sm:h-10 mt-2"
+                            />
+                          )}
                         </div>
                       );
                     })()}
