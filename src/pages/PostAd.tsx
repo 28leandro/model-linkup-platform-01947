@@ -527,12 +527,60 @@ const PostAd = () => {
                     position="popper"
                     sideOffset={4}
                   >
-                    <SelectItem value="vehicles">{t('postAd.categoryVehicles')}</SelectItem>
-                    <SelectItem value="real-estate">{t('postAd.categoryRealEstate')}</SelectItem>
-                    <SelectItem value="services">{t('postAd.categoryServices')}</SelectItem>
+                    {CATEGORIES.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>{c.label_es}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
+
+              {(() => {
+                const meta = getCategoryById(category);
+                if (!meta?.subcategories) return null;
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-2">
+                      <Label>Subcategoría</Label>
+                      <Select value={subcategory} onValueChange={(v) => { setSubcategory(v); setAttr("brand", ""); }}>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar subcategoría" /></SelectTrigger>
+                        <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                          {meta.subcategories.map((s) => (
+                            <SelectItem key={s.id} value={s.id}>{s.label_es}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Estado</Label>
+                      <Select value={condition} onValueChange={setCondition}>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar estado" /></SelectTrigger>
+                        <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                          {CONDITIONS.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>{c.label_es}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    {(() => {
+                      const sub = meta.subcategories?.find((s) => s.id === subcategory);
+                      if (!sub?.brands?.length) return null;
+                      return (
+                        <div className="space-y-2 sm:col-span-2">
+                          <Label>Marca</Label>
+                          <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
+                            <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
+                            <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                              {sub.brands.map((b) => (
+                                <SelectItem key={b} value={b}>{b}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                );
+              })()}
 
               {category === "vehicles" && (
                 <div className="space-y-2">
