@@ -27,7 +27,7 @@ const SLIDES: Slide[] = [
     cta_es: "Conocé UPAP",
     cta_pt: "Conheça a UPAP",
     href: "https://www.upap.edu.py",
-    accent: "from-sky-700 via-blue-600 to-indigo-700",
+    accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
   },
   {
     id: "tech",
