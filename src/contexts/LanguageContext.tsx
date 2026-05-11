@@ -208,6 +208,8 @@ const translations = {
     'category.realEstateSale': 'Imóveis à Venda',
     'category.realEstateRent': 'Imóveis para Alugar',
     'category.services': 'Serviços',
+    'category.homeGarden': 'Casa e Jardim',
+    'category.tech': 'Tecnologia e Eletrônica',
     'category.default': 'Categoria',
     
     // Location errors
@@ -457,6 +459,8 @@ const translations = {
     'category.realEstateSale': 'Inmuebles en Venta',
     'category.realEstateRent': 'Inmuebles en Alquiler',
     'category.services': 'Servicios',
+    'category.homeGarden': 'Hogar y Jardín',
+    'category.tech': 'Tecnología y Electrónica',
     'category.default': 'Categoría',
     
     // Location errors

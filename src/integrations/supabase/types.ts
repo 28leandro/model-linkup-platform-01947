@@ -57,7 +57,9 @@ export type Database = {
         Row: {
           area: number | null
           attributes: Json
+          brand: string | null
           category: string | null
+          condition: string | null
           created_at: string
           currency: string
           description: string | null
@@ -68,10 +70,12 @@ export type Database = {
           latitude: number | null
           location: string | null
           longitude: number | null
+          model: string | null
           phone: string | null
           photos_unlocked: boolean
           price: number | null
           rating: number | null
+          subcategory: string | null
           title: string
           type: string | null
           user_id: string
@@ -80,7 +84,9 @@ export type Database = {
         Insert: {
           area?: number | null
           attributes?: Json
+          brand?: string | null
           category?: string | null
+          condition?: string | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -91,10 +97,12 @@ export type Database = {
           latitude?: number | null
           location?: string | null
           longitude?: number | null
+          model?: string | null
           phone?: string | null
           photos_unlocked?: boolean
           price?: number | null
           rating?: number | null
+          subcategory?: string | null
           title: string
           type?: string | null
           user_id: string
@@ -103,7 +111,9 @@ export type Database = {
         Update: {
           area?: number | null
           attributes?: Json
+          brand?: string | null
           category?: string | null
+          condition?: string | null
           created_at?: string
           currency?: string
           description?: string | null
@@ -114,10 +124,12 @@ export type Database = {
           latitude?: number | null
           location?: string | null
           longitude?: number | null
+          model?: string | null
           phone?: string | null
           photos_unlocked?: boolean
           price?: number | null
           rating?: number | null
+          subcategory?: string | null
           title?: string
           type?: string | null
           user_id?: string

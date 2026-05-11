@@ -4,7 +4,9 @@ import { useListingsStore } from "@/store/listingsStore";
 import { LoginDialog } from "@/components/LoginDialog";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
-import ServiceCategories from "@/components/ServiceCategories";
+import CategoryBento from "@/components/CategoryBento";
+import HeroCarousel from "@/components/HeroCarousel";
+import AdSlot from "@/components/AdSlot";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
 import Footer from "@/components/Footer";
@@ -221,27 +223,43 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Header onLoginClick={() => setLoginDialogOpen(true)} />
-      
-      <SearchBar 
+
+      <SearchBar
         searchQuery={searchQuery}
         onSearchQueryChange={setSearchQuery}
         onSearch={handleSearch}
       />
 
+      {!hasSearched && <HeroCarousel />}
+
+      {!hasSearched && <CategoryBento />}
+
       <div className="container mx-auto px-3 sm:px-4 py-4">
-        <ListingFilter 
-          sortOption={sortOption} 
+        <ListingFilter
+          sortOption={sortOption}
           onSortChange={setSortOption}
           filters={filters}
           onFiltersChange={setFilters}
         />
       </div>
 
-      {!hasSearched && <ServiceCategories />}
-
-      {hasSearched && <SearchResults listings={sortedListings} />}
-
-      {!hasSearched && <RecentListings listings={sortedListings} />}
+      <div className="container mx-auto px-3 sm:px-4">
+        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
+          <div className="hidden lg:block">
+            <AdSlot variant="sidebar" />
+          </div>
+          <div>
+            {hasSearched ? (
+              <SearchResults listings={sortedListings} />
+            ) : (
+              <RecentListings listings={sortedListings} />
+            )}
+            <div className="my-6">
+              <AdSlot variant="banner" />
+            </div>
+          </div>
+        </div>
+      </div>
 
       <LoginDialog
         open={loginDialogOpen} 
