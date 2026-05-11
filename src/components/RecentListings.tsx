@@ -4,7 +4,6 @@ import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import FavoriteButton from "@/components/FavoriteButton";
-import { Car, Home, Wrench } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import { getPublicCity } from "@/lib/utils";
 import { getCategoryById, getConditionMeta } from "@/lib/categories";
