@@ -17,7 +17,7 @@ export const listingSchema = z.object({
     .or(z.literal("")),
   category: z.string()
     .min(1, "Selecione uma categoria válida")
-    .refine((val) => ["vehicles", "real-estate", "services"].includes(val), {
+    .refine((val) => ["vehicles", "real-estate", "services", "home-garden", "tech"].includes(val), {
       message: "Selecione uma categoria válida"
     }),
   price: z.number()
