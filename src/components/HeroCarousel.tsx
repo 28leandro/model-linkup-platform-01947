@@ -102,7 +102,13 @@ const HeroCarousel = () => {
                 </p>
                 <div className="mt-4">
                   <Button asChild variant="secondary" size="sm" className="bg-white text-foreground hover:bg-white/90">
-                    <Link to={s.href}>{isPt ? s.cta_pt : s.cta_es}</Link>
+                    {s.href.startsWith("http") ? (
+                      <a href={s.href} target="_blank" rel="noopener noreferrer">
+                        {isPt ? s.cta_pt : s.cta_es}
+                      </a>
+                    ) : (
+                      <Link to={s.href}>{isPt ? s.cta_pt : s.cta_es}</Link>
+                    )}
                   </Button>
                 </div>
               </div>
