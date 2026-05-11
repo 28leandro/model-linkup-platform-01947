@@ -564,17 +564,22 @@ const PostAd = () => {
                     {(() => {
                       const sub = meta.subcategories?.find((s) => s.id === subcategory);
                       if (!sub?.brands?.length) return null;
+                      const listId = `brands-${meta.id}-${sub.id}`;
                       return (
                         <div className="space-y-2 sm:col-span-2">
                           <Label>Marca</Label>
-                          <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
-                            <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
-                            <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                              {sub.brands.map((b) => (
-                                <SelectItem key={b} value={b}>{b}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Input
+                            list={listId}
+                            value={attributes.brand || ""}
+                            onChange={(e) => setAttr("brand", e.target.value)}
+                            placeholder="Escribí o elegí una marca"
+                            className="h-11 sm:h-10"
+                          />
+                          <datalist id={listId}>
+                            {sub.brands.map((b) => (
+                              <option key={b} value={b} />
+                            ))}
+                          </datalist>
                         </div>
                       );
                     })()}

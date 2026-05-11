@@ -99,10 +99,10 @@ export const CATEGORIES: Category[] = [
     icon: Sofa,
     accent: "from-rose-500/15 to-pink-500/10 text-rose-700 dark:text-rose-300",
     subcategories: [
-      { id: "muebles",          label_es: "Muebles",          label_pt: "Móveis",            icon: Sofa,         examples: ["Sofás", "Mesas", "Camas"] },
-      { id: "electrodomesticos", label_es: "Electrodomésticos", label_pt: "Eletrodomésticos", icon: Refrigerator, examples: ["Heladeras", "Lavarropas", "Microondas"] },
-      { id: "decoracion",       label_es: "Decoración",       label_pt: "Decoração",         icon: Lamp,         examples: ["Alfombras", "Iluminación", "Cuadros"] },
-      { id: "jardin",           label_es: "Jardín y Bricolaje", label_pt: "Jardim e Bricolagem", icon: Trees,    examples: ["Herramientas", "Plantas", "Riego"] },
+      { id: "muebles",          label_es: "Muebles",          label_pt: "Móveis",            icon: Sofa,         examples: ["Sofás", "Mesas", "Camas"], brands: ["Placacentro","Salemma","Casa Rica","Tok&Stok","Ikea","Generico"] },
+      { id: "electrodomesticos", label_es: "Electrodomésticos", label_pt: "Eletrodomésticos", icon: Refrigerator, examples: ["Heladeras","Lavarropas","Microondas"], brands: ["Samsung","LG","Electrolux","Whirlpool","Philco","Consul","Brastemp","Midea","Tokyo","Mtek","James","Enxuta","Panasonic"] },
+      { id: "decoracion",       label_es: "Decoración",       label_pt: "Decoração",         icon: Lamp,         examples: ["Alfombras","Iluminación","Cuadros"], brands: ["Philips","Osram","Tramontina","Generico"] },
+      { id: "jardin",           label_es: "Jardín y Bricolaje", label_pt: "Jardim e Bricolagem", icon: Trees,    examples: ["Herramientas","Plantas","Riego"], brands: ["Stihl","Husqvarna","Black & Decker","Bosch","Makita","Tramontina","DeWalt","Stanley"] },
     ],
   },
   {
@@ -117,9 +117,10 @@ export const CATEGORIES: Category[] = [
     subcategories: [
       { id: "informatica",   label_es: "Informática y Tablets",  label_pt: "Informática e Tablets", icon: Laptop,     brands: ["Apple", "Samsung", "Lenovo", "HP", "Dell", "Asus"] },
       { id: "celulares",     label_es: "Celulares y Smartphones", label_pt: "Celulares e Smartphones", icon: Smartphone, brands: ["iPhone", "Samsung Galaxy", "Xiaomi", "Motorola", "Huawei"] },
+      { id: "televisores",   label_es: "Televisores",            label_pt: "Televisores",            icon: Cpu,        brands: ["Samsung","LG","Sony","TCL","Hisense","Philips","Panasonic","JVC","AOC","Tokyo","Mtek","Noblex","Aiwa"] },
       { id: "consolas",      label_es: "Consolas y Videojuegos",  label_pt: "Consoles e Videogames",  icon: Gamepad2,   brands: ["PS5", "Xbox Series", "Nintendo Switch", "PC Gamer"] },
       { id: "iot",           label_es: "Objetos Conectados (IoT)", label_pt: "Objetos Conectados (IoT)", icon: Watch,    brands: ["Apple", "Samsung", "Google", "Amazon", "Xiaomi"], examples: ["Smartwatches", "Alexa", "Google Home", "Cámaras Wi-Fi"] },
-      { id: "accesorios",    label_es: "Accesorios",              label_pt: "Acessórios",              icon: Keyboard,   examples: ["Teclados", "Mouses", "Cables", "Fundas"] },
+      { id: "accesorios",    label_es: "Accesorios",              label_pt: "Acessórios",              icon: Keyboard,   examples: ["Teclados","Mouses","Cables","Fundas"], brands: ["Logitech","Genius","HP","Microsoft","Razer","Redragon","Kingston","JBL"] },
     ],
   },
 ];
