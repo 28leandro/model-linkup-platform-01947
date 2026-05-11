@@ -869,17 +869,6 @@ const PostAd = () => {
               </p>
 
               <div className="space-y-2">
-                <Label htmlFor="postcode">Código Postal (CEP)</Label>
-                <Input
-                  id="postcode"
-                  value={attributes.postcode || ""}
-                  onChange={(e) => setAttr("postcode", e.target.value)}
-                  placeholder="Ej: 1209"
-                  className="h-11 sm:h-10"
-                />
-              </div>
-
-              <div className="space-y-2">
                 <Label htmlFor="phone">{t('postAd.phone')}</Label>
                 <Input
                   id="phone"
