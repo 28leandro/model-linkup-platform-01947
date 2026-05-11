@@ -4,7 +4,7 @@ import { useListingsStore } from "@/store/listingsStore";
 import { LoginDialog } from "@/components/LoginDialog";
 import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
-import CategoryBento from "@/components/CategoryBento";
+import ServiceCategories from "@/components/ServiceCategories";
 import HeroCarousel from "@/components/HeroCarousel";
 import AdSlot from "@/components/AdSlot";
 import SearchResults from "@/components/SearchResults";
@@ -232,7 +232,7 @@ const Index = () => {
 
       {!hasSearched && <HeroCarousel />}
 
-      {!hasSearched && <CategoryBento />}
+      {!hasSearched && <ServiceCategories />}
 
       <div className="container mx-auto px-3 sm:px-4 py-4">
         <ListingFilter
