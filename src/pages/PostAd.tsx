@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { listingSchema } from "@/lib/validations";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { CATEGORIES, CONDITIONS, getCategoryById } from "@/lib/categories";
+import { getVehicleBrands, getVehicleModels } from "@/lib/vehicleBrands";
 
 const FREE_PHOTOS = 3;
 const MAX_PHOTOS_UNLOCKED = 10;
@@ -563,33 +564,84 @@ const PostAd = () => {
                     </div>
                     {(() => {
                       const sub = meta.subcategories?.find((s) => s.id === subcategory);
-                      if (!sub?.brands?.length) return null;
+                      const isVehicles = category === "vehicles";
+                      const brandList = isVehicles
+                        ? getVehicleBrands(subcategory)
+                        : (sub?.brands ?? []);
+                      if (!brandList.length) return null;
+                      const modelList = isVehicles
+                        ? getVehicleModels(subcategory, attributes.brand)
+                        : [];
                       return (
-                        <div className="space-y-2 sm:col-span-2">
-                          <Label>Marca</Label>
-                          <Select
-                            value={attributes.brand || ""}
-                            onValueChange={(v) => setAttr("brand", v)}
-                          >
-                            <SelectTrigger className="h-11 sm:h-10">
-                              <SelectValue placeholder="Seleccioná una marca" />
-                            </SelectTrigger>
-                            <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl z-50 max-h-72">
-                              {sub.brands.map((b) => (
-                                <SelectItem key={b} value={b}>{b}</SelectItem>
-                              ))}
-                              <SelectItem value="Otra">Otra</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          {attributes.brand === "Otra" && (
-                            <Input
-                              value={attributes.brandCustom || ""}
-                              onChange={(e) => setAttr("brandCustom", e.target.value)}
-                              placeholder="Escribí la marca"
-                              className="h-11 sm:h-10 mt-2"
-                            />
+                        <>
+                          <div className="space-y-2 sm:col-span-2">
+                            <Label>Marca</Label>
+                            <Select
+                              value={attributes.brand || ""}
+                              onValueChange={(v) => {
+                                setAttr("brand", v);
+                                setAttr("model", "");
+                                setAttr("modelCustom", "");
+                              }}
+                            >
+                              <SelectTrigger className="h-11 sm:h-10">
+                                <SelectValue placeholder="Seleccioná una marca" />
+                              </SelectTrigger>
+                              <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl z-50 max-h-72">
+                                {brandList.map((b) => (
+                                  <SelectItem key={b} value={b}>{b}</SelectItem>
+                                ))}
+                                <SelectItem value="Otra">Otra</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            {attributes.brand === "Otra" && (
+                              <Input
+                                value={attributes.brandCustom || ""}
+                                onChange={(e) => setAttr("brandCustom", e.target.value)}
+                                placeholder="Escribí la marca"
+                                className="h-11 sm:h-10 mt-2"
+                              />
+                            )}
+                          </div>
+                          {isVehicles && attributes.brand && attributes.brand !== "Otra" && (
+                            <div className="space-y-2 sm:col-span-2">
+                              <Label>Modelo</Label>
+                              <Select
+                                value={attributes.model || ""}
+                                onValueChange={(v) => setAttr("model", v)}
+                              >
+                                <SelectTrigger className="h-11 sm:h-10">
+                                  <SelectValue placeholder="Seleccioná un modelo" />
+                                </SelectTrigger>
+                                <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl z-50 max-h-72">
+                                  {modelList.map((m) => (
+                                    <SelectItem key={m} value={m}>{m}</SelectItem>
+                                  ))}
+                                  <SelectItem value="Otro">Otro</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              {attributes.model === "Otro" && (
+                                <Input
+                                  value={attributes.modelCustom || ""}
+                                  onChange={(e) => setAttr("modelCustom", e.target.value)}
+                                  placeholder="Escribí el modelo"
+                                  className="h-11 sm:h-10 mt-2"
+                                />
+                              )}
+                            </div>
                           )}
-                        </div>
+                          {isVehicles && attributes.brand === "Otra" && (
+                            <div className="space-y-2 sm:col-span-2">
+                              <Label>Modelo</Label>
+                              <Input
+                                value={attributes.modelCustom || ""}
+                                onChange={(e) => setAttr("modelCustom", e.target.value)}
+                                placeholder="Escribí el modelo"
+                                className="h-11 sm:h-10"
+                              />
+                            </div>
+                          )}
+                        </>
                       );
                     })()}
                   </div>
