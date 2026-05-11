@@ -148,7 +148,7 @@ const CategoryPage = () => {
       default:
         return filtered;
     }
-  }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type]);
+  }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type, subFilter, conditionFilter, meta]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -236,6 +236,47 @@ const CategoryPage = () => {
             <Button variant={serviceTypeFilter === 'other' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('other')} className="gap-2">
               <MoreHorizontal className="h-4 w-4" /> Otros
             </Button>
+          </div>
+        )}
+
+        {meta?.subcategories && (
+          <div className="mb-3 flex flex-wrap gap-2">
+            <Button variant={subFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setSubFilter("all")}>
+              Todas
+            </Button>
+            {meta.subcategories.map((sub) => {
+              const SubIcon = sub.icon;
+              return (
+                <Button
+                  key={sub.id}
+                  variant={subFilter === sub.id ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setSubFilter(sub.id)}
+                  className="gap-2"
+                >
+                  {SubIcon && <SubIcon className="h-4 w-4" />}
+                  {t === undefined ? sub.label_es : sub.label_es}
+                </Button>
+              );
+            })}
+          </div>
+        )}
+
+        {(meta?.id === "home-garden" || meta?.id === "tech") && (
+          <div className="mb-4 flex flex-wrap gap-2">
+            <Button variant={conditionFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setConditionFilter("all")}>
+              Todos los estados
+            </Button>
+            {CONDITIONS.map((c) => (
+              <Button
+                key={c.id}
+                variant={conditionFilter === c.id ? "default" : "outline"}
+                size="sm"
+                onClick={() => setConditionFilter(c.id)}
+              >
+                {c.label_es}
+              </Button>
+            ))}
           </div>
         )}
         
