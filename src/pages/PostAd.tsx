@@ -725,20 +725,19 @@ const PostAd = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {attributes.vehicleType === "moto" ? (
                     <>
-                      <div className="space-y-2">
-                        <Label>Marca</Label>
-                        <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
-                          <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
-                          <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                            {["Kenton","Star","Leopard","Taiga","Honda","Yamaha","Kawasaki","Suzuki","BMW","KTM","Harley-Davidson","Otra"].map(b => (
-                              <SelectItem key={b} value={b}>{b}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="model">Modelo</Label>
-                        <Input id="model" value={attributes.model || ""} onChange={(e) => setAttr("model", e.target.value)} placeholder="Ej: CG 150" className="h-11 sm:h-10" />
+                      <div className="space-y-2 sm:col-span-2">
+                        <Label>Marca y modelo</Label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
+                            <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
+                            <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                              {["Kenton","Star","Leopard","Taiga","Honda","Yamaha","Kawasaki","Suzuki","BMW","KTM","Harley-Davidson","Otra"].map(b => (
+                                <SelectItem key={b} value={b}>{b}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Input id="model" value={attributes.model || ""} onChange={(e) => setAttr("model", e.target.value)} placeholder="Modelo (Ej: CG 150)" className="h-11 sm:h-10" />
+                        </div>
                       </div>
                       <div className="space-y-2">
                         <Label>Cilindrada (CC)</Label>
@@ -787,20 +786,19 @@ const PostAd = () => {
                     </>
                   ) : (
                   <>
-                  <div className="space-y-2">
-                    <Label>Marca</Label>
-                    <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
-                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
-                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                        {["Toyota","Nissan","Chevrolet","Volkswagen","Hyundai","Kia","Mitsubishi","Suzuki","Honda","Mercedes-Benz","BMW","Ford","Mazda","Subaru","Lexus","Isuzu","Chery","JAC","Geely","Dongfeng","Great Wall","Renault","Peugeot","Fiat","Audi","Otra"].map(b => (
-                          <SelectItem key={b} value={b}>{b}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="model">Modelo</Label>
-                    <Input id="model" value={attributes.model || ""} onChange={(e) => setAttr("model", e.target.value)} placeholder="Ej: Corolla" className="h-11 sm:h-10" />
+                  <div className="space-y-2 sm:col-span-2">
+                    <Label>Marca y modelo</Label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <Select value={attributes.brand || ""} onValueChange={(v) => setAttr("brand", v)}>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar marca" /></SelectTrigger>
+                        <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                          {["Toyota","Nissan","Chevrolet","Volkswagen","Hyundai","Kia","Mitsubishi","Suzuki","Honda","Mercedes-Benz","BMW","Ford","Mazda","Subaru","Lexus","Isuzu","Chery","JAC","Geely","Dongfeng","Great Wall","Renault","Peugeot","Fiat","Audi","Otra"].map(b => (
+                            <SelectItem key={b} value={b}>{b}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Input id="model" value={attributes.model || ""} onChange={(e) => setAttr("model", e.target.value)} placeholder="Modelo (Ej: Corolla)" className="h-11 sm:h-10" />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="year">{t('postAd.year')}</Label>
