@@ -9,6 +9,8 @@ import type { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ListingFilter, { SortOption, FilterOptions } from "@/components/ListingFilter";
 import { getPublicCity } from "@/lib/utils";
+import { getCategoryById, getConditionMeta, CONDITIONS } from "@/lib/categories";
+import { Badge } from "@/components/ui/badge";
 
 const CategoryPage = () => {
   const { id } = useParams();
@@ -28,10 +30,15 @@ const CategoryPage = () => {
     "real-estate": { type: "real-estate", titleKey: "category.realEstate" },
     "real-estate-sale": { type: "real-estate", titleKey: "category.realEstateSale" },
     "real-estate-rent": { type: "real-estate", titleKey: "category.realEstateRent" },
-    "services": { type: "services", titleKey: "category.services" }
+    "services": { type: "services", titleKey: "category.services" },
+    "home-garden": { type: "home-garden", titleKey: "category.homeGarden" },
+    "tech": { type: "tech", titleKey: "category.tech" },
   };
 
   const category = categoryMap[id || "vehicles"] ?? { type: id || "", titleKey: "category.vehicles" };
+  const meta = getCategoryById(id || "");
+  const [subFilter, setSubFilter] = useState<string>("all");
+  const [conditionFilter, setConditionFilter] = useState<string>("all");
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -54,6 +61,13 @@ const CategoryPage = () => {
   // Apply filters and sort listings
   const sortedListings = useMemo(() => {
     let filtered = [...categoryListings];
+
+    if (meta?.subcategories && subFilter !== "all") {
+      filtered = filtered.filter((l: any) => l.subcategory === subFilter);
+    }
+    if (conditionFilter !== "all") {
+      filtered = filtered.filter((l: any) => l.condition === conditionFilter);
+    }
 
     // Vehicle type filter (auto/moto) — only applies for vehicles category
     if (category.type === 'vehicles' && vehicleTypeFilter !== 'all') {
