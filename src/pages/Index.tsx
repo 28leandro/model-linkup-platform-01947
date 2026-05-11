@@ -6,7 +6,6 @@ import Header from "@/components/Header";
 import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import HeroCarousel from "@/components/HeroCarousel";
-import AdSlot from "@/components/AdSlot";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
 import Footer from "@/components/Footer";
@@ -230,9 +229,9 @@ const Index = () => {
         onSearch={handleSearch}
       />
 
-      {!hasSearched && <HeroCarousel />}
-
       {!hasSearched && <ServiceCategories />}
+
+      {!hasSearched && <HeroCarousel />}
 
       <div className="container mx-auto px-3 sm:px-4 py-4">
         <ListingFilter
@@ -244,21 +243,11 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-3 sm:px-4">
-        <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-6">
-          <div className="hidden lg:block">
-            <AdSlot variant="sidebar" />
-          </div>
-          <div>
-            {hasSearched ? (
-              <SearchResults listings={sortedListings} />
-            ) : (
-              <RecentListings listings={sortedListings} />
-            )}
-            <div className="my-6">
-              <AdSlot variant="banner" />
-            </div>
-          </div>
-        </div>
+        {hasSearched ? (
+          <SearchResults listings={sortedListings} />
+        ) : (
+          <RecentListings listings={sortedListings} />
+        )}
       </div>
 
       <LoginDialog
