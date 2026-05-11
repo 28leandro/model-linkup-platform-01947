@@ -38,7 +38,7 @@ const SLIDES: Slide[] = [
     cta_es: "Explorar Tecnología",
     cta_pt: "Explorar Tecnologia",
     href: "/category/tech",
-    accent: "from-violet-600 via-fuchsia-500 to-rose-500",
+    accent: "from-slate-500 via-slate-400 to-slate-500",
   },
   {
     id: "home",
@@ -49,7 +49,7 @@ const SLIDES: Slide[] = [
     cta_es: "Ver Hogar y Jardín",
     cta_pt: "Ver Casa e Jardim",
     href: "/category/home-garden",
-    accent: "from-emerald-500 via-teal-500 to-cyan-500",
+    accent: "from-stone-400 via-stone-500 to-zinc-500",
   },
   {
     id: "vehicles",
@@ -60,7 +60,7 @@ const SLIDES: Slide[] = [
     cta_es: "Ver Vehículos",
     cta_pt: "Ver Veículos",
     href: "/category/vehicles",
-    accent: "from-blue-600 via-indigo-500 to-purple-500",
+    accent: "from-zinc-500 via-slate-500 to-slate-600",
   },
 ];
 
