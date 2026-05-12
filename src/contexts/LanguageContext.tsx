@@ -472,6 +472,15 @@ const translations = {
     'login.backToLogin': 'Volver al inicio de sesión',
     'login.attemptsRemaining': 'Contraseña incorrecta. Te quedan {n} intento(s).',
     'login.lockedOut': 'Demasiados intentos. Recupera tu contraseña abajo.',
+    'resetPassword.title': 'Restablecer contraseña',
+    'resetPassword.description': 'Crea una nueva contraseña para tu cuenta.',
+    'resetPassword.newPassword': 'Nueva contraseña',
+    'resetPassword.confirmPassword': 'Confirmar nueva contraseña',
+    'resetPassword.submit': 'Restablecer contraseña',
+    'resetPassword.successTitle': '¡Contraseña restablecida!',
+    'resetPassword.successDesc': 'Inicia sesión con tu nueva contraseña.',
+    'resetPassword.errorTitle': 'Error al restablecer la contraseña',
+    'resetPassword.invalidLink': 'Enlace inválido o expirado. Solicita un nuevo email de recuperación.',
     
     // ListingDetail
     'detail.description': 'Descripción',
