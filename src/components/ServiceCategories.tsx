@@ -20,14 +20,8 @@ const ServiceCategories = () => {
               className={`group flex items-center gap-2 rounded-md px-3 py-2.5 bg-transparent text-foreground transition-all ${
                 isBlue
                   ? "hover:bg-primary hover:text-primary-foreground"
-                  : "hover:text-white"
+                  : "hover:bg-accent hover:text-accent-foreground"
               }`}
-              onMouseEnter={(e) => {
-                if (!isBlue) e.currentTarget.style.backgroundColor = "#e32655";
-              }}
-              onMouseLeave={(e) => {
-                if (!isBlue) e.currentTarget.style.backgroundColor = "";
-              }}
             >
               <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
               <span className="font-medium text-xs sm:text-sm truncate">
