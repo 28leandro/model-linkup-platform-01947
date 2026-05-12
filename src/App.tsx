@@ -9,6 +9,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import RefundPolicy from "./pages/RefundPolicy";
 import PhotoPaywall from "./pages/PhotoPaywall";
 import Inbox from "./pages/Inbox";
+import ResetPassword from "./pages/ResetPassword";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -30,6 +31,7 @@ function App() {
         <Route path="/refund-policy" element={<RefundPolicy />} />
           <Route path="/photo-paywall" element={<PhotoPaywall />} />
         <Route path="/inbox" element={<Inbox />} />
+        <Route path="/auth/reset-password" element={<ResetPassword />} />
         </Routes>
         <Toaster />
       </AuthProvider>

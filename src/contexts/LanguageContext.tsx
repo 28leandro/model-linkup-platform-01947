@@ -203,6 +203,15 @@ const translations = {
     'login.backToLogin': 'Voltar ao login',
     'login.attemptsRemaining': 'Senha incorreta. Você tem mais {n} tentativa(s).',
     'login.lockedOut': 'Muitas tentativas. Recupere sua senha abaixo.',
+    'resetPassword.title': 'Redefinir senha',
+    'resetPassword.description': 'Crie uma nova senha para sua conta.',
+    'resetPassword.newPassword': 'Nova senha',
+    'resetPassword.confirmPassword': 'Confirmar nova senha',
+    'resetPassword.submit': 'Redefinir senha',
+    'resetPassword.successTitle': 'Senha redefinida!',
+    'resetPassword.successDesc': 'Faça login com sua nova senha.',
+    'resetPassword.errorTitle': 'Erro ao redefinir senha',
+    'resetPassword.invalidLink': 'Link inválido ou expirado. Solicite um novo email de recuperação.',
     
     // ListingDetail
     'detail.description': 'Descrição',
@@ -463,6 +472,15 @@ const translations = {
     'login.backToLogin': 'Volver al inicio de sesión',
     'login.attemptsRemaining': 'Contraseña incorrecta. Te quedan {n} intento(s).',
     'login.lockedOut': 'Demasiados intentos. Recupera tu contraseña abajo.',
+    'resetPassword.title': 'Restablecer contraseña',
+    'resetPassword.description': 'Crea una nueva contraseña para tu cuenta.',
+    'resetPassword.newPassword': 'Nueva contraseña',
+    'resetPassword.confirmPassword': 'Confirmar nueva contraseña',
+    'resetPassword.submit': 'Restablecer contraseña',
+    'resetPassword.successTitle': '¡Contraseña restablecida!',
+    'resetPassword.successDesc': 'Inicia sesión con tu nueva contraseña.',
+    'resetPassword.errorTitle': 'Error al restablecer la contraseña',
+    'resetPassword.invalidLink': 'Enlace inválido o expirado. Solicita un nuevo email de recuperación.',
     
     // ListingDetail
     'detail.description': 'Descripción',
