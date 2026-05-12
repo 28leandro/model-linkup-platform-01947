@@ -131,22 +131,6 @@ const Map = ({ listings, onMarkerClick, center, zoom = 6 }: MapProps) => {
   return (
     <div className="relative w-full h-[600px] rounded-lg overflow-hidden shadow-lg">
       <div ref={mapElementRef} className="h-full w-full" />
-      <div className="absolute top-4 left-4 z-[1000] bg-white p-3 rounded-lg shadow-md">
-        <div className="flex items-center gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full" style={{ background: '#3b82f6' }} />
-            <span>Veículos</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full" style={{ background: '#10b981' }} />
-            <span>Imóveis</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full" style={{ background: '#f59e0b' }} />
-            <span>Serviços</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
