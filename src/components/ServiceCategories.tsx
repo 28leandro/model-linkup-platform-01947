@@ -12,11 +12,20 @@ const ServiceCategories = () => {
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
         {CATEGORIES.map((cat) => {
           const Icon = cat.icon;
+          const hoverColor =
+            cat.id === "services" || cat.id === "home-garden"
+              ? "hover:bg-primary hover:text-primary-foreground"
+              : "hover:text-white";
+          const hoverStyle =
+            cat.id === "services" || cat.id === "home-garden"
+              ? undefined
+              : { ["--hover-bg" as any]: "#D43A42" };
           return (
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
-              className="group flex items-center gap-2 rounded-md px-3 py-2.5 bg-transparent text-foreground hover:bg-gradient-to-r hover:from-blue-600 hover:to-red-600 hover:text-white transition-all"
+              style={hoverStyle}
+              className={`group flex items-center gap-2 rounded-md px-3 py-2.5 bg-transparent text-foreground transition-all ${hoverColor} hover:[background-color:var(--hover-bg)]`}
             >
               <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
               <span className="font-medium text-xs sm:text-sm truncate">
