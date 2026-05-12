@@ -255,9 +255,8 @@ const Index = () => {
         open={loginDialogOpen} 
         onOpenChange={setLoginDialogOpen}
       />
-      <Footer />
-      <div className="h-20" aria-hidden="true" />
       <StoreBadgesBar />
+      <Footer />
     </div>
   );
 };
