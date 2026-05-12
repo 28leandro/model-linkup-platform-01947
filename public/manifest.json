@@ -1,6 +1,6 @@
 {
-  "name": "NEMU - Marketplace",
-  "short_name": "NEMU",
+  "name": "NEMU.py - Marketplace",
+  "short_name": "NEMU.py",
   "description": "Marketplace para veículos, imóveis e serviços",
   "start_url": "/",
   "scope": "/",
