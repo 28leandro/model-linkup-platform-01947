@@ -94,11 +94,22 @@ export default {
         'accordion-up': {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: '0' }
+        },
+        'pulse-blue-red': {
+          '0%, 100%': {
+            backgroundColor: 'hsl(var(--primary))',
+            color: 'hsl(var(--primary-foreground))',
+          },
+          '50%': {
+            backgroundColor: 'hsl(var(--destructive))',
+            color: 'hsl(var(--destructive-foreground))',
+          },
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out'
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-blue-red': 'pulse-blue-red 2s ease-in-out infinite'
       }
     }
   },
