@@ -454,6 +454,15 @@ const translations = {
     'login.passwordMin': 'La contraseña debe tener al menos 6 caracteres',
     'login.nameTooShort': 'Nombre muy corto',
     'login.passwordMismatch': 'Las contraseñas no coinciden',
+    'login.showPassword': 'Mostrar contraseña',
+    'login.hidePassword': 'Ocultar contraseña',
+    'login.forgotPassword': '¿Olvidaste tu contraseña? Haz clic aquí para recuperarla',
+    'login.recoveryTitle': 'Recuperar contraseña',
+    'login.recoveryDescription': 'Ingresa tu email registrado para recibir instrucciones de restablecimiento.',
+    'login.recoverySubmit': 'Enviar email de recuperación',
+    'login.backToLogin': 'Volver al inicio de sesión',
+    'login.attemptsRemaining': 'Contraseña incorrecta. Te quedan {n} intento(s).',
+    'login.lockedOut': 'Demasiados intentos. Recupera tu contraseña abajo.',
     
     // ListingDetail
     'detail.description': 'Descripción',
