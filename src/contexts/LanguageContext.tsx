@@ -194,6 +194,15 @@ const translations = {
     'login.passwordMin': 'A senha deve ter pelo menos 6 caracteres',
     'login.nameTooShort': 'Nome muito curto',
     'login.passwordMismatch': 'As senhas não coincidem',
+    'login.showPassword': 'Mostrar senha',
+    'login.hidePassword': 'Ocultar senha',
+    'login.forgotPassword': 'Esqueceu sua senha? Clique aqui para recuperar',
+    'login.recoveryTitle': 'Recuperar senha',
+    'login.recoveryDescription': 'Insira seu email cadastrado para receber instruções de redefinição.',
+    'login.recoverySubmit': 'Enviar email de recuperação',
+    'login.backToLogin': 'Voltar ao login',
+    'login.attemptsRemaining': 'Senha incorreta. Você tem mais {n} tentativa(s).',
+    'login.lockedOut': 'Muitas tentativas. Recupere sua senha abaixo.',
     
     // ListingDetail
     'detail.description': 'Descrição',
