@@ -13,20 +13,28 @@ const ServiceCategories = () => {
         {CATEGORIES.map((cat) => {
           const Icon = cat.icon;
           const isBlue = cat.id === "services" || cat.id === "home-garden";
-          const style = isBlue
-            ? undefined
-            : { backgroundColor: "#D43A42" };
-          const className = isBlue
-            ? "bg-primary text-primary-foreground"
-            : "text-white";
           return (
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
-              style={style}
-              className={`group flex items-center gap-2 rounded-md px-3 py-2.5 transition-all hover:opacity-90 ${className}`}
+              className={`group flex items-center gap-2 rounded-md px-3 py-2.5 bg-transparent text-foreground transition-all ${
+                isBlue
+                  ? "hover:bg-primary hover:text-primary-foreground"
+                  : "hover:text-white"
+              }`}
+              onMouseEnter={(e) => {
+                if (!isBlue) e.currentTarget.style.backgroundColor = "#D43A42";
+              }}
+              onMouseLeave={(e) => {
+                if (!isBlue) e.currentTarget.style.backgroundColor = "";
+              }}
             >
-              <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
+              <Icon
+                className="w-5 h-5 shrink-0 transition-colors"
+                strokeWidth={2}
+                color={isBlue ? undefined : "#D43A42"}
+                fill={isBlue ? undefined : "#D43A42"}
+              />
               <span className="font-medium text-xs sm:text-sm truncate">
                 {isPt ? cat.label_pt : cat.label_es}
               </span>
