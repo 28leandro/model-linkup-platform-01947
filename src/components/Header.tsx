@@ -27,7 +27,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
       </Button>
       <Button asChild variant="ghost" size={mobile ? "lg" : "default"} className={mobile ? "w-full justify-start" : ""}>
         <Link to="/favorites" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-          <Heart className="w-4 h-4" color="#D43A42" fill="#D43A42" />
+          <Heart className="w-4 h-4" color="#e32655" fill="#e32655" />
           {t('header.favorites')}
         </Link>
       </Button>
