@@ -24,8 +24,8 @@ interface Slide {
 const SLIDES: Slide[] = [
   {
     id: "upap",
-    title_es: "UPAP — Universidad Politécnica y Artística del Paraguay",
-    title_pt: "UPAP — Universidade Politécnica e Artística do Paraguai",
+    title_es: "UPAP",
+    title_pt: "UPAP",
     subtitle_es: "Inscripciones abiertas. Formá tu futuro con nosotros.",
     subtitle_pt: "Inscrições abertas. Construa seu futuro conosco.",
     cta_es: "Conocé UPAP",
