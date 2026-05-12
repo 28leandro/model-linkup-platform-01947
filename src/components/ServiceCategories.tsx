@@ -23,18 +23,13 @@ const ServiceCategories = () => {
                   : "hover:text-white"
               }`}
               onMouseEnter={(e) => {
-                if (!isBlue) e.currentTarget.style.backgroundColor = "#D43A42";
+                if (!isBlue) e.currentTarget.style.backgroundColor = "#A78BFA";
               }}
               onMouseLeave={(e) => {
                 if (!isBlue) e.currentTarget.style.backgroundColor = "";
               }}
             >
-              <Icon
-                className="w-5 h-5 shrink-0 transition-colors"
-                strokeWidth={2}
-                color={isBlue ? undefined : "#D43A42"}
-                fill={isBlue ? undefined : "#D43A42"}
-              />
+              <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
               <span className="font-medium text-xs sm:text-sm truncate">
                 {isPt ? cat.label_pt : cat.label_es}
               </span>
