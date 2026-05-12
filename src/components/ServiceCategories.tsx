@@ -14,13 +14,13 @@ const ServiceCategories = () => {
           const Icon = cat.icon;
           const isRed = idx % 2 === 0;
           const colorClasses = isRed
-            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            : "bg-primary text-primary-foreground hover:bg-primary/90";
+            ? "bg-gradient-to-br from-red-400 via-red-500 to-rose-600 text-white hover:from-red-500 hover:via-red-600 hover:to-rose-700"
+            : "bg-gradient-to-br from-blue-400 via-blue-500 to-indigo-600 text-white hover:from-blue-500 hover:via-blue-600 hover:to-indigo-700";
           return (
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
-              className={`group flex items-center gap-2 rounded-md px-3 py-2.5 shadow-sm transition-colors ${colorClasses}`}
+              className={`group flex items-center gap-2 rounded-xl px-3 py-2.5 shadow-sm hover:shadow-md transition-all ${colorClasses}`}
             >
               <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
               <span className="font-medium text-xs sm:text-sm truncate">
