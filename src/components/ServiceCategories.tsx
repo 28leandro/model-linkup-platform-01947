@@ -23,7 +23,7 @@ const ServiceCategories = () => {
                   : "hover:text-white"
               }`}
               onMouseEnter={(e) => {
-                if (!isBlue) e.currentTarget.style.backgroundColor = "#D43A42";
+                if (!isBlue) e.currentTarget.style.backgroundColor = "#BE123C";
               }}
               onMouseLeave={(e) => {
                 if (!isBlue) e.currentTarget.style.backgroundColor = "";
