@@ -194,6 +194,15 @@ const translations = {
     'login.passwordMin': 'A senha deve ter pelo menos 6 caracteres',
     'login.nameTooShort': 'Nome muito curto',
     'login.passwordMismatch': 'As senhas não coincidem',
+    'login.showPassword': 'Mostrar senha',
+    'login.hidePassword': 'Ocultar senha',
+    'login.forgotPassword': 'Esqueceu sua senha? Clique aqui para recuperar',
+    'login.recoveryTitle': 'Recuperar senha',
+    'login.recoveryDescription': 'Insira seu email cadastrado para receber instruções de redefinição.',
+    'login.recoverySubmit': 'Enviar email de recuperação',
+    'login.backToLogin': 'Voltar ao login',
+    'login.attemptsRemaining': 'Senha incorreta. Você tem mais {n} tentativa(s).',
+    'login.lockedOut': 'Muitas tentativas. Recupere sua senha abaixo.',
     
     // ListingDetail
     'detail.description': 'Descrição',
@@ -445,6 +454,15 @@ const translations = {
     'login.passwordMin': 'La contraseña debe tener al menos 6 caracteres',
     'login.nameTooShort': 'Nombre muy corto',
     'login.passwordMismatch': 'Las contraseñas no coinciden',
+    'login.showPassword': 'Mostrar contraseña',
+    'login.hidePassword': 'Ocultar contraseña',
+    'login.forgotPassword': '¿Olvidaste tu contraseña? Haz clic aquí para recuperarla',
+    'login.recoveryTitle': 'Recuperar contraseña',
+    'login.recoveryDescription': 'Ingresa tu email registrado para recibir instrucciones de restablecimiento.',
+    'login.recoverySubmit': 'Enviar email de recuperación',
+    'login.backToLogin': 'Volver al inicio de sesión',
+    'login.attemptsRemaining': 'Contraseña incorrecta. Te quedan {n} intento(s).',
+    'login.lockedOut': 'Demasiados intentos. Recupera tu contraseña abajo.',
     
     // ListingDetail
     'detail.description': 'Descripción',
