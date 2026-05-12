@@ -9,6 +9,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
 import Footer from "@/components/Footer";
+import StoreBadgesBar from "@/components/StoreBadgesBar";
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -255,6 +256,8 @@ const Index = () => {
         onOpenChange={setLoginDialogOpen}
       />
       <Footer />
+      <div className="h-20" aria-hidden="true" />
+      <StoreBadgesBar />
     </div>
   );
 };
