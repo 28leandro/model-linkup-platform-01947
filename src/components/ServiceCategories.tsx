@@ -16,7 +16,7 @@ const ServiceCategories = () => {
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
-              className="group flex items-center gap-2 rounded-xl bg-primary text-primary-foreground px-3 py-2.5 shadow-sm hover:shadow-md hover:bg-primary/90 transition-all"
+              className="group flex items-center gap-2 rounded-xl bg-primary/10 text-foreground border border-border/50 backdrop-blur-sm px-3 py-2.5 shadow-sm hover:bg-primary hover:text-primary-foreground hover:shadow-md hover:border-primary transition-all"
             >
               <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
               <span className="font-medium text-xs sm:text-sm truncate">
