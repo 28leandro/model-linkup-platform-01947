@@ -203,6 +203,15 @@ const translations = {
     'login.backToLogin': 'Voltar ao login',
     'login.attemptsRemaining': 'Senha incorreta. Você tem mais {n} tentativa(s).',
     'login.lockedOut': 'Muitas tentativas. Recupere sua senha abaixo.',
+    'resetPassword.title': 'Redefinir senha',
+    'resetPassword.description': 'Crie uma nova senha para sua conta.',
+    'resetPassword.newPassword': 'Nova senha',
+    'resetPassword.confirmPassword': 'Confirmar nova senha',
+    'resetPassword.submit': 'Redefinir senha',
+    'resetPassword.successTitle': 'Senha redefinida!',
+    'resetPassword.successDesc': 'Faça login com sua nova senha.',
+    'resetPassword.errorTitle': 'Erro ao redefinir senha',
+    'resetPassword.invalidLink': 'Link inválido ou expirado. Solicite um novo email de recuperação.',
     
     // ListingDetail
     'detail.description': 'Descrição',
