@@ -9,10 +9,7 @@ const Logo = () => {
       >
         NΞMU
       </span>
-      <span
-        className="text-sm bg-clip-text text-transparent"
-        style={{ backgroundImage: "var(--gradient-logo)" }}
-      >
+      <span className="text-sm font-bold" style={{ color: "#0038A8" }}>
         .py
       </span>
     </Link>
