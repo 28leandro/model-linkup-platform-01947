@@ -10,13 +10,17 @@ const ServiceCategories = () => {
   return (
     <div className="container mx-auto px-3 sm:px-4 pt-4 pb-2">
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
-        {CATEGORIES.map((cat) => {
+        {CATEGORIES.map((cat, idx) => {
           const Icon = cat.icon;
+          const isRed = idx % 2 === 0;
+          const colorClasses = isRed
+            ? "bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            : "bg-primary text-primary-foreground hover:bg-primary/90";
           return (
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
-              className="group flex items-center gap-2 rounded-md px-3 py-2.5 bg-transparent text-foreground hover:animate-pulse-blue-red transition-colors"
+              className={`group flex items-center gap-2 rounded-md px-3 py-2.5 shadow-sm transition-colors ${colorClasses}`}
             >
               <Icon className="w-5 h-5 shrink-0" strokeWidth={2} />
               <span className="font-medium text-xs sm:text-sm truncate">
