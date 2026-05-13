@@ -44,6 +44,8 @@ const translations = {
     'listings.recent': 'Anúncios Recentes',
     'listings.searchResults': 'Resultados de pesquisa',
     'listings.noImage': 'Sem imagem',
+    'listings.recentlyViewed': 'Vistos recentemente',
+    'listings.clear': 'Limpar',
     
     // Map
     'map.title': 'Mapa de Anúncios',
@@ -313,6 +315,8 @@ const translations = {
     'listings.recent': 'Anuncios Recientes',
     'listings.searchResults': 'Resultados de búsqueda',
     'listings.noImage': 'Sin imagen',
+    'listings.recentlyViewed': 'Vistos recientemente',
+    'listings.clear': 'Limpiar',
     
     // Map
     'map.title': 'Mapa de Anuncios',
