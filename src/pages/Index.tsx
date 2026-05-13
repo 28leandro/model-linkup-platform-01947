@@ -8,6 +8,7 @@ import ServiceCategories from "@/components/ServiceCategories";
 import HeroCarousel from "@/components/HeroCarousel";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
+import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import Footer from "@/components/Footer";
 import StoreBadgesBar from "@/components/StoreBadgesBar";
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
@@ -233,6 +234,8 @@ const Index = () => {
       {!hasSearched && <ServiceCategories />}
 
       {!hasSearched && <HeroCarousel />}
+
+      {!hasSearched && <RecentlyViewedCarousel />}
 
       <div className="container mx-auto px-3 sm:px-4 py-4">
         <ListingFilter
