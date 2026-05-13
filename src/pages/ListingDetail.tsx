@@ -28,6 +28,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import EditableField from "@/components/EditableField";
 import { toast as sonnerToast } from "sonner";
 import { getPublicCity } from "@/lib/utils";
+import { trackRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import ContactSellerChat from "@/components/ContactSellerChat";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 
