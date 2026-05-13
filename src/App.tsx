@@ -10,6 +10,7 @@ import RefundPolicy from "./pages/RefundPolicy";
 import PhotoPaywall from "./pages/PhotoPaywall";
 import Inbox from "./pages/Inbox";
 import ResetPassword from "./pages/ResetPassword";
+import PagoparTest from "./pages/PagoparTest";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -32,6 +33,7 @@ function App() {
           <Route path="/photo-paywall" element={<PhotoPaywall />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/auth/reset-password" element={<ResetPassword />} />
+        <Route path="/pagopar-test" element={<PagoparTest />} />
         </Routes>
         <Toaster />
       </AuthProvider>
