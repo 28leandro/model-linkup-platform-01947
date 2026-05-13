@@ -52,6 +52,20 @@ const ListingDetail = () => {
       
       if (!error && data) {
         setListing(data as Listing);
+        try {
+          const l: any = data;
+          trackRecentlyViewed({
+            id: l.id,
+            title: l.title,
+            image: Array.isArray(l.images) ? l.images[0] : undefined,
+            price: l.price,
+            currency: l.currency,
+            location: l.location,
+            type: l.type,
+          });
+        } catch {
+          /* tracking is best-effort */
+        }
       }
       setIsLoading(false);
     };
