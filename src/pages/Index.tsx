@@ -299,8 +299,6 @@ const Index = () => {
 
       {!hasSearched && <ServiceCategories />}
 
-      {!hasSearched && <SubcategoryCarousel categoryId="fashion" />}
-
       {!hasSearched && <HeroCarousel />}
 
       {!hasSearched && <RecentlyViewedCarousel />}
