@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapPin, LocateFixed, X } from "lucide-react";
+import { MapPin, LocateFixed, X, Crosshair } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { PARAGUAY_CITIES } from "@/lib/cities";
 import { CITY_COORDS } from "@/lib/cityCoords";
@@ -100,7 +101,102 @@ const LocationFilter = ({ value, onChange }: Props) => {
   };
 
   return (
-    <div className="w-full bg-card border rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center">
+    <>
+    {/* Mobile compact: icon buttons */}
+    <div className="flex md:hidden items-center gap-2 w-full">
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            className="h-10 w-10 rounded-full shrink-0"
+            aria-label={t("location.placeholder")}
+          >
+            <MapPin className="h-4 w-4" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-[260px] p-2 z-50 bg-popover">
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t("location.placeholder")}
+            className="h-10"
+            autoFocus
+          />
+          <div className="mt-2 max-h-60 overflow-auto">
+            {suggestions.map((c) => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => pickCity(c)}
+                className="w-full text-left px-2 py-2 text-sm rounded hover:bg-muted flex items-center gap-2"
+              >
+                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
+                {c}
+              </button>
+            ))}
+          </div>
+          {value.city && (
+            <button
+              type="button"
+              onClick={clear}
+              className="mt-1 w-full text-left px-2 py-2 text-xs text-muted-foreground hover:text-foreground flex items-center gap-2"
+            >
+              <X className="h-3.5 w-3.5" />
+              {t("location.clear")}
+            </button>
+          )}
+        </PopoverContent>
+      </Popover>
+
+      <Button
+        type="button"
+        variant="outline"
+        size="icon"
+        onClick={detect}
+        disabled={detecting}
+        className="h-10 w-10 rounded-full shrink-0"
+        aria-label={t("location.detect")}
+      >
+        <Crosshair className="h-4 w-4" />
+      </Button>
+
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            className="h-10 rounded-full px-4 text-xs font-semibold shrink-0"
+          >
+            {value.radiusKm ? `${value.radiusKm} KM` : "KM"}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent align="start" className="w-40 p-1 z-50 bg-popover">
+          {RADIUS_OPTIONS.map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => onChange({ ...value, radiusKm: r })}
+              className={`w-full text-left px-3 py-2 text-sm rounded hover:bg-muted ${
+                (value.radiusKm ?? 0) === r ? "bg-muted font-medium" : ""
+              }`}
+            >
+              {r === 0 ? t("location.anyRadius") : `+${r} km`}
+            </button>
+          ))}
+        </PopoverContent>
+      </Popover>
+
+      {value.city && (
+        <span className="text-xs text-muted-foreground truncate flex-1">
+          {value.city}
+        </span>
+      )}
+    </div>
+
+    {/* Desktop full version */}
+    <div className="hidden md:flex w-full bg-card border rounded-lg p-3 sm:p-4 flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center">
       <div ref={wrapRef} className="relative flex-1">
         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <Input
@@ -168,6 +264,7 @@ const LocationFilter = ({ value, onChange }: Props) => {
         </SelectContent>
       </Select>
     </div>
+    </>
   );
 };
 
