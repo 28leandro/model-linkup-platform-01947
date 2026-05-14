@@ -253,12 +253,12 @@ const LocationFilter = ({ value, onChange }: Props) => {
         onValueChange={(v) => onChange({ ...value, radiusKm: Number(v) })}
       >
         <SelectTrigger className="h-11 w-full sm:w-[140px] shrink-0">
-          <SelectValue placeholder={t("location.radius")} />
+          <SelectValue placeholder="KM" />
         </SelectTrigger>
         <SelectContent position="popper" className="z-50 bg-background border">
           {RADIUS_OPTIONS.map((r) => (
             <SelectItem key={r} value={String(r)}>
-              {r === 0 ? t("location.anyRadius") : `+${r} km`}
+              {r === 0 ? "KM" : `+${r} km`}
             </SelectItem>
           ))}
         </SelectContent>
