@@ -168,8 +168,8 @@ const Index = () => {
     return R * c;
   };
 
-  const handleSearch = () => {
-    const query = searchQuery.trim().toLowerCase();
+  const handleSearch = (overrideQuery?: string) => {
+    const query = (overrideQuery ?? searchQuery).trim().toLowerCase();
     setHasSearched(true);
     
     if (!query) {
@@ -332,7 +332,7 @@ const Index = () => {
         initialValue={searchQuery}
         onSubmit={(q) => {
           setSearchQuery(q);
-          setTimeout(() => handleSearch(), 0);
+          handleSearch(q);
         }}
       />
       <StoreBadgesBar />
