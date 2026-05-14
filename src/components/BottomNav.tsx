@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, Plus, MessageCircle, Menu } from "lucide-react";
+import { Home, Search, Plus, MessageCircle, Menu, FolderOpen, Settings } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
@@ -106,6 +106,22 @@ const BottomNav = () => {
                     {t("header.favorites")}
                   </Link>
                 </Button>
+                {user && (
+                  <>
+                    <Button asChild variant="ghost" size="lg" className="w-full justify-start">
+                      <Link to="/my-listings" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
+                        <FolderOpen className="w-4 h-4" />
+                        {t("nav.manageAds")}
+                      </Link>
+                    </Button>
+                    <Button asChild variant="ghost" size="lg" className="w-full justify-start">
+                      <Link to="/account" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
+                        <Settings className="w-4 h-4" />
+                        {t("nav.accountSettings")}
+                      </Link>
+                    </Button>
+                  </>
+                )}
                 {user ? (
                   <Button
                     variant="default"
