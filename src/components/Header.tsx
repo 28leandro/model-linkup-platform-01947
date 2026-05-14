@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, Heart, MapPin, Menu, X } from "lucide-react";
+import { Plus, LogIn, LogOut, Heart, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface HeaderProps {
   onLoginClick: () => void;
