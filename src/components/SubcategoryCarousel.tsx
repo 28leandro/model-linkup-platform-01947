@@ -29,7 +29,7 @@ const SubcategoryCarousel = ({ categoryId, title }: Props) => {
           {isPt ? "Ver tudo" : "Ver todo"}
         </Link>
       </div>
-      <div className="flex gap-2 overflow-x-auto pb-2 -mx-3 px-3 sm:-mx-4 sm:px-4 snap-x snap-mandatory scrollbar-none">
+      <div className="flex gap-2 overflow-x-auto pb-2 -mx-3 px-3 sm:-mx-4 sm:px-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {cat.subcategories.map((sub) => {
           const SubIcon = sub.icon ?? cat.icon;
           return (
