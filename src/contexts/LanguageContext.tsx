@@ -22,6 +22,8 @@ const translations = {
     'nav.postAd': 'Anunciar',
     'nav.chat': 'Chat',
     'nav.menu': 'Menu',
+    'nav.manageAds': 'Gerenciar Anúncios',
+    'nav.accountSettings': 'Configurar Conta',
 
     // Location filter
     'location.placeholder': 'Cidade ou região...',
@@ -309,6 +311,8 @@ const translations = {
     'nav.postAd': 'Publicar',
     'nav.chat': 'Chat',
     'nav.menu': 'Menú',
+    'nav.manageAds': 'Gestionar Anuncios',
+    'nav.accountSettings': 'Configurar Cuenta',
 
     // Location filter
     'location.placeholder': 'Ciudad o región...',
