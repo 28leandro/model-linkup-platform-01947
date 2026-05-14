@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { useListingsStore } from "@/store/listingsStore";
 import { LoginDialog } from "@/components/LoginDialog";
@@ -12,11 +13,14 @@ import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import Footer from "@/components/Footer";
 import StoreBadgesBar from "@/components/StoreBadgesBar";
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
+import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter";
+import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { t } = useLanguage();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
   const [allListings, setAllListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
@@ -28,6 +32,34 @@ const Index = () => {
     sortOption: 'recent',
     fuelType: 'all',
   });
+  const [locationFilter, setLocationFilter] = useState<LocationFilterValue>(() => {
+    const city = searchParams.get("city") || undefined;
+    const lat = searchParams.get("lat");
+    const lon = searchParams.get("lon");
+    const radius = searchParams.get("radius");
+    const coords = city ? CITY_COORDS[city] : undefined;
+    return {
+      city,
+      lat: lat ? Number(lat) : coords?.lat,
+      lon: lon ? Number(lon) : coords?.lon,
+      radiusKm: radius ? Number(radius) : 0,
+    };
+  });
+
+  // Sync location filter to URL
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    if (locationFilter.city) next.set("city", locationFilter.city);
+    else next.delete("city");
+    if (locationFilter.lat !== undefined) next.set("lat", String(locationFilter.lat));
+    else next.delete("lat");
+    if (locationFilter.lon !== undefined) next.set("lon", String(locationFilter.lon));
+    else next.delete("lon");
+    if (locationFilter.radiusKm) next.set("radius", String(locationFilter.radiusKm));
+    else next.delete("radius");
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locationFilter]);
 
   useEffect(() => {
     // Try IP-based geolocation (no permission needed, works everywhere)
@@ -182,6 +214,17 @@ const Index = () => {
   const sortedListings = useMemo(() => {
     let listings = hasSearched ? filteredListings : allListings;
     
+    // Apply location/radius filter
+    if (locationFilter.lat !== undefined && locationFilter.lon !== undefined && locationFilter.radiusKm > 0) {
+      listings = listings.filter((l) => {
+        if (!l.latitude || !l.longitude) return false;
+        return (
+          distanceKm(locationFilter.lat!, locationFilter.lon!, l.latitude, l.longitude) <=
+          locationFilter.radiusKm
+        );
+      });
+    }
+
     // Apply price filter
     if (filters.minPrice !== undefined) {
       listings = listings.filter(l => (l.price || 0) >= filters.minPrice!);
@@ -219,7 +262,7 @@ const Index = () => {
       default:
         return sorted;
     }
-  }, [filteredListings, allListings, hasSearched, sortOption, filters]);
+  }, [filteredListings, allListings, hasSearched, sortOption, filters, locationFilter]);
 
   return (
     <div className="min-h-screen">
@@ -230,6 +273,10 @@ const Index = () => {
         onSearchQueryChange={setSearchQuery}
         onSearch={handleSearch}
       />
+
+      <div className="container mx-auto px-3 sm:px-4 pt-4">
+        <LocationFilter value={locationFilter} onChange={setLocationFilter} />
+      </div>
 
       {!hasSearched && <ServiceCategories />}
 
