@@ -17,7 +17,6 @@ import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter
 import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
-import SubcategoryCarousel from "@/components/SubcategoryCarousel";
 import MobileSearchDialog from "@/components/MobileSearchDialog";
 
 const Index = () => {

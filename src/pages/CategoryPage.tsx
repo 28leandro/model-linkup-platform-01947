@@ -16,7 +16,8 @@ import { Badge } from "@/components/ui/badge";
 const CategoryPage = () => {
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isPt = language === "pt";
   const [listings, setListings] = useState<Listing[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
   const [filters, setFilters] = useState<FilterOptions>({
