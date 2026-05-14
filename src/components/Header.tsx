@@ -83,19 +83,6 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         {/* Mobile Navigation */}
         <div className="flex md:hidden items-center gap-2">
           <LanguageSelector />
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-11 w-11">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] sm:w-[320px]">
-              <div className="flex flex-col gap-4 mt-8">
-                <NavItems mobile />
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </header>
