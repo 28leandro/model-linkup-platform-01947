@@ -15,6 +15,22 @@ const translations = {
     'header.favorites': 'Favoritos',
     'header.postAd': 'Publicar Anúncio',
     'header.login': 'Entrar',
+
+    // Bottom nav
+    'nav.home': 'Início',
+    'nav.search': 'Buscar',
+    'nav.postAd': 'Anunciar',
+    'nav.chat': 'Chat',
+    'nav.menu': 'Menu',
+
+    // Location filter
+    'location.placeholder': 'Cidade ou região...',
+    'location.detect': 'Minha localização',
+    'location.detecting': 'Detectando...',
+    'location.radius': 'Raio',
+    'location.anyRadius': 'Qualquer raio',
+    'location.clear': 'Limpar',
+    'location.myLocation': 'Minha localização',
     
     // Categories
     'categories.title': 'Categorias Principais',
@@ -286,6 +302,22 @@ const translations = {
     'header.favorites': 'Favoritos',
     'header.postAd': 'Publicar Anuncio',
     'header.login': 'Ingresar',
+
+    // Bottom nav
+    'nav.home': 'Inicio',
+    'nav.search': 'Buscar',
+    'nav.postAd': 'Publicar',
+    'nav.chat': 'Chat',
+    'nav.menu': 'Menú',
+
+    // Location filter
+    'location.placeholder': 'Ciudad o región...',
+    'location.detect': 'Mi ubicación',
+    'location.detecting': 'Detectando...',
+    'location.radius': 'Radio',
+    'location.anyRadius': 'Cualquier radio',
+    'location.clear': 'Limpiar',
+    'location.myLocation': 'Mi ubicación',
     
     // Categories
     'categories.title': 'Categorías Principales',
