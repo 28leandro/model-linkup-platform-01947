@@ -248,6 +248,7 @@ const translations = {
     'category.services': 'Serviços',
     'category.homeGarden': 'Casa e Jardim',
     'category.tech': 'Tecnologia e Eletrônica',
+    'category.fashion': 'Moda',
     'category.default': 'Categoria',
     
     // Location errors
@@ -537,6 +538,7 @@ const translations = {
     'category.services': 'Servicios',
     'category.homeGarden': 'Hogar y Jardín',
     'category.tech': 'Tecnología y Electrónica',
+    'category.fashion': 'Moda',
     'category.default': 'Categoría',
     
     // Location errors
