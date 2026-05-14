@@ -17,6 +17,8 @@ import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter
 import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
+import SubcategoryCarousel from "@/components/SubcategoryCarousel";
+import MobileSearchDialog from "@/components/MobileSearchDialog";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -45,6 +47,21 @@ const Index = () => {
       radiusKm: radius ? Number(radius) : 0,
     };
   });
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+
+  // Open mobile search via bottom-nav event or URL param
+  useEffect(() => {
+    const handler = () => setMobileSearchOpen(true);
+    window.addEventListener("open-mobile-search", handler);
+    if (searchParams.get("search") === "1") {
+      setMobileSearchOpen(true);
+      const next = new URLSearchParams(searchParams);
+      next.delete("search");
+      setSearchParams(next, { replace: true });
+    }
+    return () => window.removeEventListener("open-mobile-search", handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Sync location filter to URL
   useEffect(() => {
@@ -282,6 +299,8 @@ const Index = () => {
 
       {!hasSearched && <ServiceCategories />}
 
+      {!hasSearched && <SubcategoryCarousel categoryId="fashion" />}
+
       {!hasSearched && <HeroCarousel />}
 
       {!hasSearched && <RecentlyViewedCarousel />}
@@ -306,6 +325,15 @@ const Index = () => {
       <LoginDialog
         open={loginDialogOpen} 
         onOpenChange={setLoginDialogOpen}
+      />
+      <MobileSearchDialog
+        open={mobileSearchOpen}
+        onOpenChange={setMobileSearchOpen}
+        initialValue={searchQuery}
+        onSubmit={(q) => {
+          setSearchQuery(q);
+          setTimeout(() => handleSearch(), 0);
+        }}
       />
       <StoreBadgesBar />
       <Footer />
