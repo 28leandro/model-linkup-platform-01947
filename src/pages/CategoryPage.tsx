@@ -1,7 +1,8 @@
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Car, Bike, Home, Building2, Trees, Wrench, Sparkles, Scissors, MoreHorizontal } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import VehicleInfo from "@/components/VehicleInfo";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState, useMemo } from "react";
@@ -14,6 +15,7 @@ import { Badge } from "@/components/ui/badge";
 
 const CategoryPage = () => {
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { t } = useLanguage();
   const [listings, setListings] = useState<Listing[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
@@ -24,6 +26,7 @@ const CategoryPage = () => {
   const [vehicleTypeFilter, setVehicleTypeFilter] = useState<'all' | 'auto' | 'moto'>('all');
   const [propertyTypeFilter, setPropertyTypeFilter] = useState<'all' | 'house' | 'apartment' | 'land'>('all');
   const [serviceTypeFilter, setServiceTypeFilter] = useState<'all' | 'construction' | 'maintenance' | 'beauty' | 'other'>('all');
+  const [otherServicesOpen, setOtherServicesOpen] = useState(false);
   
   const categoryMap: Record<string, { type: string, titleKey: string }> = {
     "vehicles": { type: "vehicles", titleKey: "category.vehicles" },
@@ -33,11 +36,20 @@ const CategoryPage = () => {
     "services": { type: "services", titleKey: "category.services" },
     "home-garden": { type: "home-garden", titleKey: "category.homeGarden" },
     "tech": { type: "tech", titleKey: "category.tech" },
+    "fashion": { type: "fashion", titleKey: "category.fashion" },
   };
 
   const category = categoryMap[id || "vehicles"] ?? { type: id || "", titleKey: "category.vehicles" };
   const meta = getCategoryById(id || "");
-  const [subFilter, setSubFilter] = useState<string>("all");
+  const [subFilter, setSubFilter] = useState<string>(searchParams.get("sub") || "all");
+
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+    if (subFilter && subFilter !== "all") next.set("sub", subFilter);
+    else next.delete("sub");
+    setSearchParams(next, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subFilter]);
 
   useEffect(() => {
     const fetchListings = async () => {
@@ -229,9 +241,40 @@ const CategoryPage = () => {
             <Button variant={serviceTypeFilter === 'beauty' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('beauty')} className="gap-2">
               <Scissors className="h-4 w-4" /> Belleza
             </Button>
-            <Button variant={serviceTypeFilter === 'other' ? 'default' : 'outline'} size="sm" onClick={() => setServiceTypeFilter('other')} className="gap-2">
-              <MoreHorizontal className="h-4 w-4" /> Otros
-            </Button>
+            <Sheet open={otherServicesOpen} onOpenChange={setOtherServicesOpen}>
+              <SheetTrigger asChild>
+                <Button
+                  variant={serviceTypeFilter === 'other' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => { setServiceTypeFilter('other'); setOtherServicesOpen(true); }}
+                  className="gap-2"
+                >
+                  <MoreHorizontal className="h-4 w-4" /> Otros
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[280px] sm:w-[360px] overflow-y-auto">
+                <SheetHeader>
+                  <SheetTitle>Otros servicios</SheetTitle>
+                </SheetHeader>
+                <div className="mt-4 flex flex-col gap-1">
+                  {[
+                    "Clases particulares","Cuidado de niños","Cuidado de ancianos","Paseo de mascotas",
+                    "Veterinaria a domicilio","Fotografía","Diseño gráfico","Diseño web","Marketing digital",
+                    "Asesoría contable","Asesoría legal","Traducciones","Mudanzas","Fletes","Cerrajería",
+                    "Costura y arreglos","Catering","Decoración de eventos","DJ y sonido","Animación de fiestas",
+                    "Enfermería a domicilio","Masajes","Entrenamiento personal","Lavado de autos","Limpieza de tapizados",
+                  ].map((s) => (
+                    <button
+                      key={s}
+                      onClick={() => setOtherServicesOpen(false)}
+                      className="text-left text-sm px-3 py-2 rounded-md hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         )}
 

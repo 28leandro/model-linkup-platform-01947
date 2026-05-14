@@ -19,12 +19,8 @@ const BottomNav = () => {
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
-  const focusSearch = () => {
-    const el = document.querySelector<HTMLInputElement>('input[type="text"], input:not([type])');
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      setTimeout(() => el.focus(), 300);
-    }
+  const openSearch = () => {
+    window.dispatchEvent(new CustomEvent("open-mobile-search"));
   };
 
   const itemClass = (active: boolean) =>
@@ -45,17 +41,21 @@ const BottomNav = () => {
             <span>{t("nav.home")}</span>
           </Link>
 
-          {location.pathname === "/" ? (
-            <button onClick={focusSearch} className={itemClass(false)} aria-label={t("nav.search")}>
-              <Search className="h-5 w-5" />
-              <span>{t("nav.search")}</span>
-            </button>
-          ) : (
-            <Link to="/" className={itemClass(false)} aria-label={t("nav.search")}>
-              <Search className="h-5 w-5" />
-              <span>{t("nav.search")}</span>
-            </Link>
-          )}
+          <button
+            onClick={() => {
+              if (location.pathname !== "/") {
+                // Navigate then dispatch after route is rendered
+                window.location.href = "/?search=1";
+              } else {
+                openSearch();
+              }
+            }}
+            className={itemClass(false)}
+            aria-label={t("nav.search")}
+          >
+            <Search className="h-5 w-5" />
+            <span>{t("nav.search")}</span>
+          </button>
 
           {/* Centered highlighted Anunciar */}
           <div className="flex-1 flex items-start justify-center">

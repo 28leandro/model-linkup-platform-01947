@@ -1,7 +1,8 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, ChevronLeft, ChevronRight, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { MapPin, Edit, Trash2, ArrowLeft } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -41,6 +42,19 @@ const ListingDetail = () => {
   const [listing, setListing] = useState<Listing | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    const onSelect = () => setCurrentImageIndex(emblaApi.selectedScrollSnap());
+    emblaApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi]);
+
+  const scrollTo = (i: number) => emblaApi?.scrollTo(i);
   
   useEffect(() => {
     const fetchListing = async () => {
@@ -139,18 +153,6 @@ const ListingDetail = () => {
     );
   }
 
-  const nextImage = () => {
-    if (listing.images && listing.images.length > 0) {
-      setCurrentImageIndex((prev) => (prev + 1) % listing.images.length);
-    }
-  };
-
-  const prevImage = () => {
-    if (listing.images && listing.images.length > 0) {
-      setCurrentImageIndex((prev) => (prev - 1 + listing.images.length) % listing.images.length);
-    }
-  };
-
   return (
     <>
       <Header onLoginClick={() => setShowLoginDialog(true)} />
@@ -165,45 +167,47 @@ const ListingDetail = () => {
           </Button>
         <Card>
           <CardContent className="p-3 sm:p-6">
-            {/* Galeria de Fotos */}
-            <div className="relative aspect-[4/3] sm:aspect-video md:aspect-[4/3] lg:max-h-[500px] bg-muted rounded-lg mb-3 sm:mb-4 overflow-hidden group">
-              <img
-                src={listing.images && listing.images[currentImageIndex] ? listing.images[currentImageIndex] : "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"}
-                alt={`${listing.title} - Foto ${currentImageIndex + 1}`}
-                loading="lazy"
-                decoding="async"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
-                }}
-              />
-              
-              {/* Botões de navegação */}
+            {/* Galeria de Fotos — carrossel com swipe e dots */}
+            <div className="relative aspect-[4/3] sm:aspect-video md:aspect-[4/3] lg:max-h-[500px] bg-muted rounded-lg mb-3 sm:mb-4 overflow-hidden">
+              <div className="overflow-hidden h-full" ref={emblaRef}>
+                <div className="flex h-full touch-pan-y">
+                  {(listing.images && listing.images.length > 0
+                    ? listing.images
+                    : ["https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"]
+                  ).map((src, i) => (
+                    <div key={i} className="relative min-w-0 flex-[0_0_100%] h-full">
+                      <img
+                        src={src}
+                        alt={`${listing.title} - Foto ${i + 1}`}
+                        loading={i === 0 ? "eager" : "lazy"}
+                        decoding="async"
+                        draggable={false}
+                        className="w-full h-full object-cover select-none"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Dots */}
               {listing.images && listing.images.length > 1 && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute left-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 sm:h-10 sm:w-10"
-                    onClick={prevImage}
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="absolute right-2 top-1/2 -translate-y-1/2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8 sm:h-10 sm:w-10"
-                    onClick={nextImage}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                  
-                  {/* Indicador de foto atual */}
-                  <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 bg-black/50 text-white px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm">
-                    {currentImageIndex + 1} / {listing.images.length}
-                  </div>
-                </>
+                <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/35 backdrop-blur-sm">
+                  {listing.images.map((_, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => scrollTo(i)}
+                      aria-label={`Foto ${i + 1}`}
+                      className={`h-1.5 rounded-full transition-all ${
+                        i === currentImageIndex ? "w-4 bg-white" : "w-1.5 bg-white/60"
+                      }`}
+                    />
+                  ))}
+                </div>
               )}
             </div>
 
@@ -213,7 +217,7 @@ const ListingDetail = () => {
                 {listing.images.map((image, index) => (
                   <button
                     key={index}
-                    onClick={() => setCurrentImageIndex(index)}
+                    onClick={() => scrollTo(index)}
                     className={`aspect-video rounded-md overflow-hidden border-2 transition-all ${
                       index === currentImageIndex ? 'border-primary' : 'border-transparent opacity-60 hover:opacity-100'
                     }`}

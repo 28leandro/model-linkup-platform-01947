@@ -14,6 +14,17 @@ import {
   Watch,
   Keyboard,
   Cpu,
+  Shirt,
+  Baby,
+  Gem,
+  SprayCan,
+  Anchor,
+  Bus,
+  Zap,
+  Building2,
+  Briefcase,
+  Factory,
+  KeyRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -66,7 +77,10 @@ export const CATEGORIES: Category[] = [
     subcategories: [
       { id: "autos",     label_es: "Autos",      label_pt: "Carros",     icon: Car,   brands: ["Toyota","Volkswagen","Chevrolet","Ford","Hyundai","Kia","Nissan","Honda","Renault","Peugeot","Fiat","Mitsubishi","Mercedes-Benz","BMW","Audi","Suzuki","Mazda","Jeep"] },
       { id: "motos",     label_es: "Motos",      label_pt: "Motos",      icon: Bike,  brands: ["Honda","Yamaha","Suzuki","Kawasaki","Bajaj","KTM","Kenton","Star","Leopard","Zanella"] },
-      { id: "camiones",  label_es: "Camiones",   label_pt: "Caminhões",  icon: Truck, brands: ["Mercedes-Benz","Volvo","Scania","Iveco","MAN","Volkswagen","Ford","Hyundai","JAC","Foton"] },
+      { id: "camionetas", label_es: "Camionetas", label_pt: "Camionetas", icon: Truck, brands: ["Toyota","Ford","Chevrolet","Volkswagen","Mitsubishi","Nissan","Hyundai","Kia","Renault"] },
+      { id: "camiones-buses", label_es: "Camiones y Buses", label_pt: "Caminhões e Ônibus", icon: Bus, brands: ["Mercedes-Benz","Volvo","Scania","Iveco","MAN","Volkswagen","Ford","Hyundai","JAC","Foton"] },
+      { id: "nauticos",  label_es: "Náuticos",    label_pt: "Náuticos",    icon: Anchor, examples: ["Lanchas","Jet Ski","Veleros"] },
+      { id: "electricos", label_es: "Vehículos Eléctricos", label_pt: "Veículos Elétricos", icon: Zap, brands: ["Tesla","BYD","Nissan","Renault","Chevrolet"] },
     ],
   },
   {
@@ -78,6 +92,12 @@ export const CATEGORIES: Category[] = [
     desc_pt: "Venda e aluguel de propriedades",
     icon: Home,
     accent: "from-emerald-500/15 to-teal-500/10 text-emerald-700 dark:text-emerald-300",
+    subcategories: [
+      { id: "alquiler",  label_es: "Alquiler",            label_pt: "Aluguel",            icon: KeyRound },
+      { id: "rural",     label_es: "Propiedad Rural",     label_pt: "Propriedade Rural",  icon: Trees },
+      { id: "oficina",   label_es: "Oficina",             label_pt: "Escritório",         icon: Briefcase },
+      { id: "industria", label_es: "Industria",           label_pt: "Indústria",          icon: Factory },
+    ],
   },
   {
     id: "services",
@@ -88,6 +108,23 @@ export const CATEGORIES: Category[] = [
     desc_pt: "Prestação de serviços",
     icon: Wrench,
     accent: "from-orange-500/15 to-amber-500/10 text-orange-700 dark:text-orange-300",
+  },
+  {
+    id: "fashion",
+    type: "fashion",
+    label_es: "Moda",
+    label_pt: "Moda",
+    desc_es: "Ropa, accesorios, perfumes",
+    desc_pt: "Roupas, acessórios, perfumes",
+    icon: Shirt,
+    accent: "from-pink-500/15 to-rose-500/10 text-pink-700 dark:text-pink-300",
+    subcategories: [
+      { id: "masculino",  label_es: "Masculino",        label_pt: "Masculino",        icon: Shirt },
+      { id: "feminino",   label_es: "Femenino",         label_pt: "Feminino",         icon: Shirt },
+      { id: "infantil",   label_es: "Infantil",         label_pt: "Infantil",         icon: Baby },
+      { id: "relojes-joyas", label_es: "Relojes y Joyas", label_pt: "Relógios e Joias", icon: Gem },
+      { id: "perfumes",   label_es: "Perfumes",         label_pt: "Perfumes",         icon: SprayCan },
+    ],
   },
   {
     id: "home-garden",

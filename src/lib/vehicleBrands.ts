@@ -84,6 +84,9 @@ export const VEHICLE_BRAND_MODELS: Record<string, BrandModelMap> = {
   autos: AUTOS_BRAND_MODELS,
   motos: MOTOS_BRAND_MODELS,
   camiones: CAMIONES_BRAND_MODELS,
+  "camiones-buses": CAMIONES_BRAND_MODELS,
+  camionetas: AUTOS_BRAND_MODELS,
+  electricos: AUTOS_BRAND_MODELS,
 };
 
 export const getVehicleBrands = (subId?: string | null): string[] => {
