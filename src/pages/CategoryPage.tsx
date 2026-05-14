@@ -16,7 +16,8 @@ import { Badge } from "@/components/ui/badge";
 const CategoryPage = () => {
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isPt = language === "pt";
   const [listings, setListings] = useState<Listing[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
   const [filters, setFilters] = useState<FilterOptions>({
@@ -184,36 +185,6 @@ const CategoryPage = () => {
           />
         </div>
 
-        {category.type === 'vehicles' && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            <Button
-              variant={vehicleTypeFilter === 'all' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setVehicleTypeFilter('all')}
-            >
-              {t('filter.allFuels') || 'Todos'}
-            </Button>
-            <Button
-              variant={vehicleTypeFilter === 'auto' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setVehicleTypeFilter('auto')}
-              className="gap-2"
-            >
-              <Car className="h-4 w-4" />
-              Auto
-            </Button>
-            <Button
-              variant={vehicleTypeFilter === 'moto' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setVehicleTypeFilter('moto')}
-              className="gap-2"
-            >
-              <Bike className="h-4 w-4" />
-              Moto
-            </Button>
-          </div>
-        )}
-
         {category.type === 'real-estate' && (
           <div className="mb-4 flex flex-wrap gap-2">
             <Button variant={propertyTypeFilter === 'all' ? 'default' : 'outline'} size="sm" onClick={() => setPropertyTypeFilter('all')}>Todos</Button>
@@ -279,8 +250,13 @@ const CategoryPage = () => {
         )}
 
         {meta?.subcategories && (
-          <div className="mb-3 flex flex-wrap gap-2">
-            <Button variant={subFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setSubFilter("all")}>
+          <div className="mb-4 flex gap-2 overflow-x-auto -mx-3 px-3 sm:-mx-4 sm:px-4 snap-x snap-mandatory pb-2 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+            <Button
+              variant={subFilter === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setSubFilter("all")}
+              className="snap-start shrink-0 rounded-full"
+            >
               Todas
             </Button>
             {meta.subcategories.map((sub) => {
@@ -291,10 +267,10 @@ const CategoryPage = () => {
                   variant={subFilter === sub.id ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSubFilter(sub.id)}
-                  className="gap-2"
+                  className="snap-start shrink-0 rounded-full gap-2"
                 >
                   {SubIcon && <SubIcon className="h-4 w-4" />}
-                  {t === undefined ? sub.label_es : sub.label_es}
+                  {isPt ? sub.label_pt : sub.label_es}
                 </Button>
               );
             })}
