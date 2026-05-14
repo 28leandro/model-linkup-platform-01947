@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, Heart, MapPin, Menu, X } from "lucide-react";
+import { Plus, LogIn, LogOut, Heart, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -83,19 +82,6 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         {/* Mobile Navigation */}
         <div className="flex md:hidden items-center gap-2">
           <LanguageSelector />
-          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-11 w-11">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] sm:w-[320px]">
-              <div className="flex flex-col gap-4 mt-8">
-                <NavItems mobile />
-              </div>
-            </SheetContent>
-          </Sheet>
         </div>
       </div>
     </header>
