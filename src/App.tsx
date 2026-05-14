@@ -14,11 +14,13 @@ import PagoparTest from "./pages/PagoparTest";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import BottomNav from "@/components/BottomNav";
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
+        <div className="pb-16 md:pb-0">
         <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/post-ad" element={<PostAd />} />
@@ -35,6 +37,8 @@ function App() {
         <Route path="/auth/reset-password" element={<ResetPassword />} />
         <Route path="/pagopar-test" element={<PagoparTest />} />
         </Routes>
+        </div>
+        <BottomNav />
         <Toaster />
       </AuthProvider>
     </ErrorBoundary>
