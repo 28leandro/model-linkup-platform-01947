@@ -268,11 +268,13 @@ const Index = () => {
     <div className="min-h-screen">
       <Header onLoginClick={() => setLoginDialogOpen(true)} />
 
-      <SearchBar
-        searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
-        onSearch={handleSearch}
-      />
+      <div className="hidden md:block">
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          onSearch={handleSearch}
+        />
+      </div>
 
       <div className="container mx-auto px-3 sm:px-4 pt-4">
         <LocationFilter value={locationFilter} onChange={setLocationFilter} />
