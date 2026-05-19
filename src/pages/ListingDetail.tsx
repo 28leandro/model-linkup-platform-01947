@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Edit, Trash2, ArrowLeft } from "lucide-react";
+import { MapPin, Edit, Trash2, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import { useState, useEffect } from "react";
@@ -208,6 +208,28 @@ const ListingDetail = () => {
                     />
                   ))}
                 </div>
+              )}
+
+              {/* Flechas navegação — somente desktop */}
+              {listing.images && listing.images.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => emblaApi?.scrollPrev()}
+                    aria-label="Foto anterior"
+                    className="hidden sm:flex absolute left-2 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-sm transition-colors"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => emblaApi?.scrollNext()}
+                    aria-label="Próxima foto"
+                    className="hidden sm:flex absolute right-2 top-1/2 -translate-y-1/2 items-center justify-center w-10 h-10 rounded-full bg-black/40 hover:bg-black/60 text-white backdrop-blur-sm transition-colors"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </>
               )}
             </div>
 
