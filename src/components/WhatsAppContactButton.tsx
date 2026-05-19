@@ -36,16 +36,16 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
     return (
       <Button
         asChild
-        className="w-full h-12 rounded-lg bg-green-500 hover:bg-green-600 text-white shadow-sm gap-2"
+        className="rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0"
       >
         <a
           href={url}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contactar por WhatsApp"
+          title="Contactar por WhatsApp"
         >
-          <MessageCircle className="w-5 h-5" />
-          <span className="font-semibold">WhatsApp</span>
+          <MessageCircle className="w-6 h-6 text-white" />
         </a>
       </Button>
     );
