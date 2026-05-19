@@ -233,7 +233,18 @@ const ListingDetail = () => {
                 ))}
               </div>
             )}
-            
+
+            {/* Botão WhatsApp rápido logo após as fotos */}
+            {!isOwner && (
+              <div className="mb-4">
+                <WhatsAppContactButton
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                  variant="inline"
+                />
+              </div>
+            )}
+
             <h1 className="text-xl sm:text-2xl font-bold mb-2">
               <EditableField
                 value={listing.title}

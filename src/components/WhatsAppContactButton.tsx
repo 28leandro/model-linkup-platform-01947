@@ -6,9 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 interface Props {
   listingId: string;
   listingTitle: string;
+  variant?: "floating" | "inline";
 }
 
-const WhatsAppContactButton = ({ listingId, listingTitle }: Props) => {
+const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }: Props) => {
   const [phone, setPhone] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +31,25 @@ const WhatsAppContactButton = ({ listingId, listingTitle }: Props) => {
   if (!sanitized) return null;
   const message = `Olá, tenho interesse no anúncio "${listingTitle}"`;
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
+
+  if (variant === "inline") {
+    return (
+      <Button
+        asChild
+        className="w-full h-12 rounded-lg bg-green-500 hover:bg-green-600 text-white shadow-sm gap-2"
+      >
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contactar por WhatsApp"
+        >
+          <MessageCircle className="w-5 h-5" />
+          <span className="font-semibold">WhatsApp</span>
+        </a>
+      </Button>
+    );
+  }
 
   return (
     <Button
