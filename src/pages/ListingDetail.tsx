@@ -168,7 +168,7 @@ const ListingDetail = () => {
         <Card>
           <CardContent className="p-3 sm:p-6">
             {/* Galeria de Fotos — carrossel com swipe e dots */}
-            <div className="relative aspect-[4/3] sm:aspect-video md:aspect-[4/3] lg:max-h-[500px] bg-muted rounded-lg mb-3 sm:mb-4 overflow-hidden">
+            <div className="relative aspect-[4/3] sm:aspect-[16/10] md:aspect-[16/10] sm:max-h-[380px] md:max-h-[420px] lg:max-h-[440px] sm:max-w-3xl sm:mx-auto bg-muted rounded-lg mb-3 sm:mb-4 overflow-hidden">
               <div className="overflow-hidden h-full" ref={emblaRef}>
                 <div className="flex h-full touch-pan-y">
                   {(listing.images && listing.images.length > 0
@@ -236,7 +236,7 @@ const ListingDetail = () => {
 
             {/* Botão WhatsApp rápido logo após as fotos */}
             {!isOwner && (
-              <div className="mb-4 flex justify-start">
+              <div className="mb-4 flex justify-end">
                 <WhatsAppContactButton
                   listingId={listing.id}
                   listingTitle={listing.title}
