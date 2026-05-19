@@ -236,7 +236,7 @@ const ListingDetail = () => {
 
             {/* Botão WhatsApp rápido logo após as fotos */}
             {!isOwner && (
-              <div className="mb-4">
+              <div className="mb-4 flex justify-start">
                 <WhatsAppContactButton
                   listingId={listing.id}
                   listingTitle={listing.title}
@@ -453,7 +453,6 @@ const ListingDetail = () => {
           </CardContent>
         </Card>
       </div>
-      {!isOwner && <WhatsAppContactButton listingId={listing.id} listingTitle={listing.title} />}
     </div>
     </>
   );

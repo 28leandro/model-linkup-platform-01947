@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Phone } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -33,7 +33,22 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
 
   if (variant === "inline") {
-    return null;
+    return (
+      <Button
+        asChild
+        className="rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0"
+      >
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contactar por WhatsApp"
+          title="Contactar por WhatsApp"
+        >
+          <MessageCircle className="w-6 h-6 text-white" />
+        </a>
+      </Button>
+    );
   }
 
   return (
@@ -48,7 +63,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
         aria-label="Contactar por WhatsApp"
         title="Contactar por WhatsApp"
       >
-          <Phone className="w-6 h-6 text-white" fill="currentColor" />
+          <MessageCircle className="w-6 h-6 text-white" />
       </a>
     </Button>
   );
