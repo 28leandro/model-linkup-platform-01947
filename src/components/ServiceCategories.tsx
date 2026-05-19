@@ -12,16 +12,15 @@ const ServiceCategories = () => {
       <div className="flex gap-2 sm:gap-3 overflow-x-auto -mx-3 px-3 sm:-mx-4 sm:px-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {CATEGORIES.map((cat, idx) => {
           const Icon = cat.icon;
-          // Alternar 3 azuis e 3 vermelhos (índices pares = azul, ímpares = vermelho)
           const isBlue = idx % 2 === 0;
           return (
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
-              className={`snap-start shrink-0 group flex items-center gap-2 rounded-full border px-3 py-2 transition-all ${
+              className={`snap-start shrink-0 group flex items-center gap-2 rounded-full border px-3 py-2 bg-card text-foreground transition-all ${
                 isBlue
-                  ? "border-blue-500/40 bg-blue-500/10 text-blue-700 dark:text-blue-300 hover:bg-blue-500 hover:text-white hover:border-blue-500"
-                  : "border-red-500/40 bg-red-500/10 text-red-700 dark:text-red-300 hover:bg-red-500 hover:text-white hover:border-red-500"
+                  ? "hover:bg-primary hover:text-primary-foreground"
+                  : "hover:bg-destructive hover:text-destructive-foreground"
               }`}
             >
               <Icon className="w-4 h-4 shrink-0" strokeWidth={2} />
