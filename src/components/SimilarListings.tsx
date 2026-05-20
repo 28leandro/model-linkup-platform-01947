@@ -10,7 +10,6 @@ import FavoriteButton from "@/components/FavoriteButton";
 interface SimilarListingsProps {
   currentId: string;
   category?: string | null;
-  subcategory?: string | null;
   price?: number | null;
   currency?: string | null;
   location?: string | null;
@@ -26,7 +25,6 @@ interface SimilarItem {
   images: string[] | null;
   created_at: string;
   category: string | null;
-  subcategory: string | null;
 }
 
 const STOPWORDS = new Set([
@@ -46,7 +44,6 @@ const tokenize = (s?: string | null) =>
 const SimilarListings = ({
   currentId,
   category,
-  subcategory,
   price,
   currency,
   location,
@@ -65,7 +62,7 @@ const SimilarListings = ({
         let query = supabase
           .from("listings_public")
           .select(
-            "id,title,price,currency,location,images,created_at,category,subcategory"
+            "id,title,price,currency,location,images,created_at,category"
           )
           .neq("id", currentId)
           .limit(60);
@@ -78,19 +75,19 @@ const SimilarListings = ({
 
         const { data, error } = await query;
         if (error) throw error;
-        let rows = (data || []) as SimilarItem[];
+        let rows = ((data || []) as unknown) as SimilarItem[];
 
         // If too few results, relax price filter
         if (rows.length < 4 && category) {
           const { data: relaxed } = await supabase
             .from("listings_public")
             .select(
-              "id,title,price,currency,location,images,created_at,category,subcategory"
+              "id,title,price,currency,location,images,created_at,category"
             )
             .neq("id", currentId)
             .eq("category", category)
             .limit(40);
-          rows = (relaxed || []) as SimilarItem[];
+          rows = ((relaxed || []) as unknown) as SimilarItem[];
         }
 
         const titleTokens = new Set(tokenize(title));
@@ -102,8 +99,6 @@ const SimilarListings = ({
 
         const scored = rows.map((r) => {
           let score = 0;
-          if (r.subcategory && subcategory && r.subcategory === subcategory)
-            score += 50;
           if (r.category && category && r.category === category) score += 30;
           if (price && price > 0 && r.price && r.price > 0) {
             const delta = Math.abs(r.price - price) / price;
@@ -137,7 +132,7 @@ const SimilarListings = ({
     return () => {
       cancelled = true;
     };
-  }, [currentId, category, subcategory, price, currency, location, title]);
+  }, [currentId, category, price, currency, location, title]);
 
   const scrollBy = (delta: number) =>
     scrollerRef.current?.scrollBy({ left: delta, behavior: "smooth" });
