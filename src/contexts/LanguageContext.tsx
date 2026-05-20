@@ -64,6 +64,7 @@ const translations = {
     'listings.noImage': 'Sem imagem',
     'listings.recentlyViewed': 'Vistos recentemente',
     'listings.clear': 'Limpar',
+    'listings.similarInRegion': 'Anúncios semelhantes na sua região',
     
     // Map
     'map.title': 'Mapa de Anúncios',
@@ -354,6 +355,7 @@ const translations = {
     'listings.noImage': 'Sin imagen',
     'listings.recentlyViewed': 'Vistos recientemente',
     'listings.clear': 'Limpiar',
+    'listings.similarInRegion': 'Anuncios similares en tu región',
     
     // Map
     'map.title': 'Mapa de Anuncios',

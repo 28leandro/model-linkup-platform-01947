@@ -32,6 +32,7 @@ import { getPublicCity } from "@/lib/utils";
 import { trackRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import ContactSellerChat from "@/components/ContactSellerChat";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
+import SimilarListings from "@/components/SimilarListings";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -474,6 +475,16 @@ const ListingDetail = () => {
             </div>
           </CardContent>
         </Card>
+        {listing && (
+          <SimilarListings
+            currentId={listing.id}
+            category={listing.category}
+            price={listing.price}
+            currency={(listing as any).currency}
+            location={listing.location}
+            title={listing.title}
+          />
+        )}
       </div>
     </div>
     </>
