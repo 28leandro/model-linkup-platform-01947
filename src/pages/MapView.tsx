@@ -51,6 +51,7 @@ const FocusedMap = ({ listing, userPos }: FocusedMapProps) => {
   const elRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layersRef = useRef<L.Layer[]>([]);
+  const [routeInfo, setRouteInfo] = useState<{ distanceKm: number; durationMin: number } | null>(null);
 
   const listingPos: [number, number] | null =
     listing?.latitude && listing?.longitude
@@ -94,25 +95,78 @@ const FocusedMap = ({ listing, userPos }: FocusedMapProps) => {
       layersRef.current.push(m);
     }
     if (userPos && listingPos) {
-      const line = L.polyline([userPos, listingPos], {
-        color: "#2563eb",
+      // Provisional straight dashed line while real route loads
+      const provisional = L.polyline([userPos, listingPos], {
+        color: "#38bdf8",
         weight: 3,
+        opacity: 0.5,
         dashArray: "6 6",
       }).addTo(map);
-      layersRef.current.push(line);
+      layersRef.current.push(provisional);
       map.fitBounds(L.latLngBounds([userPos, listingPos]), {
         padding: [60, 60],
       });
+
+      // Fetch real road itinerary from OSRM public demo server
+      const controller = new AbortController();
+      const url = `https://router.project-osrm.org/route/v1/driving/${userPos[1]},${userPos[0]};${listingPos[1]},${listingPos[0]}?overview=full&geometries=geojson`;
+      fetch(url, { signal: controller.signal })
+        .then((r) => r.json())
+        .then((data) => {
+          const route = data?.routes?.[0];
+          if (!route?.geometry?.coordinates) return;
+          const latlngs = route.geometry.coordinates.map(
+            ([lng, lat]: [number, number]) => [lat, lng] as [number, number]
+          );
+          provisional.remove();
+          const real = L.polyline(latlngs, {
+            color: "#38bdf8",
+            weight: 5,
+            opacity: 0.9,
+            lineCap: "round",
+            lineJoin: "round",
+          }).addTo(map);
+          layersRef.current.push(real);
+          map.fitBounds(real.getBounds(), { padding: [60, 60] });
+          setRouteInfo({
+            distanceKm: route.distance / 1000,
+            durationMin: route.duration / 60,
+          });
+        })
+        .catch(() => {
+          /* ignore — provisional line remains */
+        });
+      return () => controller.abort();
     } else if (listingPos) {
       map.setView(listingPos, 14);
     }
   }, [listing, listingPos?.[0], listingPos?.[1], userPos?.[0], userPos?.[1]]);
 
   return (
-    <div
-      ref={elRef}
-      className="w-full h-full rounded-lg overflow-hidden shadow-lg"
-    />
+    <div className="relative w-full h-full">
+      <div
+        ref={elRef}
+        className="w-full h-full rounded-lg overflow-hidden shadow-lg"
+      />
+      {routeInfo && (
+        <div className="absolute bottom-3 left-3 z-[1000] bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg px-3 py-2 flex items-center gap-3 text-sm">
+          <div className="flex items-center gap-1.5">
+            <Navigation className="w-4 h-4 text-[#38bdf8]" />
+            <span className="font-semibold">
+              {routeInfo.distanceKm < 1
+                ? `${Math.round(routeInfo.distanceKm * 1000)} m`
+                : `${routeInfo.distanceKm.toFixed(1)} km`}
+            </span>
+          </div>
+          <span className="text-muted-foreground">·</span>
+          <span className="text-muted-foreground">
+            {routeInfo.durationMin < 60
+              ? `${Math.round(routeInfo.durationMin)} min`
+              : `${Math.floor(routeInfo.durationMin / 60)} h ${Math.round(routeInfo.durationMin % 60)} min`}
+          </span>
+        </div>
+      )}
+    </div>
   );
 };
 
