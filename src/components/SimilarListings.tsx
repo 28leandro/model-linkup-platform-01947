@@ -80,7 +80,7 @@ const vehicleYear = (row: Pick<SimilarItem, "year" | "title" | "attributes">) =>
   return extractYear(row.title);
 };
 
-const sameVehicleCategory = (row: Pick<SimilarItem, "type" | "category">) =>
+const sameVehicleCategory = (row: { type?: string | null; category?: string | null }) =>
   normalizeValue(row.type).includes("vehicle") ||
   normalizeValue(row.category).includes("vehicle") ||
   normalizeValue(row.type).includes("vehiculo") ||
