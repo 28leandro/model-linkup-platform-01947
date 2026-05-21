@@ -6,7 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface Props {
   listingId: string;
   listingTitle: string;
-  variant?: "floating" | "inline";
+  variant?: "floating" | "inline" | "compact";
 }
 
 const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }: Props) => {
@@ -46,6 +46,26 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
           title="Contactar por WhatsApp"
         >
           <MessageCircle className="w-6 h-6 text-white" />
+        </a>
+      </Button>
+    );
+  }
+
+  if (variant === "compact") {
+    return (
+      <Button
+        asChild
+        size="icon"
+        className="h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-green-500 hover:bg-green-600 p-0"
+        title="Contactar por WhatsApp"
+      >
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Contactar por WhatsApp"
+        >
+          <MessageCircle className="w-4 h-4 text-white" />
         </a>
       </Button>
     );

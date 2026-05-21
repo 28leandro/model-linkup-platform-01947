@@ -14,6 +14,10 @@ interface SimilarListingsProps {
   currency?: string | null;
   location?: string | null;
   title?: string | null;
+  type?: string | null;
+  brand?: string | null;
+  model?: string | null;
+  year?: number | null;
 }
 
 interface SimilarItem {
@@ -25,6 +29,9 @@ interface SimilarItem {
   images: string[] | null;
   created_at: string;
   category: string | null;
+  brand?: string | null;
+  model?: string | null;
+  year?: number | null;
 }
 
 const STOPWORDS = new Set([
@@ -48,6 +55,10 @@ const SimilarListings = ({
   currency,
   location,
   title,
+  type,
+  brand,
+  model,
+  year,
 }: SimilarListingsProps) => {
   const { t } = useLanguage();
   const [items, setItems] = useState<SimilarItem[]>([]);
@@ -59,17 +70,27 @@ const SimilarListings = ({
     const run = async () => {
       setLoading(true);
       try {
+        const isVehicle = type === "vehicles" || category === "vehicles";
+        const select =
+          "id,title,price,currency,location,images,created_at,category,brand,model,year";
+
         let query = supabase
           .from("listings_public")
-          .select(
-            "id,title,price,currency,location,images,created_at,category"
-          )
+          .select(select)
           .neq("id", currentId)
           .limit(60);
 
         if (category) query = query.eq("category", category);
         if (currency) query = query.eq("currency", currency);
-        if (price && price > 0) {
+
+        // Vehicles: strict same brand+model, year ±4
+        if (isVehicle) {
+          if (brand) query = query.ilike("brand", brand);
+          if (model) query = query.ilike("model", model);
+          if (year && year > 0) {
+            query = query.gte("year", year - 4).lte("year", year + 4);
+          }
+        } else if (price && price > 0) {
           query = query.gte("price", price * 0.8).lte("price", price * 1.2);
         }
 
@@ -77,13 +98,11 @@ const SimilarListings = ({
         if (error) throw error;
         let rows = ((data || []) as unknown) as SimilarItem[];
 
-        // If too few results, relax price filter
-        if (rows.length < 4 && category) {
+        // For non-vehicles, relax price filter if too few results
+        if (!isVehicle && rows.length < 4 && category) {
           const { data: relaxed } = await supabase
             .from("listings_public")
-            .select(
-              "id,title,price,currency,location,images,created_at,category"
-            )
+            .select(select)
             .neq("id", currentId)
             .eq("category", category)
             .limit(40);
@@ -132,7 +151,7 @@ const SimilarListings = ({
     return () => {
       cancelled = true;
     };
-  }, [currentId, category, price, currency, location, title]);
+  }, [currentId, category, price, currency, location, title, type, brand, model, year]);
 
   const scrollBy = (delta: number) =>
     scrollerRef.current?.scrollBy({ left: delta, behavior: "smooth" });

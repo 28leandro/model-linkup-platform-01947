@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Plus, LogIn, LogOut, Heart, MapPin } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -15,11 +15,15 @@ const Header = ({ onLoginClick }: HeaderProps) => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  // If we're viewing a listing, focus the map on that listing
+  const listingMatch = location.pathname.match(/^\/listing\/([^/]+)/);
+  const mapHref = listingMatch ? `/map?focus=${listingMatch[1]}` : "/map";
 
   const NavItems = ({ mobile = false }: { mobile?: boolean }) => (
     <>
       <Button asChild variant="ghost" size={mobile ? "lg" : "default"} className={mobile ? "w-full justify-start" : ""}>
-        <Link to="/map" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
+        <Link to={mapHref} className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
           <MapPin className="w-4 h-4" />
           {t('header.map')}
         </Link>

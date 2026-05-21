@@ -278,7 +278,9 @@ export type Database = {
         Row: {
           area: number | null
           attributes: Json | null
+          brand: string | null
           category: string | null
+          condition: string | null
           created_at: string | null
           currency: string | null
           description: string | null
@@ -289,9 +291,11 @@ export type Database = {
           latitude: number | null
           location: string | null
           longitude: number | null
+          model: string | null
           phone: string | null
           price: number | null
           rating: number | null
+          subcategory: string | null
           title: string | null
           type: string | null
           user_id: string | null
@@ -300,7 +304,9 @@ export type Database = {
         Insert: {
           area?: number | null
           attributes?: Json | null
+          brand?: string | null
           category?: string | null
+          condition?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -311,9 +317,11 @@ export type Database = {
           latitude?: number | null
           location?: string | null
           longitude?: number | null
+          model?: string | null
           phone?: never
           price?: number | null
           rating?: number | null
+          subcategory?: string | null
           title?: string | null
           type?: string | null
           user_id?: string | null
@@ -322,7 +330,9 @@ export type Database = {
         Update: {
           area?: number | null
           attributes?: Json | null
+          brand?: string | null
           category?: string | null
+          condition?: string | null
           created_at?: string | null
           currency?: string | null
           description?: string | null
@@ -333,9 +343,11 @@ export type Database = {
           latitude?: number | null
           location?: string | null
           longitude?: number | null
+          model?: string | null
           phone?: never
           price?: number | null
           rating?: number | null
+          subcategory?: string | null
           title?: string | null
           type?: string | null
           user_id?: string | null
