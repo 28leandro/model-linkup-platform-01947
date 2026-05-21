@@ -251,10 +251,8 @@ const SimilarListings = ({
             const rowBrand = vehicleField(r, "brand");
             const rowModel = vehicleField(r, "model");
             if (normalizedBrand && normalizeValue(rowBrand) === normalizedBrand)
-              score += 40;
-            // Highest priority: same model
-            if (normalizedModel && normalizeValue(rowModel) === normalizedModel)
-              score += 80;
+              score += 100;
+            score += modelCloseness(rowModel, currentModel) * 2;
             const rowYear = vehicleYear(r);
             if (currentYear && rowYear) {
               const dy = Math.abs(rowYear - currentYear);
