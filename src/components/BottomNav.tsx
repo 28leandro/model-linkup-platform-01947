@@ -16,6 +16,10 @@ const BottomNav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
 
+  // If we're viewing a listing, focus the map on that listing
+  const listingMatch = location.pathname.match(/^\/listing\/([^/]+)/);
+  const mapHref = listingMatch ? `/map?focus=${listingMatch[1]}` : "/map";
+
   const isActive = (path: string) =>
     path === "/" ? location.pathname === "/" : location.pathname.startsWith(path);
 
@@ -95,7 +99,7 @@ const BottomNav = () => {
               <div className="flex flex-col gap-3 mt-8">
                 <LanguageSelector />
                 <Button asChild variant="ghost" size="lg" className="w-full justify-start">
-                  <Link to="/map" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
+                  <Link to={mapHref} onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
                     {t("header.map")}
                   </Link>
