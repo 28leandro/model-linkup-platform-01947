@@ -11,7 +11,9 @@ export interface Listing {
   location: string;
   type: ListingType;
   category: string;
+  subcategory?: string;
   description?: string;
+  attributes?: Record<string, unknown>;
   images: string[];
   phone?: string;
   price?: number;

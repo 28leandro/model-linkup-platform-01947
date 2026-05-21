@@ -438,7 +438,7 @@ const ListingDetail = () => {
             location={listing.location}
             title={listing.title}
             type={listing.type}
-            subcategory={(listing as any).subcategory}
+            subcategory={listing.subcategory}
             brand={getVehicleField("brand")}
             model={getVehicleField("model")}
             year={listing.year}
