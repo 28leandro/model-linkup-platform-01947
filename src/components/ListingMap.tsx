@@ -124,15 +124,23 @@ const ListingMap = ({ latitude, longitude, title, location }: ListingMapProps) =
     if (userMarkerRef.current) { userMarkerRef.current.remove(); userMarkerRef.current = null; }
     if (lineRef.current) { lineRef.current.remove(); lineRef.current = null; }
     if (!userPos) return;
-    userMarkerRef.current = L.marker(userPos, { icon: userIcon })
-      .bindPopup('Tu ubicación')
-      .addTo(map);
-    lineRef.current = L.polyline([userPos, position], {
-      color: '#2563eb',
-      weight: 3,
-      dashArray: '6 6',
-    }).addTo(map);
-    map.fitBounds(L.latLngBounds([userPos, position]), { padding: [40, 40] });
+    const raf = requestAnimationFrame(() => {
+      try {
+        map.invalidateSize();
+        userMarkerRef.current = L.marker(userPos, { icon: userIcon })
+          .bindPopup('Tu ubicación')
+          .addTo(map);
+        lineRef.current = L.polyline([userPos, position], {
+          color: '#2563eb',
+          weight: 3,
+          dashArray: '6 6',
+        }).addTo(map);
+        map.fitBounds(L.latLngBounds([userPos, position]), { padding: [40, 40] });
+      } catch {
+        /* leaflet may not be ready; ignore */
+      }
+    });
+    return () => cancelAnimationFrame(raf);
   }, [userPos, hasCoords, position]);
 
   const distanceKm = hasCoords && userPos ? haversineKm(userPos, position) : null;
