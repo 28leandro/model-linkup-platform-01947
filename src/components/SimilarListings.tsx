@@ -102,6 +102,18 @@ const sameRegion = (a?: string | null, b?: string | null) => {
   return left === right || left.includes(right) || right.includes(left);
 };
 
+const modelCloseness = (candidate?: string | null, current?: string | null) => {
+  const candidateModel = normalizeValue(candidate);
+  const currentModel = normalizeValue(current);
+  if (!candidateModel || !currentModel) return 0;
+  if (candidateModel === currentModel) return 100;
+  if (candidateModel.includes(currentModel) || currentModel.includes(candidateModel)) return 60;
+
+  const currentTokens = new Set(currentModel.split(/\s+/).filter(Boolean));
+  const candidateTokens = candidateModel.split(/\s+/).filter(Boolean);
+  return candidateTokens.filter((token) => currentTokens.has(token)).length * 15;
+};
+
 const SimilarListings = ({
   currentId,
   category,
