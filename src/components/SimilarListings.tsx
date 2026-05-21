@@ -157,9 +157,6 @@ const SimilarListings = ({
                 return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
               })
             : searchPool;
-          const sameBrand = searchPool.filter(
-            (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
-          );
           const fallbackBrand = yearPool.filter(
             (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
           );
