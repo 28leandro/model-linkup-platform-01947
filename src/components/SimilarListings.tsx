@@ -64,8 +64,13 @@ const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, 
 };
 
 const sameRegion = (a?: string | null, b?: string | null) => {
-  const left = normalizeValue(a).replace(/^[-\s]+/, "");
-  const right = normalizeValue(b).replace(/^[-\s]+/, "");
+  const regionKey = (value?: string | null) => {
+    const firstPart = (value || "").split(",")[0] || "";
+    const lastArea = firstPart.split("-").map((part) => part.trim()).filter(Boolean).pop() || firstPart;
+    return normalizeValue(lastArea).replace(/^[-\s]+/, "");
+  };
+  const left = regionKey(a);
+  const right = regionKey(b);
   if (!left || !right) return true;
   return left === right || left.includes(right) || right.includes(left);
 };
