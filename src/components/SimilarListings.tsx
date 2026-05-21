@@ -122,7 +122,7 @@ const SimilarListings = ({
         const hasYearWindow = !!currentYear && currentYear > 0;
         const isVehicle = type === "vehicles" || category === "vehicles";
         const select =
-          "id,title,price,currency,location,images,created_at,category,brand,model,year,attributes";
+          "id,title,price,currency,location,images,created_at,type,category,brand,model,year,attributes";
 
         let rows: SimilarItem[] = [];
 
@@ -156,27 +156,30 @@ const SimilarListings = ({
         };
 
         if (isVehicle) {
-          const vehicleRows = await runQuery((q) => {
-            q = q.eq("category", "vehicles");
-            return q;
-          }, 120);
-
-          const inRegion = vehicleRows.filter((r) => sameRegion(location, r.location));
-          const searchPool = inRegion.length > 0 ? inRegion : vehicleRows;
-          const yearPool = hasYearWindow
-            ? searchPool.filter((r) => {
-                const rowYear = r.year && r.year > 0 ? r.year : extractYear(r.title);
-                return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
-              })
-            : searchPool;
-          const fallbackBrand = yearPool.filter(
-            (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
-          );
-          const sameModel = fallbackBrand.filter(
-            (r) => normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel
+          const vehicleRows = await runQuery((q) =>
+            q.or("category.eq.vehicles,type.eq.vehicles"),
+            500
           );
 
-          rows = sameModel.length > 0 ? sameModel : fallbackBrand;
+          const sameBrand = (r: SimilarItem) =>
+            !!normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand;
+          const sameModel = (r: SimilarItem) =>
+            !!normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel;
+          const withinYearWindow = (r: SimilarItem) => {
+            if (!hasYearWindow) return true;
+            const rowYear = vehicleYear(r);
+            return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
+          };
+
+          const regionalPool = vehicleRows
+            .filter(sameVehicleCategory)
+            .filter((r) => sameRegion(location, r.location))
+            .filter(withinYearWindow);
+
+          const exactModelMatches = regionalPool.filter((r) => sameBrand(r) && sameModel(r));
+          const brandFallbackMatches = regionalPool.filter(sameBrand);
+
+          rows = exactModelMatches.length > 0 ? exactModelMatches : brandFallbackMatches;
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
