@@ -32,6 +32,7 @@ interface SimilarItem {
   brand?: string | null;
   model?: string | null;
   year?: number | null;
+  attributes?: Record<string, any> | null;
 }
 
 const STOPWORDS = new Set([
@@ -47,6 +48,26 @@ const tokenize = (s?: string | null) =>
     .replace(/[^a-z0-9 ]/g, " ")
     .split(/\s+/)
     .filter((w) => w.length >= 3 && !STOPWORDS.has(w));
+
+const normalizeValue = (value?: string | null) =>
+  (value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+
+const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, field: "brand" | "model") => {
+  const direct = row[field];
+  const attrs = row.attributes || {};
+  return direct || attrs[field] || attrs[`${field}Custom`] || null;
+};
+
+const sameRegion = (a?: string | null, b?: string | null) => {
+  const left = normalizeValue(a).replace(/^[-\s]+/, "");
+  const right = normalizeValue(b).replace(/^[-\s]+/, "");
+  if (!left || !right) return true;
+  return left === right || left.includes(right) || right.includes(left);
+};
 
 const SimilarListings = ({
   currentId,
