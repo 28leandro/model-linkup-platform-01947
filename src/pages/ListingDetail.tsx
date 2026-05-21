@@ -363,27 +363,27 @@ const ListingDetail = () => {
 
             <div className="mt-4 sm:mt-6">
               {/* Informações adicionais para imóveis */}
-              {listing.type === 'real-estate' && (
+              {listing.type === 'real-estate' ? (
                 <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-4">
-                  {listing.bedrooms && (
+                  {listing.bedrooms ? (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
                       <p className="text-xs sm:text-sm text-muted-foreground">{t('detail.bedrooms')}</p>
                       <p className="text-base sm:text-lg font-semibold">{listing.bedrooms}</p>
                     </div>
-                  )}
-                  {listing.bathrooms && (
+                  ) : null}
+                  {listing.bathrooms ? (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
                       <p className="text-xs sm:text-sm text-muted-foreground">{t('detail.bathrooms')}</p>
                       <p className="text-base sm:text-lg font-semibold">{listing.bathrooms}</p>
                     </div>
-                  )}
-                  {listing.area && (
+                  ) : null}
+                  {listing.area ? (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
                       <p className="text-xs sm:text-sm text-muted-foreground">{t('detail.area')}</p>
                       <p className="text-base sm:text-lg font-semibold">{listing.area}m²</p>
                     </div>
-                  )}
-                  {listing.price && (
+                  ) : null}
+                  {listing.price ? (
                     <div className="bg-muted p-2.5 sm:p-3 rounded-lg">
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         {listing.realEstateType === 'rent' ? t('detail.rentPerMonth') : t('detail.price')}
@@ -403,21 +403,21 @@ const ListingDetail = () => {
                         />
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
-              )}
+              ) : null}
 
               {/* Mapa de ubicación */}
-              {listing.latitude && listing.longitude && (
+              {listing.latitude && listing.longitude ? (
                 <ListingMap
                   latitude={listing.latitude}
                   longitude={listing.longitude}
                   title={listing.title}
                   location={listing.location}
                 />
-              )}
+              ) : null}
 
-              {!isOwner && listing.user_id && (
+              {!isOwner && listing.user_id ? (
                 <ContactSellerChat
                   listingId={listing.id}
                   listingTitle={listing.title}
@@ -425,7 +425,7 @@ const ListingDetail = () => {
                   currentUserId={user?.id || ""}
                   onLoginRequired={() => setShowLoginDialog(true)}
                 />
-              )}
+              ) : null}
             </div>
           </CardContent>
         </Card>
