@@ -55,6 +55,18 @@ const normalizeValue = (value?: string | null) =>
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\b(toyota|volkswagen|chevrolet|ford|hyundai|kia|nissan|honda|renault|peugeot|citroen|fiat|mitsubishi|mercedes\s*benz|mercedes-benz|bmw|audi|suzuki|mazda|jeep|geely|byd|chery|jac|great\s*wall|haval|mg|changan|dongfeng|gac|lifan|dfsk)\b/g, " ")
+    .replace(/\b(modelo|modelo:|marca|marca:|auto|carro|camioneta|vehiculo|veiculo|ano|año)\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+const normalizeBrand = (value?: string | null) => normalizeValue(value).replace(/\s+/g, " ");
+
+const normalizeModel = (value?: string | null) =>
+  normalizeValue(value)
+    .replace(/\b(19\d{2}|20\d{2})\b/g, " ")
+    .replace(/\b(automatico|automatica|manual|full|equipo|diesel|flex|nafta|gasolina|motor|turbo|4x2|4x4)\b/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 
 const extractYear = (value?: string | null) => {
@@ -103,8 +115,8 @@ const sameRegion = (a?: string | null, b?: string | null) => {
 };
 
 const modelCloseness = (candidate?: string | null, current?: string | null) => {
-  const candidateModel = normalizeValue(candidate);
-  const currentModel = normalizeValue(current);
+  const candidateModel = normalizeModel(candidate);
+  const currentModel = normalizeModel(current);
   if (!candidateModel || !currentModel) return 0;
   if (candidateModel === currentModel) return 100;
   if (candidateModel.includes(currentModel) || currentModel.includes(candidateModel)) return 60;
