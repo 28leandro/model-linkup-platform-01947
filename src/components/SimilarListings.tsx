@@ -116,6 +116,19 @@ const sameRegion = (a?: string | null, b?: string | null) => {
   return left === right || left.includes(right) || right.includes(left);
 };
 
+const cityKey = (value?: string | null) => {
+  const firstPart = (value || "").split(",")[0] || "";
+  const lastArea = firstPart.split("-").map((p) => p.trim()).filter(Boolean).pop() || firstPart;
+  return normalizeValue(lastArea).replace(/^[-\s]+/, "");
+};
+
+const sameCity = (a?: string | null, b?: string | null) => {
+  const left = cityKey(a);
+  const right = cityKey(b);
+  if (!left || !right) return false;
+  return left === right;
+};
+
 const modelCloseness = (candidate?: string | null, current?: string | null) => {
   const candidateModel = normalizeModel(candidate);
   const currentModel = normalizeModel(current);
@@ -198,80 +211,15 @@ const SimilarListings = ({
             500
           );
 
-          const sameBrand = (r: SimilarItem) =>
-            !!normalizedBrand && normalizeBrand(vehicleField(r, "brand")) === normalizedBrand;
-            const sameModel = (r: SimilarItem) =>
-              !!normalizedModel && normalizeModel(vehicleField(r, "model")) === normalizedModel;
-            const withinYearWindow = (r: SimilarItem) => {
-              if (!hasYearWindow) return true;
-              const rowYear = vehicleYear(r);
-              return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
-            };
+          const sameModelStrict = (r: SimilarItem) =>
+            !!normalizedModel && normalizeModel(vehicleField(r, "model")) === normalizedModel;
 
-            const vehicleCandidates = vehicleRows.filter(sameVehicleCategory);
-            const sameSubcategory = (r: SimilarItem) =>
-              !!subcategory && normalizeValue(r.subcategory) === normalizeValue(subcategory);
-            const sortVehicleFallback = (list: SimilarItem[]) =>
-              [...list].sort((a, b) => {
-                const subDelta = Number(sameSubcategory(b)) - Number(sameSubcategory(a));
-                if (subDelta !== 0) return subDelta;
+          const vehicleCandidates = vehicleRows.filter(sameVehicleCategory);
 
-                const modelDelta =
-                  modelCloseness(vehicleField(b, "model"), currentModel) -
-                  modelCloseness(vehicleField(a, "model"), currentModel);
-                if (modelDelta !== 0) return modelDelta;
-
-                const aYear = vehicleYear(a);
-                const bYear = vehicleYear(b);
-                if (currentYear && aYear && bYear) {
-                  return Math.abs(aYear - currentYear) - Math.abs(bYear - currentYear);
-                }
-                return 0;
-              });
-
-            const vehiclesInYear = vehicleCandidates.filter(withinYearWindow);
-            const vehiclesInRegionAndYear = vehiclesInYear.filter((r) =>
-              sameRegion(location, r.location)
-            );
-
-            const strictMatches = vehiclesInRegionAndYear.filter(
-              (r) => sameBrand(r) && sameModel(r)
-            );
-            const brandModelMatches = vehiclesInYear
-              .filter(withinYearWindow)
-              .filter((r) => sameBrand(r) && sameModel(r));
-            const fallbackMatches = vehiclesInRegionAndYear
-              .filter(sameBrand)
-              .sort((a, b) => {
-                const modelDelta =
-                  modelCloseness(vehicleField(b, "model"), currentModel) -
-                  modelCloseness(vehicleField(a, "model"), currentModel);
-                if (modelDelta !== 0) return modelDelta;
-
-                const aYear = vehicleYear(a);
-                const bYear = vehicleYear(b);
-                if (currentYear && aYear && bYear) {
-                  return Math.abs(aYear - currentYear) - Math.abs(bYear - currentYear);
-                }
-                return 0;
-              });
-
-            const brandYearMatches = vehiclesInYear.filter(sameBrand);
-            const broadFallback = mergeUnique(
-              mergeUnique([], sortVehicleFallback(vehiclesInRegionAndYear)),
-              sortVehicleFallback(vehiclesInYear)
-            );
-            mergeUnique(broadFallback, sortVehicleFallback(vehicleCandidates));
-
-          rows = strictMatches.length > 0
-            ? strictMatches
-            : brandModelMatches.length > 0
-              ? brandModelMatches
-              : fallbackMatches.length > 0
-                ? fallbackMatches
-                : brandYearMatches.length > 0
-                  ? brandYearMatches
-                  : broadFallback;
+          // OLX-style strict: same model + same city. No fallback.
+          rows = vehicleCandidates.filter(
+            (r) => sameModelStrict(r) && sameCity(location, r.location)
+          );
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
@@ -345,7 +293,25 @@ const SimilarListings = ({
   const scrollBy = (delta: number) =>
     scrollerRef.current?.scrollBy({ left: delta, behavior: "smooth" });
 
-  if (loading || items.length === 0) return null;
+  const isVehicleView = sameVehicleCategory({ type, category });
+  const cityName = (location || "").split(",")[0]?.split("-").pop()?.trim() || location || "";
+
+  if (loading) return null;
+  if (items.length === 0) {
+    if (isVehicleView) {
+      return (
+        <section className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-2">
+            {t("listings.similarInRegion")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Nenhum veículo similar encontrado em {cityName}.
+          </p>
+        </section>
+      );
+    }
+    return null;
+  }
 
   const formatDate = (iso: string) => {
     try {
