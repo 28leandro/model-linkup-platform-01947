@@ -183,41 +183,46 @@ const SimilarListings = ({
             500
           );
 
-          const sameBrand = (r: SimilarItem) =>
-            !!normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand;
-          const sameModel = (r: SimilarItem) =>
-            !!normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel;
-          const withinYearWindow = (r: SimilarItem) => {
-            if (!hasYearWindow) return true;
-            const rowYear = vehicleYear(r);
-            return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
-          };
+          if (!normalizedBrand) {
+            rows = [];
+          } else {
 
-          const vehiclesInRegionAndYear = vehicleRows
-            .filter(sameVehicleCategory)
-            .filter((r) => sameRegion(location, r.location))
-            .filter(withinYearWindow);
+            const sameBrand = (r: SimilarItem) =>
+              normalizeValue(vehicleField(r, "brand")) === normalizedBrand;
+            const sameModel = (r: SimilarItem) =>
+              !!normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel;
+            const withinYearWindow = (r: SimilarItem) => {
+              if (!hasYearWindow) return true;
+              const rowYear = vehicleYear(r);
+              return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
+            };
 
-          const strictMatches = vehiclesInRegionAndYear.filter(
-            (r) => sameBrand(r) && sameModel(r)
-          );
-          const fallbackMatches = vehiclesInRegionAndYear
-            .filter(sameBrand)
-            .sort((a, b) => {
-              const modelDelta =
-                modelCloseness(vehicleField(b, "model"), currentModel) -
-                modelCloseness(vehicleField(a, "model"), currentModel);
-              if (modelDelta !== 0) return modelDelta;
+            const vehiclesInRegionAndYear = vehicleRows
+              .filter(sameVehicleCategory)
+              .filter((r) => sameRegion(location, r.location))
+              .filter(withinYearWindow);
 
-              const aYear = vehicleYear(a);
-              const bYear = vehicleYear(b);
-              if (currentYear && aYear && bYear) {
-                return Math.abs(aYear - currentYear) - Math.abs(bYear - currentYear);
-              }
-              return 0;
-            });
+            const strictMatches = vehiclesInRegionAndYear.filter(
+              (r) => sameBrand(r) && sameModel(r)
+            );
+            const fallbackMatches = vehiclesInRegionAndYear
+              .filter(sameBrand)
+              .sort((a, b) => {
+                const modelDelta =
+                  modelCloseness(vehicleField(b, "model"), currentModel) -
+                  modelCloseness(vehicleField(a, "model"), currentModel);
+                if (modelDelta !== 0) return modelDelta;
 
-          rows = strictMatches.length > 0 ? strictMatches : fallbackMatches;
+                const aYear = vehicleYear(a);
+                const bYear = vehicleYear(b);
+                if (currentYear && aYear && bYear) {
+                  return Math.abs(aYear - currentYear) - Math.abs(bYear - currentYear);
+                }
+                return 0;
+              });
+
+            rows = strictMatches.length > 0 ? strictMatches : fallbackMatches;
+          }
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
