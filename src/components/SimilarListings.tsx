@@ -59,7 +59,8 @@ const normalizeValue = (value?: string | null) =>
 const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, field: "brand" | "model") => {
   const direct = row[field];
   const attrs = row.attributes || {};
-  return direct || attrs[field] || attrs[`${field}Custom`] || null;
+  const value = direct || attrs[field] || attrs[`${field}Custom`];
+  return typeof value === "string" ? value : null;
 };
 
 const sameRegion = (a?: string | null, b?: string | null) => {
