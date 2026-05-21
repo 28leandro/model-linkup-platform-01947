@@ -170,10 +170,12 @@ const SimilarListings = ({
           let score = 0;
           if (r.category && category && r.category === category) score += 30;
           if (isVehicle) {
-            if (brand && r.brand && r.brand.toLowerCase() === brand.toLowerCase())
+            const rowBrand = vehicleField(r, "brand");
+            const rowModel = vehicleField(r, "model");
+            if (normalizedBrand && normalizeValue(rowBrand) === normalizedBrand)
               score += 40;
             // Highest priority: same model
-            if (model && r.model && r.model.toLowerCase() === model.toLowerCase())
+            if (normalizedModel && normalizeValue(rowModel) === normalizedModel)
               score += 80;
             if (year && year > 0 && r.year && r.year > 0) {
               const dy = Math.abs(r.year - year);
