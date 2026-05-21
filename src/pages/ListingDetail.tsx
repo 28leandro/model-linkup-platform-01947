@@ -434,10 +434,11 @@ const ListingDetail = () => {
             currentId={listing.id}
             category={listing.category}
             price={listing.price}
-            currency={(listing as any).currency}
+            currency={listing.currency}
             location={listing.location}
             title={listing.title}
             type={listing.type}
+            subcategory={listing.subcategory}
             brand={getVehicleField("brand")}
             model={getVehicleField("model")}
             year={listing.year}
