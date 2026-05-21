@@ -130,7 +130,7 @@ const SimilarListings = ({
         const normalizedModel = normalizeValue(currentModel);
         const currentYear = year && year > 0 ? year : extractYear(title);
         const hasYearWindow = !!currentYear && currentYear > 0;
-        const isVehicle = type === "vehicles" || category === "vehicles";
+        const isVehicle = sameVehicleCategory({ type, category });
         const select =
           "id,title,price,currency,location,images,created_at,type,category,brand,model,year,attributes";
 
@@ -222,8 +222,9 @@ const SimilarListings = ({
             // Highest priority: same model
             if (normalizedModel && normalizeValue(rowModel) === normalizedModel)
               score += 80;
-            if (year && year > 0 && r.year && r.year > 0) {
-              const dy = Math.abs(r.year - year);
+            const rowYear = vehicleYear(r);
+            if (currentYear && rowYear) {
+              const dy = Math.abs(rowYear - currentYear);
               if (dy <= 4) score += 20 - dy * 3;
             }
           }
