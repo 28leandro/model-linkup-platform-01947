@@ -56,6 +56,11 @@ const normalizeValue = (value?: string | null) =>
     .replace(/[\u0300-\u036f]/g, "")
     .trim();
 
+const extractYear = (value?: string | null) => {
+  const match = (value || "").match(/\b(19\d{2}|20\d{2})\b/);
+  return match ? Number(match[1]) : null;
+};
+
 const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, field: "brand" | "model") => {
   const direct = row[field];
   const attrs = row.attributes || {};
@@ -101,7 +106,8 @@ const SimilarListings = ({
         const currentModel = model || null;
         const normalizedBrand = normalizeValue(currentBrand);
         const normalizedModel = normalizeValue(currentModel);
-        const hasYearWindow = !!year && year > 0;
+        const currentYear = year && year > 0 ? year : extractYear(title);
+        const hasYearWindow = !!currentYear && currentYear > 0;
         const isVehicle = type === "vehicles" || category === "vehicles";
         const select =
           "id,title,price,currency,location,images,created_at,category,brand,model,year,attributes";
@@ -140,20 +146,28 @@ const SimilarListings = ({
         if (isVehicle) {
           const vehicleRows = await runQuery((q) => {
             q = q.eq("category", "vehicles");
-            if (hasYearWindow) q = q.gte("year", year! - 4).lte("year", year! + 4);
             return q;
           }, 120);
 
           const inRegion = vehicleRows.filter((r) => sameRegion(location, r.location));
           const searchPool = inRegion.length > 0 ? inRegion : vehicleRows;
+          const yearPool = hasYearWindow
+            ? searchPool.filter((r) => {
+                const rowYear = r.year && r.year > 0 ? r.year : extractYear(r.title);
+                return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
+              })
+            : searchPool;
           const sameBrand = searchPool.filter(
             (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
           );
-          const sameModel = sameBrand.filter(
+          const fallbackBrand = yearPool.filter(
+            (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
+          );
+          const sameModel = fallbackBrand.filter(
             (r) => normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel
           );
 
-          rows = sameModel.length > 0 ? sameModel : sameBrand;
+          rows = sameModel.length > 0 ? sameModel : fallbackBrand;
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
