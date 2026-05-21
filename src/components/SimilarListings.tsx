@@ -198,12 +198,8 @@ const SimilarListings = ({
             500
           );
 
-          if (!normalizedBrand) {
-            rows = [];
-          } else {
-
-            const sameBrand = (r: SimilarItem) =>
-              normalizeBrand(vehicleField(r, "brand")) === normalizedBrand;
+          const sameBrand = (r: SimilarItem) =>
+            !!normalizedBrand && normalizeBrand(vehicleField(r, "brand")) === normalizedBrand;
             const sameModel = (r: SimilarItem) =>
               !!normalizedModel && normalizeModel(vehicleField(r, "model")) === normalizedModel;
             const withinYearWindow = (r: SimilarItem) => {
@@ -267,16 +263,15 @@ const SimilarListings = ({
             );
             mergeUnique(broadFallback, sortVehicleFallback(vehicleCandidates));
 
-            rows = strictMatches.length > 0
-              ? strictMatches
-              : brandModelMatches.length > 0
-                ? brandModelMatches
-                : fallbackMatches.length > 0
-                  ? fallbackMatches
-                  : brandYearMatches.length > 0
-                    ? brandYearMatches
-                    : broadFallback;
-          }
+          rows = strictMatches.length > 0
+            ? strictMatches
+            : brandModelMatches.length > 0
+              ? brandModelMatches
+              : fallbackMatches.length > 0
+                ? fallbackMatches
+                : brandYearMatches.length > 0
+                  ? brandYearMatches
+                  : broadFallback;
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
