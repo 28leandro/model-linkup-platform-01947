@@ -74,39 +74,69 @@ const SimilarListings = ({
         const select =
           "id,title,price,currency,location,images,created_at,category,brand,model,year";
 
-        let query = supabase
-          .from("listings_public")
-          .select(select)
-          .neq("id", currentId)
-          .limit(60);
+        let rows: SimilarItem[] = [];
 
-        if (category) query = query.eq("category", category);
-        if (currency) query = query.eq("currency", currency);
-
-        // Vehicles: strict same brand+model, year ±4
-        if (isVehicle) {
-          if (brand) query = query.ilike("brand", brand);
-          if (model) query = query.ilike("model", model);
-          if (year && year > 0) {
-            query = query.gte("year", year - 4).lte("year", year + 4);
-          }
-        } else if (price && price > 0) {
-          query = query.gte("price", price * 0.8).lte("price", price * 1.2);
-        }
-
-        const { data, error } = await query;
-        if (error) throw error;
-        let rows = ((data || []) as unknown) as SimilarItem[];
-
-        // For non-vehicles, relax price filter if too few results
-        if (!isVehicle && rows.length < 4 && category) {
-          const { data: relaxed } = await supabase
+        const runQuery = async (
+          build: (q: any) => any,
+          limit = 40
+        ): Promise<SimilarItem[]> => {
+          let q = supabase
             .from("listings_public")
             .select(select)
             .neq("id", currentId)
-            .eq("category", category)
-            .limit(40);
-          rows = ((relaxed || []) as unknown) as SimilarItem[];
+            .limit(limit);
+          q = build(q);
+          const { data, error } = await q;
+          if (error) throw error;
+          return ((data || []) as unknown) as SimilarItem[];
+        };
+
+        const mergeUnique = (a: SimilarItem[], b: SimilarItem[]) => {
+          const seen = new Set(a.map((r) => r.id));
+          for (const r of b) {
+            if (!seen.has(r.id)) {
+              a.push(r);
+              seen.add(r.id);
+            }
+          }
+          return a;
+        };
+
+        if (isVehicle) {
+          // Tier 1: same brand + model + year ±4
+          if (brand && model) {
+            rows = await runQuery((q) => {
+              q = q.eq("category", "vehicles").ilike("brand", brand).ilike("model", model);
+              if (year && year > 0) q = q.gte("year", year - 4).lte("year", year + 4);
+              return q;
+            });
+          }
+          // Tier 2: same brand + category + year ±4
+          if (rows.length < 6 && brand) {
+            const tier2 = await runQuery((q) => {
+              q = q.eq("category", "vehicles").ilike("brand", brand);
+              if (year && year > 0) q = q.gte("year", year - 4).lte("year", year + 4);
+              return q;
+            });
+            rows = mergeUnique(rows, tier2);
+          }
+          // Tier 3: same category only
+          if (rows.length < 6) {
+            const tier3 = await runQuery((q) => q.eq("category", "vehicles"));
+            rows = mergeUnique(rows, tier3);
+          }
+        } else {
+          rows = await runQuery((q) => {
+            if (category) q = q.eq("category", category);
+            if (currency) q = q.eq("currency", currency);
+            if (price && price > 0)
+              q = q.gte("price", price * 0.8).lte("price", price * 1.2);
+            return q;
+          }, 60);
+          if (rows.length < 4 && category) {
+            const relaxed = await runQuery((q) => q.eq("category", category));
+            rows = mergeUnique(rows, relaxed);
+          }
         }
 
         const titleTokens = new Set(tokenize(title));
@@ -119,6 +149,17 @@ const SimilarListings = ({
         const scored = rows.map((r) => {
           let score = 0;
           if (r.category && category && r.category === category) score += 30;
+          if (isVehicle) {
+            if (brand && r.brand && r.brand.toLowerCase() === brand.toLowerCase())
+              score += 40;
+            // Highest priority: same model
+            if (model && r.model && r.model.toLowerCase() === model.toLowerCase())
+              score += 80;
+            if (year && year > 0 && r.year && r.year > 0) {
+              const dy = Math.abs(r.year - year);
+              if (dy <= 4) score += 20 - dy * 3;
+            }
+          }
           if (price && price > 0 && r.price && r.price > 0) {
             const delta = Math.abs(r.price - price) / price;
             if (delta <= 0.2) score += 25 - Math.round(delta * 100);
