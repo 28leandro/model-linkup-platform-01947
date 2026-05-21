@@ -1,7 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { MapPin, Edit, Trash2, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { MapPin, ArrowLeft, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import { useState, useEffect } from "react";
@@ -9,17 +9,6 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import type { Listing } from "@/store/listingsStore";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { toast } from "@/hooks/use-toast";
 import ShareButtons from "@/components/ShareButtons";
 import Header from "@/components/Header";
@@ -257,16 +246,7 @@ const ListingDetail = () => {
               </div>
             )}
 
-            {/* Botão WhatsApp rápido logo após as fotos */}
-            {!isOwner && (
-              <div className="mb-4 flex justify-end">
-                <WhatsAppContactButton
-                  listingId={listing.id}
-                  listingTitle={listing.title}
-                  variant="inline"
-                />
-              </div>
-            )}
+            {/* WhatsApp button next to photos removed — now sits next to Share */}
 
             <h1 className="text-xl sm:text-2xl font-bold mb-2">
               <EditableField
@@ -355,44 +335,14 @@ const ListingDetail = () => {
               );
             })()}
 
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
               <ShareButtons title={listing.title} />
-              {isOwner && (
-                <div className="flex gap-2 w-full xs:w-auto">
-                  <Button 
-                    variant="outline" 
-                    size="icon"
-                    onClick={() => navigate(`/post-ad/${listing.id}`)}
-                    className="h-10 w-10 sm:h-11 sm:w-11"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </Button>
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button 
-                        variant="destructive" 
-                        size="icon"
-                        className="h-10 w-10 sm:h-11 sm:w-11"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent className="w-[90vw] max-w-md mx-auto">
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>{t('detail.deleteConfirm')}</AlertDialogTitle>
-                        <AlertDialogDescription>
-                          {t('detail.deleteDesc')}
-                        </AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter className="flex-col sm:flex-row gap-2">
-                        <AlertDialogCancel className="w-full sm:w-auto">{t('detail.cancel')}</AlertDialogCancel>
-                        <AlertDialogAction onClick={handleDelete} className="w-full sm:w-auto">
-                          {t('detail.confirmDelete')}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                </div>
+              {!isOwner && (
+                <WhatsAppContactButton
+                  listingId={listing.id}
+                  listingTitle={listing.title}
+                  variant="compact"
+                />
               )}
             </div>
 
@@ -483,6 +433,10 @@ const ListingDetail = () => {
             currency={(listing as any).currency}
             location={listing.location}
             title={listing.title}
+            type={listing.type}
+            brand={(listing as any).brand}
+            model={(listing as any).model}
+            year={listing.year}
           />
         )}
       </div>
