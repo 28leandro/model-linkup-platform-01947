@@ -78,7 +78,14 @@ const vehicleYear = (row: Pick<SimilarItem, "year" | "title" | "attributes">) =>
 };
 
 const sameVehicleCategory = (row: Pick<SimilarItem, "type" | "category">) =>
-  row.type === "vehicles" || row.category === "vehicles";
+  normalizeValue(row.type).includes("vehicle") ||
+  normalizeValue(row.category).includes("vehicle") ||
+  normalizeValue(row.type).includes("vehiculo") ||
+  normalizeValue(row.category).includes("vehiculo") ||
+  normalizeValue(row.type).includes("veiculo") ||
+  normalizeValue(row.category).includes("veiculo") ||
+  row.type === "vehicles" ||
+  row.category === "vehicles";
 
 const sameRegion = (a?: string | null, b?: string | null) => {
   const regionKey = (value?: string | null) => {
