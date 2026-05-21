@@ -32,6 +32,7 @@ interface SimilarItem {
   brand?: string | null;
   model?: string | null;
   year?: number | null;
+  attributes?: Record<string, string | number | boolean | null | undefined> | null;
 }
 
 const STOPWORDS = new Set([
@@ -47,6 +48,37 @@ const tokenize = (s?: string | null) =>
     .replace(/[^a-z0-9 ]/g, " ")
     .split(/\s+/)
     .filter((w) => w.length >= 3 && !STOPWORDS.has(w));
+
+const normalizeValue = (value?: string | null) =>
+  (value || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim();
+
+const extractYear = (value?: string | null) => {
+  const match = (value || "").match(/\b(19\d{2}|20\d{2})\b/);
+  return match ? Number(match[1]) : null;
+};
+
+const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, field: "brand" | "model") => {
+  const direct = row[field];
+  const attrs = row.attributes || {};
+  const value = direct || attrs[field] || attrs[`${field}Custom`];
+  return typeof value === "string" ? value : null;
+};
+
+const sameRegion = (a?: string | null, b?: string | null) => {
+  const regionKey = (value?: string | null) => {
+    const firstPart = (value || "").split(",")[0] || "";
+    const lastArea = firstPart.split("-").map((part) => part.trim()).filter(Boolean).pop() || firstPart;
+    return normalizeValue(lastArea).replace(/^[-\s]+/, "");
+  };
+  const left = regionKey(a);
+  const right = regionKey(b);
+  if (!left || !right) return true;
+  return left === right || left.includes(right) || right.includes(left);
+};
 
 const SimilarListings = ({
   currentId,
@@ -70,21 +102,30 @@ const SimilarListings = ({
     const run = async () => {
       setLoading(true);
       try {
+        const currentBrand = brand || null;
+        const currentModel = model || null;
+        const normalizedBrand = normalizeValue(currentBrand);
+        const normalizedModel = normalizeValue(currentModel);
+        const currentYear = year && year > 0 ? year : extractYear(title);
+        const hasYearWindow = !!currentYear && currentYear > 0;
         const isVehicle = type === "vehicles" || category === "vehicles";
         const select =
-          "id,title,price,currency,location,images,created_at,category,brand,model,year";
+          "id,title,price,currency,location,images,created_at,category,brand,model,year,attributes";
 
         let rows: SimilarItem[] = [];
 
-        const runQuery = async (
-          build: (q: any) => any,
-          limit = 40
-        ): Promise<SimilarItem[]> => {
-          let q = supabase
+        const baseQuery = () =>
+          supabase
             .from("listings_public")
             .select(select)
-            .neq("id", currentId)
-            .limit(limit);
+            .neq("id", currentId);
+        type SimilarQuery = ReturnType<typeof baseQuery>;
+
+        const runQuery = async (
+          build: (q: SimilarQuery) => SimilarQuery,
+          limit = 40
+        ): Promise<SimilarItem[]> => {
+          let q = baseQuery().limit(limit);
           q = build(q);
           const { data, error } = await q;
           if (error) throw error;
@@ -103,28 +144,27 @@ const SimilarListings = ({
         };
 
         if (isVehicle) {
-          // Tier 1: same brand + model + year ±4
-          if (brand && model) {
-            rows = await runQuery((q) => {
-              q = q.eq("category", "vehicles").ilike("brand", brand).ilike("model", model);
-              if (year && year > 0) q = q.gte("year", year - 4).lte("year", year + 4);
-              return q;
-            });
-          }
-          // Tier 2: same brand + category + year ±4
-          if (rows.length < 6 && brand) {
-            const tier2 = await runQuery((q) => {
-              q = q.eq("category", "vehicles").ilike("brand", brand);
-              if (year && year > 0) q = q.gte("year", year - 4).lte("year", year + 4);
-              return q;
-            });
-            rows = mergeUnique(rows, tier2);
-          }
-          // Tier 3: same category only
-          if (rows.length < 6) {
-            const tier3 = await runQuery((q) => q.eq("category", "vehicles"));
-            rows = mergeUnique(rows, tier3);
-          }
+          const vehicleRows = await runQuery((q) => {
+            q = q.eq("category", "vehicles");
+            return q;
+          }, 120);
+
+          const inRegion = vehicleRows.filter((r) => sameRegion(location, r.location));
+          const searchPool = inRegion.length > 0 ? inRegion : vehicleRows;
+          const yearPool = hasYearWindow
+            ? searchPool.filter((r) => {
+                const rowYear = r.year && r.year > 0 ? r.year : extractYear(r.title);
+                return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
+              })
+            : searchPool;
+          const fallbackBrand = yearPool.filter(
+            (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
+          );
+          const sameModel = fallbackBrand.filter(
+            (r) => normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel
+          );
+
+          rows = sameModel.length > 0 ? sameModel : fallbackBrand;
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
@@ -150,10 +190,12 @@ const SimilarListings = ({
           let score = 0;
           if (r.category && category && r.category === category) score += 30;
           if (isVehicle) {
-            if (brand && r.brand && r.brand.toLowerCase() === brand.toLowerCase())
+            const rowBrand = vehicleField(r, "brand");
+            const rowModel = vehicleField(r, "model");
+            if (normalizedBrand && normalizeValue(rowBrand) === normalizedBrand)
               score += 40;
             // Highest priority: same model
-            if (model && r.model && r.model.toLowerCase() === model.toLowerCase())
+            if (normalizedModel && normalizeValue(rowModel) === normalizedModel)
               score += 80;
             if (year && year > 0 && r.year && r.year > 0) {
               const dy = Math.abs(r.year - year);

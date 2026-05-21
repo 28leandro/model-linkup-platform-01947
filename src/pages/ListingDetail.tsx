@@ -45,6 +45,11 @@ const ListingDetail = () => {
   }, [emblaApi]);
 
   const scrollTo = (i: number) => emblaApi?.scrollTo(i);
+
+  const getVehicleField = (field: "brand" | "model") => {
+    const value = (listing as any)?.[field] || (listing as any)?.attributes?.[field] || (listing as any)?.attributes?.[`${field}Custom`];
+    return typeof value === "string" ? value : null;
+  };
   
   useEffect(() => {
     const fetchListing = async () => {
@@ -423,8 +428,8 @@ const ListingDetail = () => {
             location={listing.location}
             title={listing.title}
             type={listing.type}
-            brand={(listing as any).brand}
-            model={(listing as any).model}
+            brand={getVehicleField("brand")}
+            model={getVehicleField("model")}
             year={listing.year}
           />
         )}

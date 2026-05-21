@@ -335,6 +335,12 @@ const PostAd = () => {
       return Math.max(1, Math.min(5, Math.round(ratio * 5)));
     };
     const autoRating = computeRating();
+    const vehicleBrand = category === "vehicles"
+      ? ((attributes.brand === "Otra" ? attributes.brandCustom : attributes.brand) || null)
+      : (isEditing ? orig.brand ?? null : null);
+    const vehicleModel = category === "vehicles"
+      ? ((attributes.model === "Otro" ? attributes.modelCustom : attributes.model || attributes.modelCustom) || null)
+      : (isEditing ? orig.model ?? null : null);
     const fullData: any = {
       title: title.trim() || orig.title,
       rating: autoRating,
@@ -348,6 +354,8 @@ const PostAd = () => {
       currency: currency || orig.currency,
       area: (area === "" ? orig.area : area) ?? null,
       year: category === "vehicles" ? ((year === "" ? orig.year : year) ?? null) : (isEditing ? orig.year ?? null : null),
+      brand: vehicleBrand,
+      model: vehicleModel,
       fuel_type: category === "vehicles" ? (fuelType || orig.fuel_type || null) : (isEditing ? orig.fuel_type ?? null : null),
       subcategory: subcategory || orig.subcategory || null,
       condition: condition || orig.condition || null,
@@ -362,7 +370,7 @@ const PostAd = () => {
       const diff: any = {};
       const keys = [
         "title","description","category","type","location","phone","price",
-        "currency","area","year","fuel_type","subcategory","condition","latitude","longitude","rating",
+        "currency","area","year","brand","model","fuel_type","subcategory","condition","latitude","longitude","rating",
       ];
       for (const k of keys) {
         const a = fullData[k];
