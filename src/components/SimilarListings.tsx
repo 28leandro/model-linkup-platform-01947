@@ -234,9 +234,9 @@ const SimilarListings = ({
               });
 
             const vehiclesInYear = vehicleCandidates.filter(withinYearWindow);
-            const vehiclesInRegionAndYear = vehiclesInYear
-              .filter((r) => sameRegion(location, r.location))
-              ;
+            const vehiclesInRegionAndYear = vehiclesInYear.filter((r) =>
+              sameRegion(location, r.location)
+            );
 
             const strictMatches = vehiclesInRegionAndYear.filter(
               (r) => sameBrand(r) && sameModel(r)
@@ -345,7 +345,7 @@ const SimilarListings = ({
     return () => {
       cancelled = true;
     };
-  }, [currentId, category, price, currency, location, title, type, brand, model, year]);
+  }, [currentId, category, price, currency, location, title, type, subcategory, brand, model, year]);
 
   const scrollBy = (delta: number) =>
     scrollerRef.current?.scrollBy({ left: delta, behavior: "smooth" });
