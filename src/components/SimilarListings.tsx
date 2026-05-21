@@ -293,7 +293,25 @@ const SimilarListings = ({
   const scrollBy = (delta: number) =>
     scrollerRef.current?.scrollBy({ left: delta, behavior: "smooth" });
 
-  if (loading || items.length === 0) return null;
+  const isVehicleView = sameVehicleCategory({ type, category });
+  const cityName = (location || "").split(",")[0]?.split("-").pop()?.trim() || location || "";
+
+  if (loading) return null;
+  if (items.length === 0) {
+    if (isVehicleView) {
+      return (
+        <section className="container mx-auto px-3 sm:px-4 py-4 sm:py-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-2">
+            {t("listings.similarInRegion")}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Nenhum veículo similar encontrado em {cityName}.
+          </p>
+        </section>
+      );
+    }
+    return null;
+  }
 
   const formatDate = (iso: string) => {
     try {
