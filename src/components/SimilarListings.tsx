@@ -65,7 +65,10 @@ const extractYear = (value?: string | null) => {
 const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, field: "brand" | "model") => {
   const direct = row[field];
   const attrs = row.attributes || {};
-  const value = direct || attrs[field] || attrs[`${field}Custom`];
+  const rawValue = direct || attrs[field];
+  const normalizedRawValue = normalizeValue(typeof rawValue === "string" ? rawValue : null);
+  const shouldUseCustom = normalizedRawValue === "otra" || normalizedRawValue === "otro" || normalizedRawValue === "other";
+  const value = shouldUseCustom ? attrs[`${field}Custom`] : rawValue || attrs[`${field}Custom`];
   return typeof value === "string" ? value : null;
 };
 
