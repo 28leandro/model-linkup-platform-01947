@@ -150,8 +150,8 @@ const SimilarListings = ({
       try {
         const currentBrand = brand || null;
         const currentModel = model || null;
-        const normalizedBrand = normalizeValue(currentBrand);
-        const normalizedModel = normalizeValue(currentModel);
+        const normalizedBrand = normalizeBrand(currentBrand);
+        const normalizedModel = normalizeModel(currentModel);
         const currentYear = year && year > 0 ? year : extractYear(title);
         const hasYearWindow = !!currentYear && currentYear > 0;
         const isVehicle = sameVehicleCategory({ type, category });
@@ -200,9 +200,9 @@ const SimilarListings = ({
           } else {
 
             const sameBrand = (r: SimilarItem) =>
-              normalizeValue(vehicleField(r, "brand")) === normalizedBrand;
+              normalizeBrand(vehicleField(r, "brand")) === normalizedBrand;
             const sameModel = (r: SimilarItem) =>
-              !!normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel;
+              !!normalizedModel && normalizeModel(vehicleField(r, "model")) === normalizedModel;
             const withinYearWindow = (r: SimilarItem) => {
               if (!hasYearWindow) return true;
               const rowYear = vehicleYear(r);
@@ -217,6 +217,10 @@ const SimilarListings = ({
             const strictMatches = vehiclesInRegionAndYear.filter(
               (r) => sameBrand(r) && sameModel(r)
             );
+            const brandModelMatches = vehicleRows
+              .filter(sameVehicleCategory)
+              .filter(withinYearWindow)
+              .filter((r) => sameBrand(r) && sameModel(r));
             const fallbackMatches = vehiclesInRegionAndYear
               .filter(sameBrand)
               .sort((a, b) => {
@@ -233,7 +237,7 @@ const SimilarListings = ({
                 return 0;
               });
 
-            rows = strictMatches.length > 0 ? strictMatches : fallbackMatches;
+            rows = strictMatches.length > 0 ? strictMatches : brandModelMatches.length > 0 ? brandModelMatches : fallbackMatches;
           }
         } else {
           rows = await runQuery((q) => {
@@ -262,7 +266,7 @@ const SimilarListings = ({
           if (isVehicle) {
             const rowBrand = vehicleField(r, "brand");
             const rowModel = vehicleField(r, "model");
-            if (normalizedBrand && normalizeValue(rowBrand) === normalizedBrand)
+            if (normalizedBrand && normalizeBrand(rowBrand) === normalizedBrand)
               score += 100;
             score += modelCloseness(rowModel, currentModel) * 2;
             const rowYear = vehicleYear(r);
