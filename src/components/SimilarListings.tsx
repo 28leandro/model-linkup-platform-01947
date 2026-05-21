@@ -193,15 +193,31 @@ const SimilarListings = ({
             return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
           };
 
-          const regionalPool = vehicleRows
+          const vehiclesInRegionAndYear = vehicleRows
             .filter(sameVehicleCategory)
             .filter((r) => sameRegion(location, r.location))
             .filter(withinYearWindow);
 
-          const exactModelMatches = regionalPool.filter((r) => sameBrand(r) && sameModel(r));
-          const brandFallbackMatches = regionalPool.filter(sameBrand);
+          const strictMatches = vehiclesInRegionAndYear.filter(
+            (r) => sameBrand(r) && sameModel(r)
+          );
+          const fallbackMatches = vehiclesInRegionAndYear
+            .filter(sameBrand)
+            .sort((a, b) => {
+              const modelDelta =
+                modelCloseness(vehicleField(b, "model"), currentModel) -
+                modelCloseness(vehicleField(a, "model"), currentModel);
+              if (modelDelta !== 0) return modelDelta;
 
-          rows = exactModelMatches.length > 0 ? exactModelMatches : brandFallbackMatches;
+              const aYear = vehicleYear(a);
+              const bYear = vehicleYear(b);
+              if (currentYear && aYear && bYear) {
+                return Math.abs(aYear - currentYear) - Math.abs(bYear - currentYear);
+              }
+              return 0;
+            });
+
+          rows = strictMatches.length > 0 ? strictMatches : fallbackMatches;
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
