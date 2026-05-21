@@ -28,6 +28,7 @@ interface SimilarItem {
   location: string | null;
   images: string[] | null;
   created_at: string;
+  type?: string | null;
   category: string | null;
   brand?: string | null;
   model?: string | null;
@@ -67,6 +68,17 @@ const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, 
   const value = direct || attrs[field] || attrs[`${field}Custom`];
   return typeof value === "string" ? value : null;
 };
+
+const vehicleYear = (row: Pick<SimilarItem, "year" | "title" | "attributes">) => {
+  const attrYear = row.attributes?.year;
+  const parsedAttrYear = typeof attrYear === "number" ? attrYear : Number(attrYear);
+  if (row.year && row.year > 0) return row.year;
+  if (Number.isFinite(parsedAttrYear) && parsedAttrYear > 0) return parsedAttrYear;
+  return extractYear(row.title);
+};
+
+const sameVehicleCategory = (row: Pick<SimilarItem, "type" | "category">) =>
+  row.type === "vehicles" || row.category === "vehicles";
 
 const sameRegion = (a?: string | null, b?: string | null) => {
   const regionKey = (value?: string | null) => {
