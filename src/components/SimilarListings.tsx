@@ -91,9 +91,14 @@ const SimilarListings = ({
     const run = async () => {
       setLoading(true);
       try {
+        const currentBrand = brand || null;
+        const currentModel = model || null;
+        const normalizedBrand = normalizeValue(currentBrand);
+        const normalizedModel = normalizeValue(currentModel);
+        const hasYearWindow = !!year && year > 0;
         const isVehicle = type === "vehicles" || category === "vehicles";
         const select =
-          "id,title,price,currency,location,images,created_at,category,brand,model,year";
+          "id,title,price,currency,location,images,created_at,category,brand,model,year,attributes";
 
         let rows: SimilarItem[] = [];
 
@@ -124,28 +129,22 @@ const SimilarListings = ({
         };
 
         if (isVehicle) {
-          // Tier 1: same brand + model + year ±4
-          if (brand && model) {
-            rows = await runQuery((q) => {
-              q = q.eq("category", "vehicles").ilike("brand", brand).ilike("model", model);
-              if (year && year > 0) q = q.gte("year", year - 4).lte("year", year + 4);
-              return q;
-            });
-          }
-          // Tier 2: same brand + category + year ±4
-          if (rows.length < 6 && brand) {
-            const tier2 = await runQuery((q) => {
-              q = q.eq("category", "vehicles").ilike("brand", brand);
-              if (year && year > 0) q = q.gte("year", year - 4).lte("year", year + 4);
-              return q;
-            });
-            rows = mergeUnique(rows, tier2);
-          }
-          // Tier 3: same category only
-          if (rows.length < 6) {
-            const tier3 = await runQuery((q) => q.eq("category", "vehicles"));
-            rows = mergeUnique(rows, tier3);
-          }
+          const vehicleRows = await runQuery((q) => {
+            q = q.eq("category", "vehicles");
+            if (hasYearWindow) q = q.gte("year", year! - 4).lte("year", year! + 4);
+            return q;
+          }, 120);
+
+          const inRegion = vehicleRows.filter((r) => sameRegion(location, r.location));
+          const searchPool = inRegion.length > 0 ? inRegion : vehicleRows;
+          const sameBrand = searchPool.filter(
+            (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
+          );
+          const sameModel = sameBrand.filter(
+            (r) => normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel
+          );
+
+          rows = sameModel.length > 0 ? sameModel : sameBrand;
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
