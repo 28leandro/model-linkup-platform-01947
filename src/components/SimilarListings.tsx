@@ -102,6 +102,18 @@ const sameRegion = (a?: string | null, b?: string | null) => {
   return left === right || left.includes(right) || right.includes(left);
 };
 
+const modelCloseness = (candidate?: string | null, current?: string | null) => {
+  const candidateModel = normalizeValue(candidate);
+  const currentModel = normalizeValue(current);
+  if (!candidateModel || !currentModel) return 0;
+  if (candidateModel === currentModel) return 100;
+  if (candidateModel.includes(currentModel) || currentModel.includes(candidateModel)) return 60;
+
+  const currentTokens = new Set(currentModel.split(/\s+/).filter(Boolean));
+  const candidateTokens = candidateModel.split(/\s+/).filter(Boolean);
+  return candidateTokens.filter((token) => currentTokens.has(token)).length * 15;
+};
+
 const SimilarListings = ({
   currentId,
   category,
@@ -171,25 +183,46 @@ const SimilarListings = ({
             500
           );
 
-          const sameBrand = (r: SimilarItem) =>
-            !!normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand;
-          const sameModel = (r: SimilarItem) =>
-            !!normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel;
-          const withinYearWindow = (r: SimilarItem) => {
-            if (!hasYearWindow) return true;
-            const rowYear = vehicleYear(r);
-            return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
-          };
+          if (!normalizedBrand) {
+            rows = [];
+          } else {
 
-          const regionalPool = vehicleRows
-            .filter(sameVehicleCategory)
-            .filter((r) => sameRegion(location, r.location))
-            .filter(withinYearWindow);
+            const sameBrand = (r: SimilarItem) =>
+              normalizeValue(vehicleField(r, "brand")) === normalizedBrand;
+            const sameModel = (r: SimilarItem) =>
+              !!normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel;
+            const withinYearWindow = (r: SimilarItem) => {
+              if (!hasYearWindow) return true;
+              const rowYear = vehicleYear(r);
+              return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
+            };
 
-          const exactModelMatches = regionalPool.filter((r) => sameBrand(r) && sameModel(r));
-          const brandFallbackMatches = regionalPool.filter(sameBrand);
+            const vehiclesInRegionAndYear = vehicleRows
+              .filter(sameVehicleCategory)
+              .filter((r) => sameRegion(location, r.location))
+              .filter(withinYearWindow);
 
-          rows = exactModelMatches.length > 0 ? exactModelMatches : brandFallbackMatches;
+            const strictMatches = vehiclesInRegionAndYear.filter(
+              (r) => sameBrand(r) && sameModel(r)
+            );
+            const fallbackMatches = vehiclesInRegionAndYear
+              .filter(sameBrand)
+              .sort((a, b) => {
+                const modelDelta =
+                  modelCloseness(vehicleField(b, "model"), currentModel) -
+                  modelCloseness(vehicleField(a, "model"), currentModel);
+                if (modelDelta !== 0) return modelDelta;
+
+                const aYear = vehicleYear(a);
+                const bYear = vehicleYear(b);
+                if (currentYear && aYear && bYear) {
+                  return Math.abs(aYear - currentYear) - Math.abs(bYear - currentYear);
+                }
+                return 0;
+              });
+
+            rows = strictMatches.length > 0 ? strictMatches : fallbackMatches;
+          }
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
@@ -218,10 +251,8 @@ const SimilarListings = ({
             const rowBrand = vehicleField(r, "brand");
             const rowModel = vehicleField(r, "model");
             if (normalizedBrand && normalizeValue(rowBrand) === normalizedBrand)
-              score += 40;
-            // Highest priority: same model
-            if (normalizedModel && normalizeValue(rowModel) === normalizedModel)
-              score += 80;
+              score += 100;
+            score += modelCloseness(rowModel, currentModel) * 2;
             const rowYear = vehicleYear(r);
             if (currentYear && rowYear) {
               const dy = Math.abs(rowYear - currentYear);
