@@ -28,6 +28,7 @@ interface SimilarItem {
   location: string | null;
   images: string[] | null;
   created_at: string;
+  type?: string | null;
   category: string | null;
   brand?: string | null;
   model?: string | null;
@@ -64,9 +65,30 @@ const extractYear = (value?: string | null) => {
 const vehicleField = (row: Pick<SimilarItem, "brand" | "model" | "attributes">, field: "brand" | "model") => {
   const direct = row[field];
   const attrs = row.attributes || {};
-  const value = direct || attrs[field] || attrs[`${field}Custom`];
+  const rawValue = direct || attrs[field];
+  const normalizedRawValue = normalizeValue(typeof rawValue === "string" ? rawValue : null);
+  const shouldUseCustom = normalizedRawValue === "otra" || normalizedRawValue === "otro" || normalizedRawValue === "other";
+  const value = shouldUseCustom ? attrs[`${field}Custom`] : rawValue || attrs[`${field}Custom`];
   return typeof value === "string" ? value : null;
 };
+
+const vehicleYear = (row: Pick<SimilarItem, "year" | "title" | "attributes">) => {
+  const attrYear = row.attributes?.year;
+  const parsedAttrYear = typeof attrYear === "number" ? attrYear : Number(attrYear);
+  if (row.year && row.year > 0) return row.year;
+  if (Number.isFinite(parsedAttrYear) && parsedAttrYear > 0) return parsedAttrYear;
+  return extractYear(row.title);
+};
+
+const sameVehicleCategory = (row: { type?: string | null; category?: string | null }) =>
+  normalizeValue(row.type).includes("vehicle") ||
+  normalizeValue(row.category).includes("vehicle") ||
+  normalizeValue(row.type).includes("vehiculo") ||
+  normalizeValue(row.category).includes("vehiculo") ||
+  normalizeValue(row.type).includes("veiculo") ||
+  normalizeValue(row.category).includes("veiculo") ||
+  row.type === "vehicles" ||
+  row.category === "vehicles";
 
 const sameRegion = (a?: string | null, b?: string | null) => {
   const regionKey = (value?: string | null) => {
@@ -108,9 +130,9 @@ const SimilarListings = ({
         const normalizedModel = normalizeValue(currentModel);
         const currentYear = year && year > 0 ? year : extractYear(title);
         const hasYearWindow = !!currentYear && currentYear > 0;
-        const isVehicle = type === "vehicles" || category === "vehicles";
+        const isVehicle = sameVehicleCategory({ type, category });
         const select =
-          "id,title,price,currency,location,images,created_at,category,brand,model,year,attributes";
+          "id,title,price,currency,location,images,created_at,type,category,brand,model,year,attributes";
 
         let rows: SimilarItem[] = [];
 
@@ -144,27 +166,30 @@ const SimilarListings = ({
         };
 
         if (isVehicle) {
-          const vehicleRows = await runQuery((q) => {
-            q = q.eq("category", "vehicles");
-            return q;
-          }, 120);
-
-          const inRegion = vehicleRows.filter((r) => sameRegion(location, r.location));
-          const searchPool = inRegion.length > 0 ? inRegion : vehicleRows;
-          const yearPool = hasYearWindow
-            ? searchPool.filter((r) => {
-                const rowYear = r.year && r.year > 0 ? r.year : extractYear(r.title);
-                return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
-              })
-            : searchPool;
-          const fallbackBrand = yearPool.filter(
-            (r) => normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand
-          );
-          const sameModel = fallbackBrand.filter(
-            (r) => normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel
+          const vehicleRows = await runQuery((q) =>
+            q.or("category.eq.vehicles,type.eq.vehicles"),
+            500
           );
 
-          rows = sameModel.length > 0 ? sameModel : fallbackBrand;
+          const sameBrand = (r: SimilarItem) =>
+            !!normalizedBrand && normalizeValue(vehicleField(r, "brand")) === normalizedBrand;
+          const sameModel = (r: SimilarItem) =>
+            !!normalizedModel && normalizeValue(vehicleField(r, "model")) === normalizedModel;
+          const withinYearWindow = (r: SimilarItem) => {
+            if (!hasYearWindow) return true;
+            const rowYear = vehicleYear(r);
+            return !!rowYear && rowYear >= currentYear! - 4 && rowYear <= currentYear! + 4;
+          };
+
+          const regionalPool = vehicleRows
+            .filter(sameVehicleCategory)
+            .filter((r) => sameRegion(location, r.location))
+            .filter(withinYearWindow);
+
+          const exactModelMatches = regionalPool.filter((r) => sameBrand(r) && sameModel(r));
+          const brandFallbackMatches = regionalPool.filter(sameBrand);
+
+          rows = exactModelMatches.length > 0 ? exactModelMatches : brandFallbackMatches;
         } else {
           rows = await runQuery((q) => {
             if (category) q = q.eq("category", category);
@@ -197,8 +222,9 @@ const SimilarListings = ({
             // Highest priority: same model
             if (normalizedModel && normalizeValue(rowModel) === normalizedModel)
               score += 80;
-            if (year && year > 0 && r.year && r.year > 0) {
-              const dy = Math.abs(r.year - year);
+            const rowYear = vehicleYear(r);
+            if (currentYear && rowYear) {
+              const dy = Math.abs(rowYear - currentYear);
               if (dy <= 4) score += 20 - dy * 3;
             }
           }
