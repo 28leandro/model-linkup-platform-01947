@@ -47,8 +47,18 @@ const ListingDetail = () => {
   const scrollTo = (i: number) => emblaApi?.scrollTo(i);
 
   const getVehicleField = (field: "brand" | "model") => {
-    const value = (listing as any)?.[field] || (listing as any)?.attributes?.[field] || (listing as any)?.attributes?.[`${field}Custom`];
-    return typeof value === "string" ? value : null;
+    const listingWithAttributes = listing as (Listing & { attributes?: Record<string, unknown> }) | null;
+    const attrs = listingWithAttributes?.attributes || {};
+    const value = listingWithAttributes?.[field] || attrs[field];
+    const normalized = typeof value === "string" ? value.toLowerCase().trim() : "";
+    const customValue = attrs[`${field}Custom`];
+
+    if (["otra", "otro", "other"].includes(normalized) && typeof customValue === "string") {
+      return customValue;
+    }
+
+    if (typeof value === "string" && value.trim()) return value;
+    return typeof customValue === "string" && customValue.trim() ? customValue : null;
   };
   
   useEffect(() => {
