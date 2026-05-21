@@ -32,7 +32,7 @@ interface SimilarItem {
   brand?: string | null;
   model?: string | null;
   year?: number | null;
-  attributes?: Record<string, any> | null;
+  attributes?: Record<string, string | number | boolean | null | undefined> | null;
 }
 
 const STOPWORDS = new Set([
@@ -102,15 +102,18 @@ const SimilarListings = ({
 
         let rows: SimilarItem[] = [];
 
-        const runQuery = async (
-          build: (q: any) => any,
-          limit = 40
-        ): Promise<SimilarItem[]> => {
-          let q = supabase
+        const baseQuery = () =>
+          supabase
             .from("listings_public")
             .select(select)
-            .neq("id", currentId)
-            .limit(limit);
+            .neq("id", currentId);
+        type SimilarQuery = ReturnType<typeof baseQuery>;
+
+        const runQuery = async (
+          build: (q: SimilarQuery) => SimilarQuery,
+          limit = 40
+        ): Promise<SimilarItem[]> => {
+          let q = baseQuery().limit(limit);
           q = build(q);
           const { data, error } = await q;
           if (error) throw error;
