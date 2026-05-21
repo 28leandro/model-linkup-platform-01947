@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, Heart, MapPin } from "lucide-react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard } from "lucide-react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -16,9 +16,18 @@ const Header = ({ onLoginClick }: HeaderProps) => {
   const { user, signOut } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   // If we're viewing a listing, focus the map on that listing
   const listingMatch = location.pathname.match(/^\/listing\/([^/]+)/);
   const mapHref = listingMatch ? `/map?focus=${listingMatch[1]}` : "/map";
+
+  const handleManageListings = () => {
+    if (user) {
+      navigate("/my-listings");
+    } else {
+      onLoginClick();
+    }
+  };
 
   const NavItems = ({ mobile = false }: { mobile?: boolean }) => (
     <>
@@ -81,6 +90,15 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         <div className="hidden md:flex items-center gap-2 lg:gap-4">
           <LanguageSelector />
           <NavItems />
+          <Button
+            variant="outline"
+            size="default"
+            onClick={handleManageListings}
+            className="hidden md:inline-flex items-center gap-2"
+          >
+            <LayoutDashboard className="w-4 h-4" />
+            Mis Anuncios
+          </Button>
         </div>
 
         {/* Mobile Navigation */}
