@@ -347,17 +347,6 @@ const ListingDetail = () => {
             </div>
 
             <div className="mt-4 sm:mt-6">
-              {listing.type === 'vehicles' && (
-                <div className="bg-muted/40 border border-border rounded-lg p-3 sm:p-4">
-                  <VehicleInfo
-                    year={listing.year}
-                    mileage={listing.mileage ?? (listing as any).attributes?.mileage}
-                    fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
-                    className="text-sm"
-                  />
-                </div>
-              )}
-              
               {/* Informações adicionais para imóveis */}
               {listing.type === 'real-estate' && (
                 <div className="mt-4 grid grid-cols-2 gap-2 sm:gap-4">
