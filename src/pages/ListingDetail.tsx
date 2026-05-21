@@ -47,8 +47,9 @@ const ListingDetail = () => {
   const scrollTo = (i: number) => emblaApi?.scrollTo(i);
 
   const getVehicleField = (field: "brand" | "model") => {
-    const attrs = ((listing as any)?.attributes || {}) as Record<string, unknown>;
-    const value = (listing as any)?.[field] || attrs[field];
+    const listingWithAttributes = listing as (Listing & { attributes?: Record<string, unknown> }) | null;
+    const attrs = listingWithAttributes?.attributes || {};
+    const value = listingWithAttributes?.[field] || attrs[field];
     const normalized = typeof value === "string" ? value.toLowerCase().trim() : "";
     const customValue = attrs[`${field}Custom`];
 
