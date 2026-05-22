@@ -179,7 +179,7 @@ const Index = () => {
     return R * c;
   };
 
-  const handleSearch = (overrideQuery?: string) => {
+  const handleSearch = (overrideQuery?: string, silent = false) => {
     const query = (overrideQuery ?? searchQuery).trim().toLowerCase();
     if (!query) {
       setHasSearched(false);
@@ -256,6 +256,7 @@ const Index = () => {
 
     setFilteredListings(results);
 
+    if (silent) return;
     if (results.length === 0) {
       toast({
         title: t('search.noResults'),
