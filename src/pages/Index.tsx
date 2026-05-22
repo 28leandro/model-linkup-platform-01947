@@ -4,7 +4,6 @@ import { toast } from "@/components/ui/use-toast";
 import { useListingsStore } from "@/store/listingsStore";
 import { LoginDialog } from "@/components/LoginDialog";
 import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import HeroCarousel from "@/components/HeroCarousel";
 import SearchResults from "@/components/SearchResults";
@@ -18,6 +17,7 @@ import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import MobileSearchDialog from "@/components/MobileSearchDialog";
+import { CATEGORIES } from "@/lib/categories";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -181,13 +181,54 @@ const Index = () => {
       return;
     }
 
+    // Match query against category/subcategory ids and localized labels
+    const matchedCategoryIds = new Set<string>();
+    const matchedSubcategoryIds = new Set<string>();
+    for (const cat of CATEGORIES) {
+      if (
+        cat.id.toLowerCase().includes(query) ||
+        cat.type.toLowerCase().includes(query) ||
+        cat.label_es.toLowerCase().includes(query) ||
+        cat.label_pt.toLowerCase().includes(query)
+      ) {
+        matchedCategoryIds.add(cat.id);
+        matchedCategoryIds.add(cat.type);
+      }
+      cat.subcategories?.forEach((s) => {
+        if (
+          s.id.toLowerCase().includes(query) ||
+          s.label_es.toLowerCase().includes(query) ||
+          s.label_pt.toLowerCase().includes(query)
+        ) {
+          matchedSubcategoryIds.add(s.id);
+          matchedCategoryIds.add(cat.id);
+          matchedCategoryIds.add(cat.type);
+        }
+      });
+    }
+
     let results = allListings.filter((listing) => {
       const titleMatch = listing.title.toLowerCase().includes(query);
       const locationMatch = listing.location?.toLowerCase().includes(query);
       const categoryMatch = listing.category?.toLowerCase().includes(query);
       const descriptionMatch = listing.description?.toLowerCase().includes(query) || false;
+      const typeMatch = listing.type?.toLowerCase().includes(query);
+      const subMatch = listing.subcategory?.toLowerCase().includes(query);
+      const catIdMatch =
+        (listing.category && matchedCategoryIds.has(listing.category)) ||
+        (listing.type && matchedCategoryIds.has(listing.type));
+      const subIdMatch = listing.subcategory && matchedSubcategoryIds.has(listing.subcategory);
 
-      return titleMatch || locationMatch || categoryMatch || descriptionMatch;
+      return (
+        titleMatch ||
+        locationMatch ||
+        categoryMatch ||
+        descriptionMatch ||
+        typeMatch ||
+        subMatch ||
+        catIdMatch ||
+        subIdMatch
+      );
     });
 
     // Sort by proximity if user location is available
@@ -284,16 +325,14 @@ const Index = () => {
     <div className="min-h-screen">
       <Header onLoginClick={() => setLoginDialogOpen(true)} />
 
-      <div className="hidden md:block">
-        <SearchBar
+      <div className="container mx-auto px-3 sm:px-4 pt-4">
+        <LocationFilter
+          value={locationFilter}
+          onChange={setLocationFilter}
           searchQuery={searchQuery}
           onSearchQueryChange={setSearchQuery}
-          onSearch={handleSearch}
+          onSearch={() => handleSearch()}
         />
-      </div>
-
-      <div className="container mx-auto px-3 sm:px-4 pt-4">
-        <LocationFilter value={locationFilter} onChange={setLocationFilter} />
       </div>
 
       {!hasSearched && <ServiceCategories />}
