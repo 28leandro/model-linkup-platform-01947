@@ -107,7 +107,7 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
   return (
     <>
     {/* Mobile compact: horizontal scrollable pills (Ciudad → Ubicación → KM) */}
-    <div className="flex md:hidden items-center gap-2 w-full overflow-x-auto flex-nowrap scrollbar-hide -mx-1 px-1">
+    <div className="flex md:hidden items-center gap-2 w-full overflow-x-auto flex-nowrap -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <Popover>
         <PopoverTrigger asChild>
           <Button
