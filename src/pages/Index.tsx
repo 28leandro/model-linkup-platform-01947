@@ -62,6 +62,18 @@ const Index = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Global instant search (from mobile header input)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const q = ((e as CustomEvent).detail ?? "") as string;
+      setSearchQuery(q);
+      handleSearch(q);
+    };
+    window.addEventListener("global-search", handler as EventListener);
+    return () => window.removeEventListener("global-search", handler as EventListener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allListings, userLocation]);
+
   // Sync location filter to URL
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
