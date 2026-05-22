@@ -67,7 +67,7 @@ const Index = () => {
     const handler = (e: Event) => {
       const q = ((e as CustomEvent).detail ?? "") as string;
       setSearchQuery(q);
-      handleSearch(q);
+      handleSearch(q, true);
     };
     window.addEventListener("global-search", handler as EventListener);
     return () => window.removeEventListener("global-search", handler as EventListener);
