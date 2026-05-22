@@ -18,19 +18,19 @@ const Header = ({ onLoginClick }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const [mobileQuery, setMobileQuery] = useState("");
+  const [desktopQuery, setDesktopQuery] = useState("");
   const debounceRef = useRef<number | null>(null);
 
-  // Debounced global search dispatch (Le Bon Coin-style instant search)
+  // Debounced global search dispatch (Le Bon Coin-style instant search, desktop only)
   useEffect(() => {
     if (debounceRef.current) window.clearTimeout(debounceRef.current);
     debounceRef.current = window.setTimeout(() => {
-      window.dispatchEvent(new CustomEvent("global-search", { detail: mobileQuery }));
+      window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }));
     }, 250);
     return () => {
       if (debounceRef.current) window.clearTimeout(debounceRef.current);
     };
-  }, [mobileQuery]);
+  }, [desktopQuery]);
 
   // If we're viewing a listing, focus the map on that listing
   const listingMatch = location.pathname.match(/^\/listing\/([^/]+)/);
@@ -103,6 +103,23 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-2 lg:gap-4">
+          <div className="relative w-56 lg:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              inputMode="search"
+              value={desktopQuery}
+              onChange={(e) => setDesktopQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }));
+                }
+              }}
+              placeholder={t("search.placeholder")}
+              className="h-10 pl-9 pr-3 rounded-full bg-muted/60 border-0 focus-visible:ring-1 focus-visible:ring-ring"
+              aria-label={t("nav.search")}
+            />
+          </div>
           <LanguageSelector />
           <NavItems />
           <Button
@@ -117,24 +134,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="flex md:hidden items-center gap-2 flex-1 justify-end max-w-[60%]">
-          <div className="relative flex-1 min-w-0">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="search"
-              inputMode="search"
-              value={mobileQuery}
-              onChange={(e) => setMobileQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  window.dispatchEvent(new CustomEvent("global-search", { detail: mobileQuery }));
-                }
-              }}
-              placeholder={t("search.placeholder")}
-              className="h-10 pl-9 pr-3 rounded-full bg-muted/60 border-0 text-base focus-visible:ring-1 focus-visible:ring-ring"
-              aria-label={t("nav.search")}
-            />
-          </div>
+        <div className="flex md:hidden items-center gap-2">
           <LanguageSelector />
         </div>
       </div>
