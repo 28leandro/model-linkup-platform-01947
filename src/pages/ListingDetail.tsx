@@ -407,16 +407,6 @@ const ListingDetail = () => {
                 </div>
               ) : null}
 
-              {/* Mapa de ubicación */}
-              {listing.latitude && listing.longitude ? (
-                <ListingMap
-                  latitude={listing.latitude}
-                  longitude={listing.longitude}
-                  title={listing.title}
-                  location={listing.location}
-                />
-              ) : null}
-
               {!isOwner && listing.user_id ? (
                 <ContactSellerChat
                   listingId={listing.id}
