@@ -4,7 +4,6 @@ import { toast } from "@/components/ui/use-toast";
 import { useListingsStore } from "@/store/listingsStore";
 import { LoginDialog } from "@/components/LoginDialog";
 import Header from "@/components/Header";
-import SearchBar from "@/components/SearchBar";
 import ServiceCategories from "@/components/ServiceCategories";
 import HeroCarousel from "@/components/HeroCarousel";
 import SearchResults from "@/components/SearchResults";
