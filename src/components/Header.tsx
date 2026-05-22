@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard } from "lucide-react";
+import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard, Search } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -17,6 +18,20 @@ const Header = ({ onLoginClick }: HeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+  const [mobileQuery, setMobileQuery] = useState("");
+  const debounceRef = useRef<number | null>(null);
+
+  // Debounced global search dispatch (Le Bon Coin-style instant search)
+  useEffect(() => {
+    if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent("global-search", { detail: mobileQuery }));
+    }, 250);
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [mobileQuery]);
+
   // If we're viewing a listing, focus the map on that listing
   const listingMatch = location.pathname.match(/^\/listing\/([^/]+)/);
   const mapHref = listingMatch ? `/map?focus=${listingMatch[1]}` : "/map";
@@ -102,7 +117,24 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="flex md:hidden items-center gap-2">
+        <div className="flex md:hidden items-center gap-2 flex-1 justify-end max-w-[60%]">
+          <div className="relative flex-1 min-w-0">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              type="search"
+              inputMode="search"
+              value={mobileQuery}
+              onChange={(e) => setMobileQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  window.dispatchEvent(new CustomEvent("global-search", { detail: mobileQuery }));
+                }
+              }}
+              placeholder={t("search.placeholder")}
+              className="h-10 pl-9 pr-3 rounded-full bg-muted/60 border-0 text-base focus-visible:ring-1 focus-visible:ring-ring"
+              aria-label={t("nav.search")}
+            />
+          </div>
           <LanguageSelector />
         </div>
       </div>

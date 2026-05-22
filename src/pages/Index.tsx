@@ -62,6 +62,18 @@ const Index = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Global instant search (from mobile header input)
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const q = ((e as CustomEvent).detail ?? "") as string;
+      setSearchQuery(q);
+      handleSearch(q, true);
+    };
+    window.addEventListener("global-search", handler as EventListener);
+    return () => window.removeEventListener("global-search", handler as EventListener);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allListings, userLocation]);
+
   // Sync location filter to URL
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
@@ -167,19 +179,14 @@ const Index = () => {
     return R * c;
   };
 
-  const handleSearch = (overrideQuery?: string) => {
+  const handleSearch = (overrideQuery?: string, silent = false) => {
     const query = (overrideQuery ?? searchQuery).trim().toLowerCase();
-    setHasSearched(true);
-    
     if (!query) {
+      setHasSearched(false);
       setFilteredListings(allListings);
-      toast({
-        title: t('search.emptyTitle'),
-        description: t('search.emptyDesc'),
-        duration: 3000,
-      });
       return;
     }
+    setHasSearched(true);
 
     // Match query against category/subcategory ids and localized labels
     const matchedCategoryIds = new Set<string>();
@@ -249,6 +256,7 @@ const Index = () => {
 
     setFilteredListings(results);
 
+    if (silent) return;
     if (results.length === 0) {
       toast({
         title: t('search.noResults'),

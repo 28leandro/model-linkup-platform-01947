@@ -106,18 +106,18 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
 
   return (
     <>
-    {/* Mobile compact: icon buttons */}
-    <div className="flex md:hidden items-center gap-2 w-full">
+    {/* Mobile compact: horizontal scrollable pills (Ciudad → Ubicación → KM) */}
+    <div className="flex md:hidden items-center gap-2 w-full overflow-x-auto flex-nowrap -mx-1 px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <Popover>
         <PopoverTrigger asChild>
           <Button
             type="button"
             variant="outline"
-            size="icon"
-            className="h-10 w-10 rounded-full shrink-0"
+            className="h-10 rounded-full px-4 text-xs font-semibold shrink-0 gap-2 max-w-[55vw]"
             aria-label={t("location.placeholder")}
           >
-            <MapPin className="h-4 w-4" />
+            <MapPin className="h-4 w-4 shrink-0" />
+            <span className="truncate">{value.city || t("location.placeholder")}</span>
           </Button>
         </PopoverTrigger>
         <PopoverContent align="start" className="w-[260px] p-2 z-50 bg-popover">
@@ -157,13 +157,13 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
       <Button
         type="button"
         variant="outline"
-        size="icon"
         onClick={detect}
         disabled={detecting}
-        className="h-10 w-10 rounded-full shrink-0"
+        className="h-10 rounded-full px-4 text-xs font-semibold shrink-0 gap-2"
         aria-label={t("location.detect")}
       >
         <Crosshair className="h-4 w-4" />
+        <span>{detecting ? t("location.detecting") : t("location.detect")}</span>
       </Button>
 
       <Popover>
@@ -191,12 +191,6 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
           ))}
         </PopoverContent>
       </Popover>
-
-      {value.city && (
-        <span className="text-xs text-muted-foreground truncate flex-1">
-          {value.city}
-        </span>
-      )}
     </div>
 
     {/* Desktop full version */}
