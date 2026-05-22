@@ -181,17 +181,12 @@ const Index = () => {
 
   const handleSearch = (overrideQuery?: string) => {
     const query = (overrideQuery ?? searchQuery).trim().toLowerCase();
-    setHasSearched(true);
-    
     if (!query) {
+      setHasSearched(false);
       setFilteredListings(allListings);
-      toast({
-        title: t('search.emptyTitle'),
-        description: t('search.emptyDesc'),
-        duration: 3000,
-      });
       return;
     }
+    setHasSearched(true);
 
     // Match query against category/subcategory ids and localized labels
     const matchedCategoryIds = new Set<string>();
