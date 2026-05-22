@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapPin, LocateFixed, X, Crosshair } from "lucide-react";
+import { MapPin, LocateFixed, X, Crosshair, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,16 +24,20 @@ export interface LocationFilterValue {
 interface Props {
   value: LocationFilterValue;
   onChange: (v: LocationFilterValue) => void;
+  searchQuery?: string;
+  onSearchQueryChange?: (q: string) => void;
+  onSearch?: () => void;
 }
 
 const RADIUS_OPTIONS = [0, 5, 10, 20, 50, 100];
 
-const LocationFilter = ({ value, onChange }: Props) => {
+const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onSearch }: Props) => {
   const { t } = useLanguage();
   const [query, setQuery] = useState(value.city ?? "");
   const [open, setOpen] = useState(false);
   const [detecting, setDetecting] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const showSearch = typeof onSearch === "function";
 
   useEffect(() => setQuery(value.city ?? ""), [value.city]);
 
@@ -196,9 +200,24 @@ const LocationFilter = ({ value, onChange }: Props) => {
     </div>
 
     {/* Desktop full version */}
-    <div className="hidden md:flex w-full bg-card border rounded-lg p-3 sm:p-4 flex-col sm:flex-row gap-2 sm:gap-3 sm:items-center">
-      <div ref={wrapRef} className="relative flex-1">
-        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+    <div className="hidden md:flex w-full bg-card/80 backdrop-blur border border-border/60 rounded-full p-1.5 shadow-sm gap-1.5 items-center">
+      {showSearch && (
+        <div className="relative flex-1 min-w-0">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+          <Input
+            value={searchQuery ?? ""}
+            onChange={(e) => onSearchQueryChange?.(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && onSearch?.()}
+            placeholder={t("search.placeholder")}
+            className="pl-10 h-11 border-0 bg-transparent rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
+          />
+        </div>
+      )}
+
+      {showSearch && <div className="h-7 w-px bg-border/70 shrink-0" />}
+
+      <div ref={wrapRef} className="relative flex-1 min-w-0">
+        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
         <Input
           value={query}
           onChange={(e) => {
@@ -207,7 +226,7 @@ const LocationFilter = ({ value, onChange }: Props) => {
           }}
           onFocus={() => setOpen(true)}
           placeholder={t("location.placeholder")}
-          className="pl-9 pr-9 h-11"
+          className="pl-10 pr-9 h-11 border-0 bg-transparent rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
         />
         {query && (
           <button
@@ -237,22 +256,26 @@ const LocationFilter = ({ value, onChange }: Props) => {
         )}
       </div>
 
+      <div className="h-7 w-px bg-border/70 shrink-0" />
+
       <Button
         type="button"
-        variant="outline"
+        variant="ghost"
         onClick={detect}
         disabled={detecting}
-        className="h-11 gap-2 shrink-0"
+        className="h-11 gap-2 shrink-0 rounded-full px-4 text-sm font-medium hover:bg-muted"
       >
         <LocateFixed className="h-4 w-4" />
-        {detecting ? t("location.detecting") : t("location.detect")}
+        <span className="hidden lg:inline">{detecting ? t("location.detecting") : t("location.detect")}</span>
       </Button>
+
+      <div className="h-7 w-px bg-border/70 shrink-0" />
 
       <Select
         value={String(value.radiusKm ?? 0)}
         onValueChange={(v) => onChange({ ...value, radiusKm: Number(v) })}
       >
-        <SelectTrigger className="h-11 w-full sm:w-[140px] shrink-0">
+        <SelectTrigger className="h-11 w-[110px] shrink-0 border-0 bg-transparent rounded-full focus:ring-0 focus:ring-offset-0">
           <SelectValue placeholder="KM" />
         </SelectTrigger>
         <SelectContent position="popper" className="z-50 bg-background border">
@@ -263,6 +286,17 @@ const LocationFilter = ({ value, onChange }: Props) => {
           ))}
         </SelectContent>
       </Select>
+
+      {showSearch && (
+        <Button
+          type="button"
+          onClick={() => onSearch?.()}
+          className="h-11 px-5 rounded-full gap-2 shrink-0 shadow-sm"
+        >
+          <Search className="h-4 w-4" />
+          {t("search.button")}
+        </Button>
+      )}
     </div>
     </>
   );
