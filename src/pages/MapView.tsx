@@ -97,7 +97,7 @@ const FocusedMap = ({ listing, userPos }: FocusedMapProps) => {
     if (userPos && listingPos) {
       // Provisional straight dashed line while real route loads
       const provisional = L.polyline([userPos, listingPos], {
-        color: "#38bdf8",
+        color: "#1e3a8a",
         weight: 3,
         opacity: 0.5,
         dashArray: "6 6",
@@ -120,7 +120,7 @@ const FocusedMap = ({ listing, userPos }: FocusedMapProps) => {
           );
           provisional.remove();
           const real = L.polyline(latlngs, {
-            color: "#38bdf8",
+            color: "#1e3a8a",
             weight: 5,
             opacity: 0.9,
             lineCap: "round",
@@ -151,7 +151,7 @@ const FocusedMap = ({ listing, userPos }: FocusedMapProps) => {
       {routeInfo && (
         <div className="absolute bottom-3 left-3 z-[1000] bg-background/95 backdrop-blur-sm border rounded-lg shadow-lg px-3 py-2 flex items-center gap-3 text-sm">
           <div className="flex items-center gap-1.5">
-            <Navigation className="w-4 h-4 text-[#38bdf8]" />
+            <Navigation className="w-4 h-4 text-[#1e3a8a]" />
             <span className="font-semibold">
               {routeInfo.distanceKm < 1
                 ? `${Math.round(routeInfo.distanceKm * 1000)} m`
