@@ -321,13 +321,28 @@ const ListingDetail = () => {
                 parking: "Estacionamiento",
                 schedule: "Horario",
                 coverage: "Cobertura",
+                city: "Ciudad",
               };
+              const HIDDEN_ATTRS = new Set([
+                "street",
+                "state",
+                "postcode",
+                "postal_code",
+                "postalCode",
+                "zip",
+                "zipcode",
+                "address",
+                "lat",
+                "lng",
+                "latitude",
+                "longitude",
+              ]);
               const extras: Array<[string, any]> = [];
               if (listing.year) extras.push(["Año", listing.year]);
               if ((listing as any).fuel_type) extras.push(["Combustible", (listing as any).fuel_type]);
               if (listing.area) extras.push(["Área", `${listing.area} m²`]);
               const entries = Object.entries(attrs)
-                .filter(([, v]) => v !== null && v !== undefined && v !== "")
+                .filter(([k, v]) => v !== null && v !== undefined && v !== "" && !HIDDEN_ATTRS.has(k))
                 .map(([k, v]) => {
                   const label = labels[k] || k;
                   const value = typeof v === "boolean" ? (v ? "Sí" : "No") : String(v);
