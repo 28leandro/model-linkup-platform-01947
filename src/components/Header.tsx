@@ -103,22 +103,35 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center gap-2 lg:gap-4">
-          <div className="relative w-56 lg:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              type="search"
-              inputMode="search"
-              value={desktopQuery}
-              onChange={(e) => setDesktopQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }));
-                }
-              }}
-              placeholder={t("search.placeholder")}
-              className="h-10 pl-9 pr-3 rounded-full bg-muted/60 border-0 focus-visible:ring-1 focus-visible:ring-ring"
-              aria-label={t("nav.search")}
-            />
+          <div className="flex items-center gap-2">
+            <div className="relative w-56 lg:w-72">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <Input
+                type="search"
+                inputMode="search"
+                value={desktopQuery}
+                onChange={(e) => setDesktopQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }));
+                  }
+                }}
+                placeholder={t("search.placeholder")}
+                className="h-10 pl-9 pr-3 rounded-full bg-muted/60 border-0 focus-visible:ring-1 focus-visible:ring-ring"
+                aria-label={t("nav.search")}
+              />
+            </div>
+            <Button
+              type="button"
+              size="icon"
+              className="h-10 w-10 rounded-full shrink-0"
+              onClick={() =>
+                window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }))
+              }
+              aria-label={t("search.button")}
+            >
+              <Search className="h-4 w-4" />
+            </Button>
           </div>
           <LanguageSelector />
           <NavItems />
