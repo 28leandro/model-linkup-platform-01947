@@ -105,9 +105,7 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
   };
 
   return (
-    <>
-    {/* Mobile compact: icon buttons */}
-    <div className="flex md:hidden items-center gap-2 w-full">
+    <div className="flex items-center gap-2 w-full">
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -198,107 +196,6 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
         </span>
       )}
     </div>
-
-    {/* Desktop full version */}
-    <div className="hidden md:flex w-full bg-card/80 backdrop-blur border border-border/60 rounded-full p-1.5 shadow-sm gap-1.5 items-center">
-      {showSearch && (
-        <div className="relative flex-1 min-w-0">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-          <Input
-            value={searchQuery ?? ""}
-            onChange={(e) => onSearchQueryChange?.(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onSearch?.()}
-            placeholder={t("search.placeholder")}
-            className="pl-10 h-11 border-0 bg-transparent rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
-          />
-        </div>
-      )}
-
-      {showSearch && <div className="h-7 w-px bg-border/70 shrink-0" />}
-
-      <div ref={wrapRef} className="relative flex-1 min-w-0">
-        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-        <Input
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setOpen(true);
-          }}
-          onFocus={() => setOpen(true)}
-          placeholder={t("location.placeholder")}
-          className="pl-10 pr-9 h-11 border-0 bg-transparent rounded-full focus-visible:ring-0 focus-visible:ring-offset-0"
-        />
-        {query && (
-          <button
-            type="button"
-            onClick={clear}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground"
-            aria-label={t("location.clear")}
-          >
-            <X className="h-4 w-4" />
-          </button>
-        )}
-        {open && suggestions.length > 0 && (
-          <div className="absolute z-40 mt-1 w-full bg-popover border rounded-md shadow-lg max-h-64 overflow-auto">
-            {suggestions.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => pickCity(c)}
-                className="w-full text-left px-3 py-2 text-sm hover:bg-muted flex items-center gap-2"
-              >
-                <MapPin className="h-3.5 w-3.5 text-muted-foreground" />
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      <div className="h-7 w-px bg-border/70 shrink-0" />
-
-      <Button
-        type="button"
-        variant="ghost"
-        onClick={detect}
-        disabled={detecting}
-        className="h-11 gap-2 shrink-0 rounded-full px-4 text-sm font-medium hover:bg-muted"
-      >
-        <LocateFixed className="h-4 w-4" />
-        <span className="hidden lg:inline">{detecting ? t("location.detecting") : t("location.detect")}</span>
-      </Button>
-
-      <div className="h-7 w-px bg-border/70 shrink-0" />
-
-      <Select
-        value={String(value.radiusKm ?? 0)}
-        onValueChange={(v) => onChange({ ...value, radiusKm: Number(v) })}
-      >
-        <SelectTrigger className="h-11 w-[110px] shrink-0 border-0 bg-transparent rounded-full focus:ring-0 focus:ring-offset-0">
-          <SelectValue placeholder="KM" />
-        </SelectTrigger>
-        <SelectContent position="popper" className="z-50 bg-background border">
-          {RADIUS_OPTIONS.map((r) => (
-            <SelectItem key={r} value={String(r)}>
-              {r === 0 ? "KM" : `+${r} km`}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {showSearch && (
-        <Button
-          type="button"
-          onClick={() => onSearch?.()}
-          className="h-11 px-5 rounded-full gap-2 shrink-0 shadow-sm"
-        >
-          <Search className="h-4 w-4" />
-          {t("search.button")}
-        </Button>
-      )}
-    </div>
-    </>
   );
 };
 
