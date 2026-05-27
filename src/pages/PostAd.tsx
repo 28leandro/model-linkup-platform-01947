@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
@@ -57,6 +58,19 @@ const PostAd = () => {
   const [photosUnlocked, setPhotosUnlocked] = useState(false);
   const [testCode, setTestCode] = useState("");
   const [redeemingCode, setRedeemingCode] = useState(false);
+
+  // Real-time validation helpers
+  const titleError = title.length > 0 && title.trim().length < 5
+    ? "Mínimo 5 caracteres"
+    : "";
+  const clampNonNeg = (v: string) => (v === "" ? "" : Math.max(0, Number(v)));
+  const currentYear = new Date().getFullYear();
+  const clampYear = (v: string) => {
+    if (v === "") return "";
+    const n = Number(v);
+    if (Number.isNaN(n)) return "";
+    return Math.max(1900, Math.min(currentYear + 1, n));
+  };
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -219,6 +233,41 @@ const PostAd = () => {
         description: t('postAd.waitDesc'),
       });
       return;
+    }
+
+    // Title length guard (real-time helper already shown)
+    if (title.trim().length < 5) {
+      toast({ title: "Título muy corto", description: "El título debe tener al menos 5 caracteres.", variant: "destructive" });
+      return;
+    }
+
+    // Category-specific required fields
+    if (category === "vehicles") {
+      if (!subcategory) {
+        toast({ title: "Falta tipo de vehículo", description: "Seleccioná el tipo de vehículo.", variant: "destructive" });
+        return;
+      }
+      if (!attributes.brand) {
+        toast({ title: "Falta la marca", description: "Seleccioná la marca del vehículo.", variant: "destructive" });
+        return;
+      }
+      if (!year) {
+        toast({ title: "Falta el año", description: "Indicá el año del vehículo.", variant: "destructive" });
+        return;
+      }
+    } else if (category === "real-estate") {
+      if (!attributes.transactionType) {
+        toast({ title: "Falta tipo de transacción", description: "Elegí Venta o Alquiler.", variant: "destructive" });
+        return;
+      }
+      if (!attributes.propertyType) {
+        toast({ title: "Falta tipo de inmueble", description: "Seleccioná el tipo de inmueble.", variant: "destructive" });
+        return;
+      }
+      if (!area) {
+        toast({ title: "Falta el área", description: "Indicá el área en m².", variant: "destructive" });
+        return;
+      }
     }
 
     // Build full candidate values
@@ -513,6 +562,11 @@ const PostAd = () => {
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              {/* ============ SECCIÓN 1 — Categoría y fotos ============ */}
+              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
+                1. Categoría y fotos
+              </h3>
+
               <div className="space-y-2">
                 <Label htmlFor="title">{t('postAd.adTitle')}</Label>
                 <Input
@@ -523,6 +577,9 @@ const PostAd = () => {
                   required
                   className="h-11 sm:h-10"
                 />
+                {titleError && (
+                  <p className="text-xs text-destructive">{titleError}</p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -543,11 +600,20 @@ const PostAd = () => {
                 </Select>
               </div>
 
-              {(() => {
+              {category && (
+                <>
+                  <Separator />
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide animate-in fade-in slide-in-from-top-2 duration-300">
+                    2. Detalles del item
+                  </h3>
+                </>
+              )}
+
+              {category && (() => {
                 const meta = getCategoryById(category);
                 if (!meta?.subcategories) return null;
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="space-y-2">
                       <Label>{category === "vehicles" ? "Tipo de vehículo" : "Subcategoría"}</Label>
                       <Select value={subcategory} onValueChange={(v) => { setSubcategory(v); setAttr("brand", ""); }}>
@@ -656,37 +722,8 @@ const PostAd = () => {
                 );
               })()}
 
-              <div className="space-y-2">
-                <Label htmlFor="price">{t('postAd.price')}</Label>
-                <div className="flex gap-2">
-                  <Select value={currency} onValueChange={setCurrency}>
-                    <SelectTrigger className="w-[100px] h-11 sm:h-10">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="PYG">Gs.</SelectItem>
-                      <SelectItem value="USD">US$</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="relative flex-1">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
-                      {currency === "USD" ? "US$" : "Gs."}
-                    </span>
-                    <Input
-                      id="price"
-                      type="number"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value ? Number(e.target.value) : "")}
-                      placeholder={currency === "USD" ? "Ej: 1500" : "Ej: 50000000"}
-                      min="0"
-                      className="h-11 sm:h-10 pl-12"
-                    />
-                  </div>
-                </div>
-              </div>
-
               {category === "real-estate" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label>Tipo de transacción</Label>
                     <Select value={attributes.transactionType || ""} onValueChange={(v) => setAttr("transactionType", v)}>
@@ -713,17 +750,17 @@ const PostAd = () => {
                     <>
                       <div className="space-y-2">
                         <Label htmlFor="bedrooms">Habitaciones</Label>
-                        <Input id="bedrooms" type="number" min="0" value={attributes.bedrooms ?? ""} onChange={(e) => setAttr("bedrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
+                        <Input id="bedrooms" type="number" min="0" value={attributes.bedrooms ?? ""} onChange={(e) => setAttr("bedrooms", clampNonNeg(e.target.value))} className="h-11 sm:h-10" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="bathrooms">Baños</Label>
-                        <Input id="bathrooms" type="number" min="0" value={attributes.bathrooms ?? ""} onChange={(e) => setAttr("bathrooms", e.target.value ? Number(e.target.value) : "")} className="h-11 sm:h-10" />
+                        <Input id="bathrooms" type="number" min="0" value={attributes.bathrooms ?? ""} onChange={(e) => setAttr("bathrooms", clampNonNeg(e.target.value))} className="h-11 sm:h-10" />
                       </div>
                     </>
                   )}
                   <div className="space-y-2">
                     <Label htmlFor="area">Área total (m²)</Label>
-                    <Input id="area" type="number" min="0" value={area} onChange={(e) => setArea(e.target.value ? Number(e.target.value) : "")} placeholder="m²" className="h-11 sm:h-10" />
+                    <Input id="area" type="number" min="0" value={area} onChange={(e) => setArea(clampNonNeg(e.target.value) as any)} placeholder="m²" className="h-11 sm:h-10" />
                   </div>
                   {attributes.propertyType !== "land" && (
                     <div className="space-y-2">
@@ -741,7 +778,7 @@ const PostAd = () => {
               )}
 
               {category === "vehicles" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   {attributes.vehicleType === "moto" ? (
                     <>
                       <div className="space-y-2">
@@ -782,22 +819,22 @@ const PostAd = () => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="year">{t('postAd.year')}</Label>
-                        <Input id="year" type="number" value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")} placeholder={t('postAd.yearPlaceholder')} min="1900" max={new Date().getFullYear() + 1} className="h-11 sm:h-10" />
+                        <Input id="year" type="number" value={year} onChange={(e) => setYear(clampYear(e.target.value) as any)} placeholder={t('postAd.yearPlaceholder')} min="1900" max={currentYear + 1} className="h-11 sm:h-10" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="mileage">Kilometraje (km)</Label>
-                        <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", e.target.value ? Number(e.target.value) : "")} placeholder="Ej: 10000" className="h-11 sm:h-10" />
+                        <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", clampNonNeg(e.target.value))} placeholder="Ej: 10000" className="h-11 sm:h-10" />
                       </div>
                     </>
                   ) : (
                   <>
                   <div className="space-y-2">
                     <Label htmlFor="year">{t('postAd.year')}</Label>
-                    <Input id="year" type="number" value={year} onChange={(e) => setYear(e.target.value ? Number(e.target.value) : "")} placeholder={t('postAd.yearPlaceholder')} min="1900" max={new Date().getFullYear() + 1} className="h-11 sm:h-10" />
+                    <Input id="year" type="number" value={year} onChange={(e) => setYear(clampYear(e.target.value) as any)} placeholder={t('postAd.yearPlaceholder')} min="1900" max={currentYear + 1} className="h-11 sm:h-10" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="mileage">Kilometraje (km)</Label>
-                    <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", e.target.value ? Number(e.target.value) : "")} placeholder="Ej: 50000" className="h-11 sm:h-10" />
+                    <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", clampNonNeg(e.target.value))} placeholder="Ej: 50000" className="h-11 sm:h-10" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="fuelType">{t('postAd.fuelType')}</Label>
@@ -828,7 +865,7 @@ const PostAd = () => {
               )}
 
               {category === "services" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label htmlFor="schedule">Horario de atención</Label>
                     <Input id="schedule" value={attributes.schedule || ""} onChange={(e) => setAttr("schedule", e.target.value)} placeholder="Ej: Lun-Vie 8-18h" className="h-11 sm:h-10" />
@@ -840,6 +877,87 @@ const PostAd = () => {
                 </div>
               )}
 
+              {category === "fashion" && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="space-y-2">
+                    <Label htmlFor="size">Talla</Label>
+                    <Input id="size" value={attributes.size || ""} onChange={(e) => setAttr("size", e.target.value)} placeholder="Ej: M, 42, 38" className="h-11 sm:h-10" />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Género</Label>
+                    <Select value={attributes.gender || ""} onValueChange={(v) => setAttr("gender", v)}>
+                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar" /></SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        <SelectItem value="masculino">Masculino</SelectItem>
+                        <SelectItem value="femenino">Femenino</SelectItem>
+                        <SelectItem value="infantil">Infantil</SelectItem>
+                        <SelectItem value="unisex">Unisex</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+
+              {category === "tech" && (
+                <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-2">
+                  <Label htmlFor="modelFree">Modelo</Label>
+                  <Input id="modelFree" value={attributes.modelCustom || ""} onChange={(e) => setAttr("modelCustom", e.target.value)} placeholder="Ej: iPhone 14 Pro, Galaxy S23" className="h-11 sm:h-10" />
+                </div>
+              )}
+
+              {category && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Label htmlFor="description">{t('postAd.description')}</Label>
+                  <Textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder={t('postAd.descriptionPlaceholder')}
+                    required
+                    className="min-h-[120px]"
+                  />
+                </div>
+              )}
+
+              {category && <Separator />}
+              {category && (
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide animate-in fade-in slide-in-from-top-2 duration-300">
+                  3. Precio y ubicación
+                </h3>
+              )}
+
+              {category && (
+                <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <Label htmlFor="price">{t('postAd.price')}</Label>
+                  <div className="flex gap-2">
+                    <Select value={currency} onValueChange={setCurrency}>
+                      <SelectTrigger className="w-[100px] h-11 sm:h-10">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="PYG">Gs.</SelectItem>
+                        <SelectItem value="USD">US$</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <div className="relative flex-1">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground pointer-events-none">
+                        {currency === "USD" ? "US$" : "Gs."}
+                      </span>
+                      <Input
+                        id="price"
+                        type="number"
+                        value={price}
+                        onChange={(e) => setPrice(clampNonNeg(e.target.value) as any)}
+                        placeholder={currency === "USD" ? "Ej: 1500" : "Ej: 50000000"}
+                        min="0"
+                        className="h-11 sm:h-10 pl-12"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {category && (
               <LocationPicker
                 onLocationSelect={(loc) => {
                   setLocation({
@@ -859,7 +977,9 @@ const PostAd = () => {
                 }}
                 initialAddress={location.address}
               />
+              )}
 
+              {category && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="city">Ciudad *</Label>
@@ -883,10 +1003,14 @@ const PostAd = () => {
                   />
                 </div>
               </div>
-              <p className="-mt-1 text-xs text-muted-foreground">
-                Solo la ciudad será mostrada públicamente. La dirección detallada permanece privada.
-              </p>
+              )}
+              {category && (
+                <p className="-mt-1 text-xs text-muted-foreground">
+                  Solo la ciudad será mostrada públicamente. La dirección detallada permanece privada.
+                </p>
+              )}
 
+              {category && (
               <div className="space-y-2">
                 <Label htmlFor="phone">{t('postAd.phone')}</Label>
                 <Input
@@ -898,18 +1022,7 @@ const PostAd = () => {
                   className="h-11 sm:h-10"
                 />
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">{t('postAd.description')}</Label>
-                <Textarea
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder={t('postAd.descriptionPlaceholder')}
-                  required
-                  className="min-h-[120px]"
-                />
-              </div>
+              )}
 
               <div className="space-y-2">
                 <Label htmlFor="images">
