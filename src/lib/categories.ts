@@ -27,6 +27,24 @@ import {
   KeyRound,
   type LucideIcon,
 } from "lucide-react";
+import {
+  Trophy,
+  Dumbbell,
+  Footprints,
+  Package,
+  Settings,
+  Store,
+  Tag,
+  Sparkles,
+  GraduationCap,
+  PawPrint,
+  CalendarDays,
+  Hammer,
+  Paintbrush,
+  Truck as TruckIcon,
+  HeartPulse,
+  MapPin,
+} from "lucide-react";
 
 export type ConditionId =
   | "nuevo"
@@ -81,6 +99,10 @@ export const CATEGORIES: Category[] = [
       { id: "camiones-buses", label_es: "Camiones y Buses", label_pt: "Caminhões e Ônibus", icon: Bus, brands: ["Mercedes-Benz","Volvo","Scania","Iveco","MAN","Volkswagen","Ford","Hyundai","JAC","Foton"] },
       { id: "nauticos",  label_es: "Náuticos",    label_pt: "Náuticos",    icon: Anchor, examples: ["Lanchas","Jet Ski","Veleros"] },
       { id: "electricos", label_es: "Vehículos Eléctricos", label_pt: "Veículos Elétricos", icon: Zap, brands: ["Tesla","BYD","Nissan","Renault","Chevrolet"] },
+      { id: "repuestos-auto",    label_es: "Repuestos para Auto",    label_pt: "Peças para Carro",      icon: Settings },
+      { id: "repuestos-moto",    label_es: "Repuestos para Moto",    label_pt: "Peças para Moto",       icon: Settings },
+      { id: "repuestos-camion",  label_es: "Repuestos para Camión",  label_pt: "Peças para Caminhão",   icon: Settings },
+      { id: "accesorios-vehiculos", label_es: "Accesorios para Vehículos", label_pt: "Acessórios Veiculares", icon: Package },
     ],
   },
   {
@@ -93,10 +115,10 @@ export const CATEGORIES: Category[] = [
     icon: Home,
     accent: "from-emerald-500/15 to-teal-500/10 text-emerald-700 dark:text-emerald-300",
     subcategories: [
-      { id: "alquiler",  label_es: "Alquiler",            label_pt: "Aluguel",            icon: KeyRound },
-      { id: "rural",     label_es: "Propiedad Rural",     label_pt: "Propriedade Rural",  icon: Trees },
-      { id: "oficina",   label_es: "Oficina",             label_pt: "Escritório",         icon: Briefcase },
-      { id: "industria", label_es: "Industria",           label_pt: "Indústria",          icon: Factory },
+      { id: "venta",      label_es: "Venta",       label_pt: "Venda",     icon: Tag },
+      { id: "alquiler",   label_es: "Alquiler",    label_pt: "Aluguel",   icon: KeyRound },
+      { id: "terrenos",   label_es: "Terrenos",    label_pt: "Terrenos",  icon: MapPin },
+      { id: "comerciales", label_es: "Comerciales", label_pt: "Comerciais", icon: Store },
     ],
   },
   {
@@ -108,6 +130,19 @@ export const CATEGORIES: Category[] = [
     desc_pt: "Prestação de serviços",
     icon: Wrench,
     accent: "from-orange-500/15 to-amber-500/10 text-orange-700 dark:text-orange-300",
+    subcategories: [
+      { id: "reformas",   label_es: "Reformas y Construcción", label_pt: "Reformas e Construção", icon: Hammer },
+      { id: "limpieza",   label_es: "Limpieza",                 label_pt: "Limpeza",               icon: Sparkles },
+      { id: "mudanzas",   label_es: "Mudanzas y Fletes",        label_pt: "Mudanças e Fretes",     icon: TruckIcon },
+      { id: "clases",     label_es: "Clases Particulares",      label_pt: "Aulas Particulares",    icon: GraduationCap },
+      { id: "eventos",    label_es: "Eventos",                  label_pt: "Eventos",               icon: CalendarDays },
+      { id: "belleza",    label_es: "Belleza y Bienestar",      label_pt: "Beleza e Bem-estar",    icon: Sparkles },
+      { id: "mascotas",   label_es: "Mascotas",                 label_pt: "Animais",               icon: PawPrint },
+      { id: "tecnico",    label_es: "Servicio Técnico",         label_pt: "Assistência Técnica",   icon: Wrench },
+      { id: "salud",      label_es: "Salud",                    label_pt: "Saúde",                 icon: HeartPulse },
+      { id: "pintura",    label_es: "Pintura",                  label_pt: "Pintura",               icon: Paintbrush },
+      { id: "otros-servicios", label_es: "Otros Servicios",     label_pt: "Outros Serviços",       icon: Briefcase },
+    ],
   },
   {
     id: "fashion",
@@ -158,6 +193,24 @@ export const CATEGORIES: Category[] = [
       { id: "consolas",      label_es: "Consolas y Videojuegos",  label_pt: "Consoles e Videogames",  icon: Gamepad2,   brands: ["PS5", "Xbox Series", "Nintendo Switch", "PC Gamer"] },
       { id: "iot",           label_es: "Objetos Conectados (IoT)", label_pt: "Objetos Conectados (IoT)", icon: Watch,    brands: ["Apple", "Samsung", "Google", "Amazon", "Xiaomi"], examples: ["Smartwatches", "Alexa", "Google Home", "Cámaras Wi-Fi"] },
       { id: "accesorios",    label_es: "Accesorios",              label_pt: "Acessórios",              icon: Keyboard,   examples: ["Teclados","Mouses","Cables","Fundas"], brands: ["Logitech","Genius","HP","Microsoft","Razer","Redragon","Kingston","JBL"] },
+    ],
+  },
+  {
+    id: "sport",
+    type: "sport",
+    label_es: "Deportes",
+    label_pt: "Esportes",
+    desc_es: "Bicicletas, fitness y más",
+    desc_pt: "Bicicletas, fitness e mais",
+    icon: Trophy,
+    accent: "from-lime-500/15 to-green-500/10 text-lime-700 dark:text-lime-300",
+    subcategories: [
+      { id: "bicicletas",        label_es: "Bicicletas",                       label_pt: "Bicicletas",                          icon: Bike },
+      { id: "ropa-deportiva",    label_es: "Ropa y Uniformes Deportivos",      label_pt: "Roupas e Uniformes Esportivos",       icon: Shirt },
+      { id: "calzado-deportivo", label_es: "Calzado Deportivo / Tenis",        label_pt: "Calçados Esportivos / Tênis",         icon: Footprints },
+      { id: "fitness",           label_es: "Equipamientos de Gimnasio / Fitness", label_pt: "Equipamentos de Academia / Fitness", icon: Dumbbell },
+      { id: "deportes-equipo",   label_es: "Deportes Colectivos",              label_pt: "Esportes Coletivos",                  icon: Trophy },
+      { id: "otros-deportes",    label_es: "Otros Artículos de Deporte",       label_pt: "Outros Artigos de Esporte",           icon: Package },
     ],
   },
 ];
