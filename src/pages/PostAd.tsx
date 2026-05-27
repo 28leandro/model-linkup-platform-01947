@@ -687,7 +687,17 @@ const PostAd = () => {
 
               {category === "real-estate" && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-2 sm:col-span-2">
+                  <div className="space-y-2">
+                    <Label>Tipo de transacción</Label>
+                    <Select value={attributes.transactionType || ""} onValueChange={(v) => setAttr("transactionType", v)}>
+                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Venta / Alquiler" /></SelectTrigger>
+                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                        <SelectItem value="venta">Venta</SelectItem>
+                        <SelectItem value="alquiler">Alquiler</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
                     <Label>Tipo de inmueble</Label>
                     <Select value={attributes.propertyType || ""} onValueChange={(v) => setAttr("propertyType", v)}>
                       <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Casa / Apartamento / Terreno" /></SelectTrigger>
@@ -695,6 +705,7 @@ const PostAd = () => {
                         <SelectItem value="house">Casa</SelectItem>
                         <SelectItem value="apartment">Apartamento</SelectItem>
                         <SelectItem value="land">Terreno</SelectItem>
+                        <SelectItem value="commercial">Local Comercial</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
