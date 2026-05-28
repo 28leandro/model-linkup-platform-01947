@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
         {
           ciudad: "1",
           nombre: `Pack ${photo_count} fotos`,
-          categoria: "909",
+          categoria: "1",
           public_key: PUBLIC_KEY,
           descripcion: `Desbloqueo de fotos para anuncio ${ownedListing.title ?? ""}`.slice(0, 250),
           url_imagen: "",
