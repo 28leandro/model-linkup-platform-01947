@@ -92,6 +92,12 @@ Deno.serve(async (req) => {
       .toISOString()
       .slice(0, 19)
       .replace("T", " ");
+    const buyerName =
+      (user.user_metadata?.full_name as string) ||
+      (user.user_metadata?.name as string) ||
+      user.email ||
+      "Cliente";
+    const buyerDocument = user.id.replace(/\D/g, "").slice(0, 7).padStart(7, "1");
 
     const payload = {
       token: pagoparToken,
@@ -104,12 +110,12 @@ Deno.serve(async (req) => {
       forma_pago: 9,
       comprador: {
         ruc: "",
-        documento: "0",
+        documento: buyerDocument,
         tipo_documento: "CI",
         email: user.email ?? "noreply@nemu.com.py",
         ciudad: "1",
-        nombre: (user.user_metadata?.full_name as string) ?? user.email ?? "Cliente",
-        telefono: "0000000000",
+        nombre: buyerName,
+        telefono: "+595981000000",
         direccion: "",
         coordenadas: "",
         razon_social: "",
