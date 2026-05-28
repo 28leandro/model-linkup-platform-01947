@@ -55,7 +55,16 @@ const PhotoPaywall = () => {
       const { data, error } = await supabase.functions.invoke("pagopar-create-order", {
         body: { listing_id: listingId, photo_count: 10 },
       });
-      if (error) throw error;
+      if (error) {
+        const message = await getFunctionErrorMessage(error);
+        toast({
+          title: "Error",
+          description: message,
+          variant: "destructive",
+        });
+        setProcessing(false);
+        return;
+      }
       if (data?.checkout_url) {
         window.location.href = data.checkout_url;
         return;
