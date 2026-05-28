@@ -9,6 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
+const getFunctionErrorMessage = async (error: any) => {
+  const context = error?.context;
+  if (context instanceof Response) {
+    const body = await context.clone().json().catch(() => null);
+    if (body?.error) return body.error;
+  }
+  return error?.message || "No se pudo iniciar el pago";
+};
+
 const PhotoPaywall = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -46,16 +55,26 @@ const PhotoPaywall = () => {
       const { data, error } = await supabase.functions.invoke("pagopar-create-order", {
         body: { listing_id: listingId, photo_count: 10 },
       });
-      if (error) throw error;
+      if (error) {
+        const message = await getFunctionErrorMessage(error);
+        toast({
+          title: "Error",
+          description: message,
+          variant: "destructive",
+        });
+        setProcessing(false);
+        return;
+      }
       if (data?.checkout_url) {
         window.location.href = data.checkout_url;
         return;
       }
       throw new Error("No se recibió URL de pago");
     } catch (e: any) {
+      const message = await getFunctionErrorMessage(e);
       toast({
         title: "Error",
-        description: e.message || "No se pudo iniciar el pago",
+        description: message,
         variant: "destructive",
       });
       setProcessing(false);

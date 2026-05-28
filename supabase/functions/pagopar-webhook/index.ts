@@ -22,12 +22,13 @@ Deno.serve(async (req) => {
     );
 
     const body = await req.json();
-    const orderNumber = body.numero_pedido ?? body.external_order_number;
-    const status = (body.estado ?? body.status ?? "").toString().toUpperCase();
-    const method = body.forma_pago ?? body.payment_method ?? null;
-    const hash = body.hash_pagopar ?? body.hash ?? null;
+    const result = Array.isArray(body?.resultado) ? body.resultado[0] ?? {} : body;
+    const orderNumber = result.id_pedido_comercio ?? result.external_order_number ?? result.numero_pedido;
+    const status = (result.estado ?? result.status ?? "").toString().toUpperCase();
+    const method = result.forma_pago ?? result.payment_method ?? null;
+    const hash = result.hash_pedido ?? result.hash_pagopar ?? result.hash ?? null;
+    const token = result.token ?? body.token ?? null;
 
-    if (!orderNumber) throw new Error("numero_pedido required");
     if (!hash) {
       return new Response(JSON.stringify({ error: "missing hash" }), {
         status: 401,
@@ -38,11 +39,11 @@ Deno.serve(async (req) => {
     const { data: order, error: getErr } = await supabase
       .from("payment_orders")
       .select("*")
-      .eq("external_order_number", orderNumber)
+      .eq("pagopar_hash", hash)
       .single();
     if (getErr || !order) throw new Error("Order not found");
 
-    // Verify Pagopar hash signature: SHA1(PRIVATE_KEY + orderNumber + amount + currency)
+    // Verify Pagopar notification token: SHA1(PRIVATE_KEY + hash_pedido)
     const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY");
     if (!PRIVATE_KEY) {
       console.error("PAGOPAR_PRIVATE_KEY not configured");
@@ -51,17 +52,15 @@ Deno.serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const expected = await sha1Hex(
-      `${PRIVATE_KEY}${orderNumber}${order.amount_pyg}PYG`
-    );
-    if (hash.toLowerCase() !== expected.toLowerCase()) {
+    const expected = await sha1Hex(`${PRIVATE_KEY.trim()}${hash}`);
+    if (!token || token.toLowerCase() !== expected.toLowerCase()) {
       return new Response(JSON.stringify({ error: "invalid signature" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const isPaid = status === "PAGO" || status === "PAID";
+    const isPaid = result.pagado === true || status === "PAGO" || status === "PAID";
 
     await supabase.from("payment_orders").update({
       status: isPaid ? "paid" : "failed",
