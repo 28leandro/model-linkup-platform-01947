@@ -9,6 +9,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
 
+const getFunctionErrorMessage = async (error: any) => {
+  const context = error?.context;
+  if (context instanceof Response) {
+    const body = await context.clone().json().catch(() => null);
+    if (body?.error) return body.error;
+  }
+  return error?.message || "No se pudo iniciar el pago";
+};
+
 const PhotoPaywall = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -53,9 +62,10 @@ const PhotoPaywall = () => {
       }
       throw new Error("No se recibió URL de pago");
     } catch (e: any) {
+      const message = await getFunctionErrorMessage(e);
       toast({
         title: "Error",
-        description: e.message || "No se pudo iniciar el pago",
+        description: message,
         variant: "destructive",
       });
       setProcessing(false);
