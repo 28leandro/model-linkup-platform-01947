@@ -61,8 +61,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    const PUBLIC_KEY = Deno.env.get("PAGOPAR_PUBLIC_KEY");
-    const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY");
+    const PUBLIC_KEY = Deno.env.get("PAGOPAR_PUBLIC_KEY")?.trim();
+    const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY")?.trim();
     if (!PUBLIC_KEY || !PRIVATE_KEY) {
       throw new Error("Pagopar keys not configured");
     }
