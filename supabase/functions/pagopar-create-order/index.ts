@@ -18,6 +18,8 @@ async function sha1Hex(s: string): Promise<string> {
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
+const PAGOPAR_API = "https://api.pagopar.com/api/comercios/1.1/iniciar-transaccion";
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
@@ -42,7 +44,7 @@ Deno.serve(async (req) => {
     // Ownership check: ensure listing belongs to caller
     const { data: ownedListing, error: ownErr } = await supabase
       .from("listings")
-      .select("id")
+      .select("id, title")
       .eq("id", listing_id)
       .eq("user_id", user.id)
       .maybeSingle();
@@ -59,7 +61,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Pagopar credentials (fictitious for now — replace later)
     const PUBLIC_KEY = Deno.env.get("PAGOPAR_PUBLIC_KEY");
     const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY");
     if (!PUBLIC_KEY || !PRIVATE_KEY) {
@@ -67,8 +68,15 @@ Deno.serve(async (req) => {
     }
 
     const orderNumber = `LST-${listing_id.slice(0, 8)}-${Date.now()}`;
-    // Pagopar token signature: SHA1(private_key + orderNumber + amount + currency)
-    const pagoparToken = await sha1Hex(`${PRIVATE_KEY}${orderNumber}${amount}PYG`);
+    // Pagopar 1.1 signature for iniciar-transaccion:
+    // token = sha1(private_token + public_key + numero_pedido + monto_total)
+    const pagoparToken = await sha1Hex(
+      `${PRIVATE_KEY}${PUBLIC_KEY}${orderNumber}${amount}`
+    );
+    // Hash used to validate webhook (numero_pedido + amount + currency)
+    const webhookHash = await sha1Hex(
+      `${PRIVATE_KEY}${orderNumber}${amount}PYG`
+    );
 
     const { data: order, error: insErr } = await supabase
       .from("payment_orders")
@@ -78,16 +86,71 @@ Deno.serve(async (req) => {
         photo_count,
         amount_pyg: amount,
         external_order_number: orderNumber,
-        pagopar_token: pagoparToken,
+        pagopar_token: webhookHash,
         status: "pending",
       })
       .select()
       .single();
     if (insErr) throw insErr;
 
-    // In real impl: POST to https://api.pagopar.com/api/comercios/1.1/iniciar-transaccion
-    // For now we return a simulated checkout URL
-    const checkoutUrl = `https://desarrollo.pagopar.com/pagos/${pagoparToken}?order=${orderNumber}&amount=${amount}&public_key=${PUBLIC_KEY}`;
+    const fechaMax = new Date(Date.now() + 24 * 60 * 60 * 1000)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " ");
+
+    const payload = {
+      token: pagoparToken,
+      public_key: PUBLIC_KEY,
+      tipo_pedido: "VENTA",
+      numero_pedido: orderNumber,
+      monto_total: amount,
+      id_estado_pedido: 1,
+      fecha_maxima_pago: fechaMax,
+      descripcion_resumen: `Pack ${photo_count} fotos - Anuncio`,
+      email_solicitante: user.email ?? "noreply@nemu.com.py",
+      comprador: {
+        documento: "0",
+        documento_tipo: "CI",
+        email: user.email ?? "noreply@nemu.com.py",
+        nombre: (user.user_metadata?.full_name as string) ?? user.email ?? "Cliente",
+        telefono: "0000000000",
+        direccion: "Asuncion",
+        pais: "PY",
+      },
+      compras_items: [
+        {
+          nombre: `Pack ${photo_count} fotos`,
+          ticket: orderNumber,
+          descripcion: `Desbloqueo de fotos para anuncio ${ownedListing.title ?? ""}`.slice(0, 250),
+          url_imagen: "",
+          cantidad: 1,
+          precio_unitario: amount,
+        },
+      ],
+    };
+
+    const apiRes = await fetch(PAGOPAR_API, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const apiJson = await apiRes.json().catch(() => null);
+    console.log("[pagopar] response", apiRes.status, JSON.stringify(apiJson));
+
+    if (!apiRes.ok || !apiJson || apiJson.respuesta === false) {
+      const msg =
+        (apiJson && (apiJson.resultado?.[0]?.mensaje || apiJson.mensaje)) ||
+        `Pagopar API error (HTTP ${apiRes.status})`;
+      throw new Error(msg);
+    }
+
+    const hashPedido: string | undefined =
+      apiJson.resultado?.[0]?.hash_pedido ||
+      apiJson.hash_pedido ||
+      apiJson.resultado?.hash_pedido;
+    if (!hashPedido) throw new Error("Pagopar no devolvió hash_pedido");
+
+    const checkoutUrl = `https://www.pagopar.com/pagos/${hashPedido}`;
 
     return new Response(
       JSON.stringify({
@@ -95,12 +158,13 @@ Deno.serve(async (req) => {
         external_order_number: orderNumber,
         amount,
         checkout_url: checkoutUrl,
-        token: pagoparToken,
+        hash_pedido: hashPedido,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    console.error("[pagopar-create-order]", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
