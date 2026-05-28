@@ -68,15 +68,10 @@ Deno.serve(async (req) => {
     }
 
     const orderNumber = `LST-${listing_id.slice(0, 8)}-${Date.now()}`;
-    // Pagopar 1.1 signature for iniciar-transaccion:
-    // token = sha1(private_token + public_key + numero_pedido + monto_total)
-    const pagoparToken = await sha1Hex(
-      `${PRIVATE_KEY}${PUBLIC_KEY}${orderNumber}${amount}`
-    );
-    // Hash used to validate webhook (numero_pedido + amount + currency)
-    const webhookHash = await sha1Hex(
-      `${PRIVATE_KEY}${orderNumber}${amount}PYG`
-    );
+    const normalizedAmount = String(Number(amount));
+    // Pagopar iniciar-transaccion token:
+    // sha1(comercio_token_privado + id_pedido_comercio + strval(floatval(monto_total)))
+    const pagoparToken = await sha1Hex(`${PRIVATE_KEY}${orderNumber}${normalizedAmount}`);
 
     const { data: order, error: insErr } = await supabase
       .from("payment_orders")
@@ -86,7 +81,7 @@ Deno.serve(async (req) => {
         photo_count,
         amount_pyg: amount,
         external_order_number: orderNumber,
-        pagopar_token: webhookHash,
+        pagopar_token: pagoparToken,
         status: "pending",
       })
       .select()
@@ -101,30 +96,40 @@ Deno.serve(async (req) => {
     const payload = {
       token: pagoparToken,
       public_key: PUBLIC_KEY,
-      tipo_pedido: "VENTA",
-      numero_pedido: orderNumber,
+      tipo_pedido: "VENTA-COMERCIO",
+      id_pedido_comercio: orderNumber,
       monto_total: amount,
-      id_estado_pedido: 1,
       fecha_maxima_pago: fechaMax,
       descripcion_resumen: `Pack ${photo_count} fotos - Anuncio`,
-      email_solicitante: user.email ?? "noreply@nemu.com.py",
+      forma_pago: 9,
       comprador: {
+        ruc: "",
         documento: "0",
-        documento_tipo: "CI",
+        tipo_documento: "CI",
         email: user.email ?? "noreply@nemu.com.py",
+        ciudad: "1",
         nombre: (user.user_metadata?.full_name as string) ?? user.email ?? "Cliente",
         telefono: "0000000000",
-        direccion: "Asuncion",
-        pais: "PY",
+        direccion: "",
+        coordenadas: "",
+        razon_social: "",
+        direccion_referencia: "",
       },
       compras_items: [
         {
+          ciudad: "1",
           nombre: `Pack ${photo_count} fotos`,
-          ticket: orderNumber,
+          categoria: "909",
+          public_key: PUBLIC_KEY,
           descripcion: `Desbloqueo de fotos para anuncio ${ownedListing.title ?? ""}`.slice(0, 250),
           url_imagen: "",
+          id_producto: 1,
           cantidad: 1,
-          precio_unitario: amount,
+          precio_total: amount,
+          vendedor_telefono: "",
+          vendedor_direccion: "",
+          vendedor_direccion_referencia: "",
+          vendedor_direccion_coordenadas: "",
         },
       ],
     };
@@ -139,16 +144,26 @@ Deno.serve(async (req) => {
 
     if (!apiRes.ok || !apiJson || apiJson.respuesta === false) {
       const msg =
-        (apiJson && (apiJson.resultado?.[0]?.mensaje || apiJson.mensaje)) ||
+        (apiJson &&
+          (apiJson.resultado?.[0]?.mensaje ||
+            apiJson.mensaje ||
+            (typeof apiJson.resultado === "string" ? apiJson.resultado : null))) ||
         `Pagopar API error (HTTP ${apiRes.status})`;
       throw new Error(msg);
     }
 
     const hashPedido: string | undefined =
       apiJson.resultado?.[0]?.hash_pedido ||
+      apiJson.resultado?.[0]?.data ||
       apiJson.hash_pedido ||
+      apiJson.data ||
       apiJson.resultado?.hash_pedido;
     if (!hashPedido) throw new Error("Pagopar no devolvió hash_pedido");
+
+    await supabase
+      .from("payment_orders")
+      .update({ pagopar_hash: hashPedido })
+      .eq("id", order.id);
 
     const checkoutUrl = `https://www.pagopar.com/pagos/${hashPedido}`;
 
