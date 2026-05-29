@@ -115,10 +115,10 @@ export const CATEGORIES: Category[] = [
     icon: Home,
     accent: "from-emerald-500/15 to-teal-500/10 text-emerald-700 dark:text-emerald-300",
     subcategories: [
-      { id: "venta",      label_es: "Venta",       label_pt: "Venda",     icon: Tag },
-      { id: "alquiler",   label_es: "Alquiler",    label_pt: "Aluguel",   icon: KeyRound },
-      { id: "terrenos",   label_es: "Terrenos",    label_pt: "Terrenos",  icon: MapPin },
-      { id: "comerciales", label_es: "Comerciales", label_pt: "Comerciais", icon: Store },
+      { id: "sitios",    label_es: "Sitios",    label_pt: "Sítios",    icon: MapPin },
+      { id: "fazendas",  label_es: "Fazendas",  label_pt: "Fazendas",  icon: Trees },
+      { id: "comercio",  label_es: "Comercio",  label_pt: "Comércio",  icon: Store },
+      { id: "industria", label_es: "Industria", label_pt: "Indústria", icon: Factory },
     ],
   },
   {
@@ -154,8 +154,8 @@ export const CATEGORIES: Category[] = [
     icon: Shirt,
     accent: "from-pink-500/15 to-rose-500/10 text-pink-700 dark:text-pink-300",
     subcategories: [
-      { id: "masculino",  label_es: "Masculino",        label_pt: "Masculino",        icon: Shirt },
-      { id: "feminino",   label_es: "Femenino",         label_pt: "Feminino",         icon: Shirt },
+      { id: "masculino",  label_es: "Roupas",           label_pt: "Roupas",           icon: Shirt },
+      { id: "feminino",   label_es: "Calzados",         label_pt: "Calçados",         icon: Footprints },
       { id: "infantil",   label_es: "Infantil",         label_pt: "Infantil",         icon: Baby },
       { id: "relojes-joyas", label_es: "Relojes y Joyas", label_pt: "Relógios e Joias", icon: Gem },
       { id: "perfumes",   label_es: "Perfumes",         label_pt: "Perfumes",         icon: SprayCan },
@@ -210,7 +210,7 @@ export const CATEGORIES: Category[] = [
       { id: "calzado-deportivo", label_es: "Calzado Deportivo / Tenis",        label_pt: "Calçados Esportivos / Tênis",         icon: Footprints },
       { id: "fitness",           label_es: "Equipamientos de Gimnasio / Fitness", label_pt: "Equipamentos de Academia / Fitness", icon: Dumbbell },
       { id: "deportes-equipo",   label_es: "Deportes Colectivos",              label_pt: "Esportes Coletivos",                  icon: Trophy },
-      { id: "otros-deportes",    label_es: "Otros Artículos de Deporte",       label_pt: "Outros Artigos de Esporte",           icon: Package },
+      { id: "otros-deportes",    label_es: "Otros",                            label_pt: "Outros",                              icon: Package },
     ],
   },
 ];
