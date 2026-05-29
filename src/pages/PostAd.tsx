@@ -740,7 +740,7 @@ const PostAd = () => {
               })()}
 
               {category === "real-estate" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label>Tipo de transacción</Label>
                     <Select value={attributes.transactionType || ""} onValueChange={(v) => setAttr("transactionType", v)}>
@@ -795,8 +795,8 @@ const PostAd = () => {
               )}
 
               {category === "vehicles" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                  {attributes.vehicleType === "moto" ? (
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {(subcategory === "repuestos-auto" || subcategory === "repuestos-moto") ? null : attributes.vehicleType === "moto" ? (
                     <>
                       <div className="space-y-2">
                         <Label>Cilindrada (CC)</Label>
@@ -882,7 +882,7 @@ const PostAd = () => {
               )}
 
               {category === "services" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label htmlFor="schedule">Horario de atención</Label>
                     <Input id="schedule" value={attributes.schedule || ""} onChange={(e) => setAttr("schedule", e.target.value)} placeholder="Ej: Lun-Vie 8-18h" className="h-11 sm:h-10" />
@@ -895,7 +895,7 @@ const PostAd = () => {
               )}
 
               {category === "fashion" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label htmlFor="size">Talla</Label>
                     <Input id="size" value={attributes.size || ""} onChange={(e) => setAttr("size", e.target.value)} placeholder="Ej: M, 42, 38" className="h-11 sm:h-10" />
@@ -937,11 +937,6 @@ const PostAd = () => {
               )}
 
               {category && <Separator />}
-              {category && (
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide animate-in fade-in slide-in-from-top-2 duration-300">
-                  3. Precio y ubicación
-                </h3>
-              )}
 
               {category && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -997,7 +992,7 @@ const PostAd = () => {
               )}
 
               {category && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="city">Ciudad *</Label>
                   <Input
