@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard, Search } from "lucide-react";
+import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard, Search, User, Settings } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -7,6 +7,13 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface HeaderProps {
   onLoginClick: () => void;
@@ -58,28 +65,22 @@ const Header = ({ onLoginClick }: HeaderProps) => {
           {t('header.favorites')}
         </Link>
       </Button>
-      {user && (
-        <Button asChild size={mobile ? "lg" : "default"} className={mobile ? "w-full justify-start" : ""}>
-          <Link to="/post-ad" className="flex items-center gap-2" onClick={() => setMobileMenuOpen(false)}>
-            <Plus className="w-4 h-4" />
-            {t('header.postAd')}
-          </Link>
-        </Button>
-      )}
-      {user ? (
-        <Button 
-          variant="default" 
-          size={mobile ? "lg" : "default"}
-          className={`flex items-center gap-2 ${mobile ? "w-full justify-start" : ""}`}
-          onClick={() => {
-            signOut();
-            setMobileMenuOpen(false);
-          }}
-        >
-          <LogOut className="w-4 h-4" />
-          {t('auth.logout')}
-        </Button>
-      ) : (
+      <Button
+        size={mobile ? "lg" : "default"}
+        className={`flex items-center gap-2 ${mobile ? "w-full justify-start" : ""}`}
+        onClick={() => {
+          setMobileMenuOpen(false);
+          if (user) {
+            navigate("/post-ad");
+          } else {
+            onLoginClick();
+          }
+        }}
+      >
+        <Plus className="w-4 h-4" />
+        {t('header.postAd')}
+      </Button>
+      {!user && (
         <Button 
           variant="default" 
           size={mobile ? "lg" : "default"}
@@ -135,15 +136,30 @@ const Header = ({ onLoginClick }: HeaderProps) => {
           </div>
           <LanguageSelector />
           <NavItems />
-          <Button
-            variant="outline"
-            size="default"
-            onClick={handleManageListings}
-            className="hidden md:inline-flex items-center gap-2"
-          >
-            <LayoutDashboard className="w-4 h-4" />
-            Mis Anuncios
-          </Button>
+          {user && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon" aria-label="Menú de usuario">
+                  <User className="w-4 h-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56 bg-popover z-50">
+                <DropdownMenuItem onClick={() => navigate("/my-listings")}>
+                  <LayoutDashboard className="w-4 h-4 mr-2" />
+                  Mis Anuncios
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/account")}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Mi Cuenta
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => signOut()}>
+                  <LogOut className="w-4 h-4 mr-2" />
+                  {t('auth.logout')}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {/* Mobile Navigation */}
