@@ -562,11 +562,6 @@ const PostAd = () => {
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              {/* ============ SECCIÓN 1 — Categoría y fotos ============ */}
-              <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                1. Categoría y fotos
-              </h3>
-
               <div className="space-y-2">
                 <Label htmlFor="title">{t('postAd.adTitle')}</Label>
                 <Input
@@ -603,21 +598,29 @@ const PostAd = () => {
               {category && (
                 <>
                   <Separator />
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide animate-in fade-in slide-in-from-top-2 duration-300">
-                    2. Detalles del item
-                  </h3>
                 </>
               )}
 
               {category && (() => {
                 const meta = getCategoryById(category);
                 if (!meta?.subcategories) return null;
+                const isServices = category === "services";
+                const subLabel = category === "vehicles"
+                  ? "Tipo de vehículo"
+                  : category === "real-estate"
+                  ? "Tipo de inmueble"
+                  : "Subcategoría";
+                const subPlaceholder = category === "vehicles"
+                  ? "Seleccionar tipo de vehículo"
+                  : category === "real-estate"
+                  ? "Seleccionar tipo de inmueble"
+                  : "Seleccionar subcategoría";
                 return (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="space-y-2">
-                      <Label>{category === "vehicles" ? "Tipo de vehículo" : "Subcategoría"}</Label>
+                      <Label>{subLabel}</Label>
                       <Select value={subcategory} onValueChange={(v) => { setSubcategory(v); setAttr("brand", ""); }}>
-                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder={category === "vehicles" ? "Seleccionar tipo de vehículo" : "Seleccionar subcategoría"} /></SelectTrigger>
+                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder={subPlaceholder} /></SelectTrigger>
                         <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
                           {meta.subcategories.map((s) => (
                             <SelectItem key={s.id} value={s.id}>{s.label_es}</SelectItem>
@@ -625,17 +628,31 @@ const PostAd = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-2">
-                      <Label>Estado</Label>
-                      <Select value={condition} onValueChange={setCondition}>
-                        <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar estado" /></SelectTrigger>
-                        <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                          {CONDITIONS.map((c) => (
-                            <SelectItem key={c.id} value={c.id}>{c.label_es}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {!isServices && (
+                      <div className="space-y-2">
+                        <Label>Estado</Label>
+                        <Select value={condition} onValueChange={setCondition}>
+                          <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar estado" /></SelectTrigger>
+                          <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
+                            {CONDITIONS.map((c) => (
+                              <SelectItem key={c.id} value={c.id}>{c.label_es}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                    {category === "sport" && subcategory === "otros-deportes" && (
+                      <div className="space-y-2">
+                        <Label htmlFor="sportOther">¿Qué artículo deportivo?</Label>
+                        <Input
+                          id="sportOther"
+                          value={attributes.sportOther || ""}
+                          onChange={(e) => setAttr("sportOther", e.target.value)}
+                          placeholder="Describí el artículo deportivo"
+                          className="h-11 sm:h-10"
+                        />
+                      </div>
+                    )}
                     {(() => {
                       const sub = meta.subcategories?.find((s) => s.id === subcategory);
                       const isVehicles = category === "vehicles";
@@ -723,7 +740,7 @@ const PostAd = () => {
               })()}
 
               {category === "real-estate" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label>Tipo de transacción</Label>
                     <Select value={attributes.transactionType || ""} onValueChange={(v) => setAttr("transactionType", v)}>
@@ -778,8 +795,8 @@ const PostAd = () => {
               )}
 
               {category === "vehicles" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                  {attributes.vehicleType === "moto" ? (
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  {(subcategory === "repuestos-auto" || subcategory === "repuestos-moto") ? null : attributes.vehicleType === "moto" ? (
                     <>
                       <div className="space-y-2">
                         <Label>Cilindrada (CC)</Label>
@@ -865,7 +882,7 @@ const PostAd = () => {
               )}
 
               {category === "services" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label htmlFor="schedule">Horario de atención</Label>
                     <Input id="schedule" value={attributes.schedule || ""} onChange={(e) => setAttr("schedule", e.target.value)} placeholder="Ej: Lun-Vie 8-18h" className="h-11 sm:h-10" />
@@ -878,7 +895,7 @@ const PostAd = () => {
               )}
 
               {category === "fashion" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label htmlFor="size">Talla</Label>
                     <Input id="size" value={attributes.size || ""} onChange={(e) => setAttr("size", e.target.value)} placeholder="Ej: M, 42, 38" className="h-11 sm:h-10" />
@@ -920,11 +937,6 @@ const PostAd = () => {
               )}
 
               {category && <Separator />}
-              {category && (
-                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide animate-in fade-in slide-in-from-top-2 duration-300">
-                  3. Precio y ubicación
-                </h3>
-              )}
 
               {category && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -980,7 +992,7 @@ const PostAd = () => {
               )}
 
               {category && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-2">
                   <Label htmlFor="city">Ciudad *</Label>
                   <Input
