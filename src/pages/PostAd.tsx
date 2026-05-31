@@ -84,14 +84,10 @@ const PostAd = () => {
     }
   }, [user, loading, navigate, t]);
 
-  useEffect(() => {
-    if (
-      window.sessionStorage.getItem("test_photo_unlock") === "true" &&
-      window.sessionStorage.getItem("test_photo_code")
-    ) {
-      setPhotosUnlocked(true);
-    }
-  }, []);
+  // Photo unlock is tracked server-side only (listings.photos_unlocked
+  // populated by the Pagopar webhook or by the redeem-test-token edge
+  // function). We intentionally do NOT trust any client-side storage flag
+  // here because it could be set by anyone to bypass the photo paywall.
 
   const isEditing = !!id;
   const editingListing = isEditing
