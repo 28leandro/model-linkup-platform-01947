@@ -115,10 +115,14 @@ export const CATEGORIES: Category[] = [
     icon: Home,
     accent: "from-emerald-500/15 to-teal-500/10 text-emerald-700 dark:text-emerald-300",
     subcategories: [
-      { id: "sitios",    label_es: "Sitios",    label_pt: "Sítios",    icon: MapPin },
-      { id: "fazendas",  label_es: "Fazendas",  label_pt: "Fazendas",  icon: Trees },
-      { id: "comercio",  label_es: "Comercio",  label_pt: "Comércio",  icon: Store },
-      { id: "industria", label_es: "Industria", label_pt: "Indústria", icon: Factory },
+      { id: "casa",        label_es: "Casa",            label_pt: "Casa",            icon: Home },
+      { id: "departamento", label_es: "Departamento",   label_pt: "Departamento",    icon: Building2 },
+      { id: "terreno",     label_es: "Terreno",         label_pt: "Terreno",         icon: MapPin },
+      { id: "comercial",   label_es: "Local Comercial", label_pt: "Local Comercial", icon: Store },
+      { id: "quinta",      label_es: "Quinta",          label_pt: "Quinta",          icon: Trees },
+      { id: "estancia",    label_es: "Estancia",        label_pt: "Estância",        icon: Trees },
+      { id: "oficina",     label_es: "Oficina",         label_pt: "Escritório",      icon: Briefcase },
+      { id: "edificio",    label_es: "Edificio",        label_pt: "Edifício",        icon: Factory },
     ],
   },
   {

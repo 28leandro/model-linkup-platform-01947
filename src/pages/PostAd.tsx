@@ -260,7 +260,7 @@ const PostAd = () => {
         toast({ title: "Falta tipo de transacción", description: "Elegí Venta o Alquiler.", variant: "destructive" });
         return;
       }
-      if (!attributes.propertyType) {
+      if (!subcategory) {
         toast({ title: "Falta tipo de inmueble", description: "Seleccioná el tipo de inmueble.", variant: "destructive" });
         return;
       }
@@ -630,6 +630,18 @@ const PostAd = () => {
                     </div>
                     {!isServices && (
                       <div className="space-y-2">
+                        {category === "sport" && subcategory === "otros-deportes" && (
+                          <div className="space-y-2 mb-3">
+                            <Label htmlFor="sportOther">¿Qué artículo deportivo?</Label>
+                            <Input
+                              id="sportOther"
+                              value={attributes.sportOther || ""}
+                              onChange={(e) => setAttr("sportOther", e.target.value)}
+                              placeholder="Describí el artículo deportivo"
+                              className="h-11 sm:h-10"
+                            />
+                          </div>
+                        )}
                         <Label>Estado</Label>
                         <Select value={condition} onValueChange={setCondition}>
                           <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar estado" /></SelectTrigger>
@@ -639,18 +651,6 @@ const PostAd = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                      </div>
-                    )}
-                    {category === "sport" && subcategory === "otros-deportes" && (
-                      <div className="space-y-2">
-                        <Label htmlFor="sportOther">¿Qué artículo deportivo?</Label>
-                        <Input
-                          id="sportOther"
-                          value={attributes.sportOther || ""}
-                          onChange={(e) => setAttr("sportOther", e.target.value)}
-                          placeholder="Describí el artículo deportivo"
-                          className="h-11 sm:h-10"
-                        />
                       </div>
                     )}
                     {(() => {
@@ -751,19 +751,7 @@ const PostAd = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Tipo de inmueble</Label>
-                    <Select value={attributes.propertyType || ""} onValueChange={(v) => setAttr("propertyType", v)}>
-                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Casa / Apartamento / Terreno" /></SelectTrigger>
-                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                        <SelectItem value="house">Casa</SelectItem>
-                        <SelectItem value="apartment">Apartamento</SelectItem>
-                        <SelectItem value="land">Terreno</SelectItem>
-                        <SelectItem value="commercial">Local Comercial</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {attributes.propertyType !== "land" && (
+                  {subcategory !== "terreno" && subcategory !== "quinta" && subcategory !== "estancia" && (
                     <>
                       <div className="space-y-2">
                         <Label htmlFor="bedrooms">Habitaciones</Label>
@@ -779,7 +767,7 @@ const PostAd = () => {
                     <Label htmlFor="area">Área total (m²)</Label>
                     <Input id="area" type="number" min="0" value={area} onChange={(e) => setArea(clampNonNeg(e.target.value) as any)} placeholder="m²" className="h-11 sm:h-10" />
                   </div>
-                  {attributes.propertyType !== "land" && (
+                  {subcategory !== "terreno" && subcategory !== "quinta" && subcategory !== "estancia" && (
                     <div className="space-y-2">
                       <Label>Estacionamiento</Label>
                       <Select value={attributes.parking === undefined ? "" : (attributes.parking ? "yes" : "no")} onValueChange={(v) => setAttr("parking", v === "yes")}>
@@ -796,7 +784,7 @@ const PostAd = () => {
 
               {category === "vehicles" && (
                 <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                  {(subcategory === "repuestos-auto" || subcategory === "repuestos-moto") ? null : attributes.vehicleType === "moto" ? (
+                  {(subcategory === "repuestos-auto" || subcategory === "repuestos-moto" || subcategory === "repuestos-camion" || subcategory === "accesorios-vehiculos") ? null : attributes.vehicleType === "moto" ? (
                     <>
                       <div className="space-y-2">
                         <Label>Cilindrada (CC)</Label>
