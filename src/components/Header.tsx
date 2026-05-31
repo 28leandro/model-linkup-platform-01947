@@ -67,7 +67,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
       </Button>
       <Button
         size={mobile ? "lg" : "default"}
-        className={`flex items-center gap-2 ${mobile ? "w-full justify-start" : ""}`}
+        className={`flex items-center gap-2 transition-colors hover:bg-accent hover:text-accent-foreground ${mobile ? "w-full justify-start" : ""}`}
         onClick={() => {
           setMobileMenuOpen(false);
           if (user) {
@@ -84,7 +84,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         <Button 
           variant="default" 
           size={mobile ? "lg" : "default"}
-          className={`flex items-center gap-2 ${mobile ? "w-full justify-start" : ""}`}
+          className={`flex items-center gap-2 transition-colors hover:bg-accent hover:text-accent-foreground ${mobile ? "w-full justify-start" : ""}`}
           onClick={() => {
             onLoginClick();
             setMobileMenuOpen(false);
