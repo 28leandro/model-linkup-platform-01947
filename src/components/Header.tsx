@@ -106,7 +106,6 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         <div className="hidden md:flex items-center gap-2 lg:gap-4">
           <div className="flex items-center gap-2">
             <div className="relative w-56 lg:w-72">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               <Input
                 type="search"
                 inputMode="search"
@@ -118,14 +117,14 @@ const Header = ({ onLoginClick }: HeaderProps) => {
                   }
                 }}
                 placeholder={t("search.placeholder")}
-                className="h-10 pl-9 pr-3 rounded-full bg-muted/60 border-0 focus-visible:ring-1 focus-visible:ring-ring"
+                className="h-10 px-4 rounded-full bg-muted/60 border-0 focus-visible:ring-1 focus-visible:ring-ring"
                 aria-label={t("nav.search")}
               />
             </div>
             <Button
               type="button"
               size="icon"
-              className="h-10 w-10 rounded-full shrink-0"
+              className="h-10 w-10 rounded-full shrink-0 transition-colors hover:bg-accent hover:text-accent-foreground"
               onClick={() =>
                 window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }))
               }
