@@ -751,19 +751,7 @@ const PostAd = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Tipo de inmueble</Label>
-                    <Select value={attributes.propertyType || ""} onValueChange={(v) => setAttr("propertyType", v)}>
-                      <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Casa / Apartamento / Terreno" /></SelectTrigger>
-                      <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
-                        <SelectItem value="house">Casa</SelectItem>
-                        <SelectItem value="apartment">Apartamento</SelectItem>
-                        <SelectItem value="land">Terreno</SelectItem>
-                        <SelectItem value="commercial">Local Comercial</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {attributes.propertyType !== "land" && (
+                  {subcategory !== "terreno" && subcategory !== "quinta" && subcategory !== "estancia" && (
                     <>
                       <div className="space-y-2">
                         <Label htmlFor="bedrooms">Habitaciones</Label>
@@ -779,7 +767,7 @@ const PostAd = () => {
                     <Label htmlFor="area">Área total (m²)</Label>
                     <Input id="area" type="number" min="0" value={area} onChange={(e) => setArea(clampNonNeg(e.target.value) as any)} placeholder="m²" className="h-11 sm:h-10" />
                   </div>
-                  {attributes.propertyType !== "land" && (
+                  {subcategory !== "terreno" && subcategory !== "quinta" && subcategory !== "estancia" && (
                     <div className="space-y-2">
                       <Label>Estacionamiento</Label>
                       <Select value={attributes.parking === undefined ? "" : (attributes.parking ? "yes" : "no")} onValueChange={(v) => setAttr("parking", v === "yes")}>
