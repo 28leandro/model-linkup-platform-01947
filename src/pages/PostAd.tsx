@@ -260,7 +260,7 @@ const PostAd = () => {
         toast({ title: "Falta tipo de transacción", description: "Elegí Venta o Alquiler.", variant: "destructive" });
         return;
       }
-      if (!attributes.propertyType) {
+      if (!subcategory) {
         toast({ title: "Falta tipo de inmueble", description: "Seleccioná el tipo de inmueble.", variant: "destructive" });
         return;
       }
