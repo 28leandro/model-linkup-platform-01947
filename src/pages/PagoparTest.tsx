@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, CheckCircle2, XCircle, Loader2, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { usePagoparScript } from "@/hooks/usePagoparScript";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 type ConfigState = {
   configured: boolean;
@@ -15,6 +16,7 @@ type ConfigState = {
 } | null;
 
 const PagoparTest = () => {
+  const { user, loading } = useAuth();
   const scriptStatus = usePagoparScript();
   const [config, setConfig] = useState<ConfigState>(null);
   const [checking, setChecking] = useState(true);
@@ -39,8 +41,11 @@ const PagoparTest = () => {
   };
 
   useEffect(() => {
-    refresh();
-  }, []);
+    if (user) refresh();
+  }, [user]);
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/" replace />;
 
   const handleTestPayment = () => {
     if (!config?.configured) {
