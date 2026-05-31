@@ -784,7 +784,7 @@ const PostAd = () => {
 
               {category === "vehicles" && (
                 <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
-                  {(subcategory === "repuestos-auto" || subcategory === "repuestos-moto") ? null : attributes.vehicleType === "moto" ? (
+                  {(subcategory === "repuestos-auto" || subcategory === "repuestos-moto" || subcategory === "repuestos-camion" || subcategory === "accesorios-vehiculos") ? null : attributes.vehicleType === "moto" ? (
                     <>
                       <div className="space-y-2">
                         <Label>Cilindrada (CC)</Label>
