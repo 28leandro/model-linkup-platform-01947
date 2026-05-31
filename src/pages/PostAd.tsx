@@ -630,6 +630,18 @@ const PostAd = () => {
                     </div>
                     {!isServices && (
                       <div className="space-y-2">
+                        {category === "sport" && subcategory === "otros-deportes" && (
+                          <div className="space-y-2 mb-3">
+                            <Label htmlFor="sportOther">¿Qué artículo deportivo?</Label>
+                            <Input
+                              id="sportOther"
+                              value={attributes.sportOther || ""}
+                              onChange={(e) => setAttr("sportOther", e.target.value)}
+                              placeholder="Describí el artículo deportivo"
+                              className="h-11 sm:h-10"
+                            />
+                          </div>
+                        )}
                         <Label>Estado</Label>
                         <Select value={condition} onValueChange={setCondition}>
                           <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder="Seleccionar estado" /></SelectTrigger>
@@ -639,18 +651,6 @@ const PostAd = () => {
                             ))}
                           </SelectContent>
                         </Select>
-                      </div>
-                    )}
-                    {category === "sport" && subcategory === "otros-deportes" && (
-                      <div className="space-y-2">
-                        <Label htmlFor="sportOther">¿Qué artículo deportivo?</Label>
-                        <Input
-                          id="sportOther"
-                          value={attributes.sportOther || ""}
-                          onChange={(e) => setAttr("sportOther", e.target.value)}
-                          placeholder="Describí el artículo deportivo"
-                          className="h-11 sm:h-10"
-                        />
                       </div>
                     )}
                     {(() => {
