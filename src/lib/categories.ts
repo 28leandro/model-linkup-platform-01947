@@ -113,7 +113,7 @@ export const CATEGORIES: Category[] = [
     desc_es: "Venta y alquiler de propiedades",
     desc_pt: "Venda e aluguel de propriedades",
     icon: Home,
-    accent: "from-emerald-500/15 to-teal-500/10 text-emerald-700 dark:text-emerald-300",
+    accent: "from-transparent to-transparent text-foreground group-hover:from-emerald-500/15 group-hover:to-teal-500/10 group-hover:text-emerald-700 dark:group-hover:text-emerald-300",
     subcategories: [
       { id: "casa",        label_es: "Casa",            label_pt: "Casa",            icon: Home },
       { id: "departamento", label_es: "Departamento",   label_pt: "Departamento",    icon: Building2 },
@@ -156,7 +156,7 @@ export const CATEGORIES: Category[] = [
     desc_es: "Ropa, accesorios, perfumes",
     desc_pt: "Roupas, acessórios, perfumes",
     icon: Shirt,
-    accent: "from-pink-500/15 to-rose-500/10 text-pink-700 dark:text-pink-300",
+    accent: "from-transparent to-transparent text-foreground group-hover:from-pink-500/15 group-hover:to-rose-500/10 group-hover:text-pink-700 dark:group-hover:text-pink-300",
     subcategories: [
       { id: "masculino",  label_es: "Roupas",           label_pt: "Roupas",           icon: Shirt },
       { id: "feminino",   label_es: "Calzados",         label_pt: "Calçados",         icon: Footprints },
@@ -189,7 +189,7 @@ export const CATEGORIES: Category[] = [
     desc_es: "Informática, celulares, gaming y más",
     desc_pt: "Informática, celulares, gaming e mais",
     icon: Cpu,
-    accent: "from-violet-500/15 to-fuchsia-500/10 text-violet-700 dark:text-violet-300",
+    accent: "from-transparent to-transparent text-foreground group-hover:from-violet-500/15 group-hover:to-fuchsia-500/10 group-hover:text-violet-700 dark:group-hover:text-violet-300",
     subcategories: [
       { id: "informatica",   label_es: "Informática y Tablets",  label_pt: "Informática e Tablets", icon: Laptop,     brands: ["Apple", "Samsung", "Lenovo", "HP", "Dell", "Asus"] },
       { id: "celulares",     label_es: "Celulares y Smartphones", label_pt: "Celulares e Smartphones", icon: Smartphone, brands: ["iPhone", "Samsung Galaxy", "Xiaomi", "Motorola", "Huawei"] },
