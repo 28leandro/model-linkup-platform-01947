@@ -107,6 +107,25 @@ const Inbox = () => {
     );
   }, [activeThread, messages, user]);
 
+  // Mark thread as read when opened or new messages arrive in active thread
+  useEffect(() => {
+    if (!user || !activeThread) return;
+    const unreadIds = threadMessages
+      .filter((m) => m.receiver_id === user.id && !(m as any).read_at)
+      .map((m) => m.id);
+    if (unreadIds.length === 0) return;
+    (async () => {
+      const { error } = await supabase
+        .from("messages")
+        .update({ read_at: new Date().toISOString() })
+        .in("id", unreadIds)
+        .eq("receiver_id", user.id);
+      if (!error) {
+        qc.invalidateQueries({ queryKey: ["inbox", user.id] });
+      }
+    })();
+  }, [activeThread, threadMessages, user, qc]);
+
   // Realtime
   useEffect(() => {
     if (!user) return;
