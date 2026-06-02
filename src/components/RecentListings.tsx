@@ -34,7 +34,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
               <FavoriteButton listingId={listing.id} className="bg-background/80 backdrop-blur-sm" />
             </div>
             <Link to={`/listing/${listing.id}`}>
-              <div className="overflow-hidden bg-muted aspect-[4/3] sm:aspect-video">
+              <div className="overflow-hidden bg-muted aspect-[16/10] sm:aspect-video">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
