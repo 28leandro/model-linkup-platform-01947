@@ -35,7 +35,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
               <FavoriteButton listingId={listing.id} className="bg-background/80 backdrop-blur-sm" />
             </div>
             <Link to={`/listing/${listing.id}`}>
-              <AspectRatio ratio={16 / 9} className="overflow-hidden bg-muted">
+              <AspectRatio ratio={4 / 3} className="overflow-hidden bg-muted sm:aspect-video">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
