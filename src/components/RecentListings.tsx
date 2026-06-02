@@ -27,7 +27,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
   return (
     <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t('listings.recent')}</h2>
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
         {listings.map((listing) => (
           <div key={listing.id} className="group relative hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden">
             <div className="absolute top-2 right-2 z-10">
