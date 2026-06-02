@@ -236,6 +236,30 @@ export type Database = {
           },
         ]
       }
+      promo_code_redemptions: {
+        Row: {
+          code_hash: string
+          id: string
+          listing_id: string | null
+          redeemed_at: string
+          user_id: string
+        }
+        Insert: {
+          code_hash: string
+          id?: string
+          listing_id?: string | null
+          redeemed_at?: string
+          user_id: string
+        }
+        Update: {
+          code_hash?: string
+          id?: string
+          listing_id?: string | null
+          redeemed_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -271,6 +295,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
@@ -367,9 +412,16 @@ export type Database = {
       }
       get_listing_owner: { Args: { listing_uuid: string }; Returns: string }
       get_my_listing_phone: { Args: { listing_uuid: string }; Returns: string }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -496,6 +548,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
