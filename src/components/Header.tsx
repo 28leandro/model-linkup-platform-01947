@@ -68,7 +68,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
       <Button
         size={mobile ? "lg" : "default"}
         variant="outline"
-        className={`flex items-center gap-2 transition-colors bg-transparent border-lime-600 text-lime-700 dark:text-lime-300 dark:border-lime-500 hover:bg-lime-600 hover:text-white hover:border-lime-600 dark:hover:bg-lime-500 dark:hover:text-white ${mobile ? "w-full justify-start" : ""}`}
+        className={`flex items-center gap-2 transition-all border border-lime-600/40 bg-gradient-to-br from-lime-500/40 to-green-500/30 text-lime-700 dark:text-lime-300 hover:from-lime-500/60 hover:to-green-500/50 hover:shadow-md ${mobile ? "w-full justify-start" : ""}`}
         onClick={() => {
           setMobileMenuOpen(false);
           if (user) {
@@ -126,7 +126,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
               type="button"
               variant="outline"
               size="icon"
-              className="h-10 w-10 rounded-full shrink-0 transition-colors bg-transparent border-lime-600 text-lime-700 dark:text-lime-300 dark:border-lime-500 hover:bg-lime-600 hover:text-white hover:border-lime-600 dark:hover:bg-lime-500 dark:hover:text-white"
+              className="h-10 w-10 rounded-full shrink-0 transition-all border border-lime-600/40 bg-gradient-to-br from-lime-500/40 to-green-500/30 text-lime-700 dark:text-lime-300 hover:from-lime-500/60 hover:to-green-500/50 hover:shadow-md"
               onClick={() =>
                 window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }))
               }
