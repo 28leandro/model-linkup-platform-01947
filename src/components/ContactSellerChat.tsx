@@ -188,11 +188,7 @@ const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, o
           <Textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder={
-              currentUserId
-                ? `Hola, me interesa "${listingTitle}"...`
-                : `Olá, tenho interesse em "${listingTitle}"...`
-            }
+            placeholder="Escribe tu mensaje..."
             rows={2}
             maxLength={1000}
             className="text-base sm:text-sm"
