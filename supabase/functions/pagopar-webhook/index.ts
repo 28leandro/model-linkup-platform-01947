@@ -43,6 +43,13 @@ Deno.serve(async (req) => {
       .single();
     if (getErr || !order) throw new Error("Order not found");
 
+    // Idempotency: if already paid, accept and return without re-applying
+    if (order.status === "paid") {
+      return new Response(JSON.stringify({ ok: true, already_processed: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     // Verify Pagopar notification token: SHA1(PRIVATE_KEY + hash_pedido)
     const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY");
     if (!PRIVATE_KEY) {
@@ -58,6 +65,23 @@ Deno.serve(async (req) => {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // Validate that the paid amount matches the order amount we recorded
+    const reportedAmountRaw =
+      result.monto_total ?? result.monto ?? result.amount ?? null;
+    if (reportedAmountRaw != null) {
+      const reportedAmount = Number(reportedAmountRaw);
+      if (!Number.isFinite(reportedAmount) || Math.round(reportedAmount) !== Number(order.amount_pyg)) {
+        console.error("[pagopar-webhook] amount mismatch", {
+          reported: reportedAmountRaw,
+          expected: order.amount_pyg,
+        });
+        return new Response(JSON.stringify({ error: "amount mismatch" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const isPaid = result.pagado === true || status === "PAGO" || status === "PAID";
