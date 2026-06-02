@@ -67,8 +67,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
       </Button>
       <Button
         size={mobile ? "lg" : "default"}
-        variant="outline"
-        className={`flex items-center gap-2 bg-transparent border-input text-foreground transition-colors hover:bg-primary hover:text-primary-foreground hover:border-primary ${mobile ? "w-full justify-start" : ""}`}
+        className={`flex items-center gap-2 transition-colors hover:bg-accent hover:text-accent-foreground ${mobile ? "w-full justify-start" : ""}`}
         onClick={() => {
           setMobileMenuOpen(false);
           if (user) {
