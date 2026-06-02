@@ -61,6 +61,34 @@ Deno.serve(async (req) => {
       });
     }
 
+    // De-duplicate: if a recent pending order exists for the same listing/amount,
+    // reuse its checkout instead of creating a new Pagopar transaction.
+    const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+    const { data: existingPending } = await supabase
+      .from("payment_orders")
+      .select("id, external_order_number, amount_pyg, pagopar_hash")
+      .eq("user_id", user.id)
+      .eq("listing_id", listing_id)
+      .eq("status", "pending")
+      .eq("amount_pyg", amount)
+      .gte("created_at", fiveMinAgo)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (existingPending?.pagopar_hash) {
+      return new Response(
+        JSON.stringify({
+          order_id: existingPending.id,
+          external_order_number: existingPending.external_order_number,
+          amount: existingPending.amount_pyg,
+          checkout_url: `https://www.pagopar.com/pagos/${existingPending.pagopar_hash}`,
+          hash_pedido: existingPending.pagopar_hash,
+          reused: true,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     const PUBLIC_KEY = Deno.env.get("PAGOPAR_PUBLIC_KEY")?.trim();
     const PRIVATE_KEY = Deno.env.get("PAGOPAR_PRIVATE_KEY")?.trim();
     if (!PUBLIC_KEY || !PRIVATE_KEY) {
