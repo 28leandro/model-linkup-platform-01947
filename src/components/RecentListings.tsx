@@ -25,16 +25,16 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
   const isPt = language === "pt";
 
   return (
-    <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
+    <div className="container mx-auto px-2 sm:px-3 py-6 sm:py-8">
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t('listings.recent')}</h2>
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
         {listings.map((listing) => (
           <div key={listing.id} className="group relative hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden">
             <div className="absolute top-2 right-2 z-10">
               <FavoriteButton listingId={listing.id} className="bg-background/80 backdrop-blur-sm" />
             </div>
             <Link to={`/listing/${listing.id}`}>
-              <div className="overflow-hidden bg-muted aspect-square sm:aspect-video">
+              <div className="overflow-hidden bg-muted aspect-[5/4] md:aspect-video">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
