@@ -126,7 +126,6 @@ const Header = ({ onLoginClick }: HeaderProps) => {
               type="button"
               variant="outline"
               size="icon"
-              variant="outline"
               className="h-10 w-10 rounded-full shrink-0 border-lime-600/30 bg-gradient-to-br from-lime-500/15 to-green-500/10 text-lime-700 dark:text-lime-300 hover:from-lime-500/25 hover:to-green-500/20"
               onClick={() =>
                 window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }))
