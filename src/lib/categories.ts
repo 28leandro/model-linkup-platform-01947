@@ -193,7 +193,7 @@ export const CATEGORIES: Category[] = [
     icon: Cpu,
     accent: "from-transparent to-transparent group-hover:from-accent group-hover:to-accent group-hover:text-accent-foreground",
     subcategories: [
-      { id: "informatica",   label_es: "Informática y Tablets",  label_pt: "Informática e Tablets", icon: Laptop,     brands: ["Apple", "Samsung", "Lenovo", "HP", "Dell", "Asus"] },
+      { id: "informatica",   label_es: "Computadoras y Tablets", label_pt: "Computadores e Tablets", icon: Laptop,     brands: ["Apple", "Samsung", "Lenovo", "HP", "Dell", "Asus"] },
       { id: "celulares",     label_es: "Celulares y Smartphones", label_pt: "Celulares e Smartphones", icon: Smartphone, brands: ["iPhone", "Samsung Galaxy", "Xiaomi", "Motorola", "Huawei"] },
       { id: "televisores",   label_es: "Televisores",            label_pt: "Televisores",            icon: Cpu,        brands: ["Samsung","LG","Sony","TCL","Hisense","Philips","Panasonic","JVC","AOC","Tokyo","Mtek","Noblex","Aiwa"] },
       { id: "consolas",      label_es: "Consolas y Videojuegos",  label_pt: "Consoles e Videogames",  icon: Gamepad2,   brands: ["PS5", "Xbox Series", "Nintendo Switch", "PC Gamer"] },
