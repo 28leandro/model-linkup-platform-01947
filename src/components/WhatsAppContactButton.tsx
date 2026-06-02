@@ -29,7 +29,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
 
   const sanitized = phone.replace(/\D/g, "");
   if (!sanitized) return null;
-  const message = `Olá, tenho interesse no anúncio "${listingTitle}"`;
+  const message = `Hola, estoy interesado en el anuncio "${listingTitle}"`;
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
 
   if (variant === "inline") {
