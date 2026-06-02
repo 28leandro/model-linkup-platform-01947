@@ -624,7 +624,7 @@ const PostAd = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    {!isServices && (
+                    {!isServices && !(category === "real-estate" && ["terreno","comercial","quinta","estancia","oficina","edificio"].includes(subcategory)) && (
                       <div className="space-y-2">
                         {category === "sport" && subcategory === "otros-deportes" && (
                           <div className="space-y-2 mb-3">
@@ -820,7 +820,7 @@ const PostAd = () => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="year">{t('postAd.year')}</Label>
-                        <Input id="year" type="number" value={year} onChange={(e) => setYear(clampYear(e.target.value) as any)} placeholder={t('postAd.yearPlaceholder')} min="1900" max={currentYear + 1} className="h-11 sm:h-10" />
+                        <Input id="year" type="number" inputMode="numeric" value={year} onChange={(e) => setYear(e.target.value === "" ? "" : (Number(e.target.value) as any))} placeholder={t('postAd.yearPlaceholder')} className="h-11 sm:h-10" />
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="mileage">Kilometraje (km)</Label>
@@ -831,7 +831,7 @@ const PostAd = () => {
                   <>
                   <div className="space-y-2">
                     <Label htmlFor="year">{t('postAd.year')}</Label>
-                    <Input id="year" type="number" value={year} onChange={(e) => setYear(clampYear(e.target.value) as any)} placeholder={t('postAd.yearPlaceholder')} min="1900" max={currentYear + 1} className="h-11 sm:h-10" />
+                    <Input id="year" type="number" inputMode="numeric" value={year} onChange={(e) => setYear(e.target.value === "" ? "" : (Number(e.target.value) as any))} placeholder={t('postAd.yearPlaceholder')} className="h-11 sm:h-10" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="mileage">Kilometraje (km)</Label>

@@ -3,9 +3,11 @@ import { Link } from "react-router-dom";
 import VehicleInfo from "@/components/VehicleInfo";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Car, Home, Wrench } from "lucide-react";
+import { Car, Home, Wrench, Ruler } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import { getPublicCity } from "@/lib/utils";
+
+const AREA_SUBS = ["terreno","comercial","quinta","estancia","oficina","edificio"];
 
 const getCategoryIcon = (type?: string) => {
   switch (type) {
@@ -84,6 +86,12 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                   mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
                   fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                 />
+                {listing.type === "real-estate" && AREA_SUBS.includes((listing as any).subcategory) && (listing as any).area > 0 && (
+                  <p className="inline-flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                    <Ruler className="h-3 w-3" />
+                    {Number((listing as any).area).toLocaleString("es-PY")} m²
+                  </p>
+                )}
                 <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getPublicCity(listing)}</p>
               </CardContent>
             </Link>

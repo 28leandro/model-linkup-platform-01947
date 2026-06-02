@@ -7,6 +7,9 @@ import { formatPrice } from "@/lib/formatPrice";
 import { getPublicCity } from "@/lib/utils";
 import { getCategoryById, getConditionMeta } from "@/lib/categories";
 import { cn } from "@/lib/utils";
+import { Ruler } from "lucide-react";
+
+const AREA_SUBS = ["terreno","comercial","quinta","estancia","oficina","edificio"];
 
 const getCategoryBadge = (type?: string, isPt = false) => {
   const cat = getCategoryById(type);
@@ -86,6 +89,12 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                   mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
                   fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                 />
+                {listing.type === "real-estate" && AREA_SUBS.includes((listing as any).subcategory) && (listing as any).area > 0 && (
+                  <p className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground mt-1">
+                    <Ruler className="h-3 w-3" />
+                    {Number((listing as any).area).toLocaleString("es-PY")} m²
+                  </p>
+                )}
                 <p className="text-[11px] sm:text-xs lg:text-sm text-muted-foreground mt-1.5 line-clamp-1">{getPublicCity(listing)}</p>
               </div>
             </Link>
