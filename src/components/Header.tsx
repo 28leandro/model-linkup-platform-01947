@@ -67,8 +67,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
       </Button>
       <Button
         size={mobile ? "lg" : "default"}
-        variant="outline"
-        className={`flex items-center gap-2 transition-all border border-lime-600/40 bg-gradient-to-br from-lime-500/40 to-green-500/30 text-lime-700 dark:text-lime-300 hover:from-lime-500/60 hover:to-green-500/50 hover:shadow-md ${mobile ? "w-full justify-start" : ""}`}
+        className={`flex items-center gap-2 ${mobile ? "w-full justify-start" : ""}`}
         onClick={() => {
           setMobileMenuOpen(false);
           if (user) {
@@ -126,7 +125,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
               type="button"
               variant="outline"
               size="icon"
-              className="h-10 w-10 rounded-full shrink-0 transition-all border border-lime-600/40 bg-gradient-to-br from-lime-500/40 to-green-500/30 text-lime-700 dark:text-lime-300 hover:from-lime-500/60 hover:to-green-500/50 hover:shadow-md"
+              className="h-10 w-10 rounded-full shrink-0"
               onClick={() =>
                 window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }))
               }

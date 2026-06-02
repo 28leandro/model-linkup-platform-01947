@@ -212,7 +212,7 @@ export const CATEGORIES: Category[] = [
     desc_es: "Bicicletas, fitness y más",
     desc_pt: "Bicicletas, fitness e mais",
     icon: Trophy,
-    accent: "from-lime-500/40 to-green-500/30 text-lime-700 dark:text-lime-300",
+    accent: "from-lime-500/15 to-green-500/10 text-lime-700 dark:text-lime-300",
     subcategories: [
       { id: "bicicletas",        label_es: "Bicicletas",                       label_pt: "Bicicletas",                          icon: Bike },
       { id: "ropa-deportiva",    label_es: "Ropa y Uniformes Deportivos",      label_pt: "Roupas e Uniformes Esportivos",       icon: Shirt },
