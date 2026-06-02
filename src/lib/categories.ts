@@ -79,6 +79,8 @@ export interface Category {
   icon: LucideIcon;
   /** Tailwind gradient tokens for bento tile */
   accent: string;
+  /** Ghost style: transparent + accent border/text, fills on hover (desktop only) */
+  ghost?: boolean;
   subcategories?: Subcategory[];
 }
 
