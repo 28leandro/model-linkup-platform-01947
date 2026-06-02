@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import VehicleInfo from "@/components/VehicleInfo";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import FavoriteButton from "@/components/FavoriteButton";
 import { formatPrice } from "@/lib/formatPrice";
 import { getPublicCity } from "@/lib/utils";
@@ -35,7 +34,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
               <FavoriteButton listingId={listing.id} className="bg-background/80 backdrop-blur-sm" />
             </div>
             <Link to={`/listing/${listing.id}`}>
-              <AspectRatio ratio={16 / 9} className="overflow-hidden bg-muted">
+              <div className="overflow-hidden bg-muted aspect-[4/3] sm:aspect-video">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
@@ -52,7 +51,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                     {t('listings.noImage')}
                   </div>
                 )}
-              </AspectRatio>
+              </div>
               <div className="p-3 sm:p-4">
                 <div className="flex items-center gap-1.5 mb-1.5">
                   {(() => {

@@ -36,7 +36,9 @@ const CategoryBento = () => {
                 "group relative overflow-hidden rounded-2xl border bg-card",
                 "shadow-sm hover:shadow-md transition-all duration-300",
                 "hover:-translate-y-0.5",
-                big ? "col-span-2 row-span-2" : "col-span-1 row-span-1"
+                big ? "col-span-2 row-span-2" : "col-span-1 row-span-1",
+                cat.ghost &&
+                  "md:border-2 md:border-accent md:text-accent md:hover:text-accent-foreground"
               )}
             >
               <div
@@ -57,7 +59,10 @@ const CategoryBento = () => {
                 <div>
                   <h3
                     className={cn(
-                      "font-semibold leading-tight text-foreground",
+                      "font-semibold leading-tight",
+                      cat.ghost
+                        ? "text-foreground md:text-accent md:group-hover:text-accent-foreground transition-colors"
+                        : "text-foreground",
                       big ? "text-lg sm:text-2xl" : "text-sm sm:text-base"
                     )}
                   >
