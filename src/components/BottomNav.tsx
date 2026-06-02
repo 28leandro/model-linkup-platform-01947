@@ -28,7 +28,7 @@ const BottomNav = () => {
   };
 
   const itemClass = (active: boolean) =>
-    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium transition-colors rounded-md mx-0.5 active:bg-primary/15 active:text-primary ${
+    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium transition-colors rounded-md mx-0.5 active:bg-accent active:text-accent-foreground ${
       active ? "text-primary" : "text-muted-foreground"
     }`;
 
@@ -72,7 +72,9 @@ const BottomNav = () => {
             aria-label={t("nav.postAd")}
             className={itemClass(isActive("/post-ad"))}
           >
-            <Plus className="h-5 w-5" />
+            <span className="flex items-center justify-center h-7 w-7 rounded-lg bg-primary text-primary-foreground">
+              <Plus className="h-4 w-4" />
+            </span>
             <span>{t("nav.postAd")}</span>
           </Link>
 

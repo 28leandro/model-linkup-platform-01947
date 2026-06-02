@@ -1,19 +1,18 @@
-## Alterações na BottomNav (mobile)
+## Alterações em `src/components/BottomNav.tsx` (somente mobile)
 
-**Arquivo:** `src/components/BottomNav.tsx`
+### 1. Efeito de toque igual aos botões "ubicación" e "km"
+Esses botões usam `variant="outline"` do shadcn, cujo efeito é `hover:bg-accent hover:text-accent-foreground` (fundo cinza suave do tema, sem tom primário).
 
-### 1. Alinhar o botão "Publicar" com os demais
-- Remover o estilo destacado (círculo grande elevado com `-mt-5`, `ring-4`, sombra).
-- Transformar o "Publicar" em um item normal da barra, igual aos outros (ícone + label, mesma altura, mesmo tamanho de fonte).
-- Manter o ícone `Plus` e o label `t("nav.postAd")`, mas usando a mesma classe `itemClass` dos demais.
-- Resultado: 5 itens uniformes na mesma linha — Início, Buscar, Publicar, Chat, Menu.
+- Trocar no `itemClass` o atual `active:bg-primary/15 active:text-primary` por `active:bg-accent active:text-accent-foreground`.
+- Manter o estado de rota ativa com `text-primary` (continua sinalizando a página atual).
+- Sem estado permanente — o efeito aparece só enquanto o dedo está pressionando.
 
-### 2. Cor ao tocar nos demais comandos
-- Atualizar `itemClass` para que TODOS os itens (incluindo agora o Publicar) reajam ao toque com uma cor visível.
-- Usar estado `active:` do Tailwind: `active:bg-primary/10 active:text-primary` (substituindo o atual `active:bg-accent/10 active:text-accent` que pode estar pouco visível).
-- O efeito aparece apenas no momento do toque e desaparece ao soltar — sem estado permanente.
-- Item ativo da rota continua com `text-primary` para indicar a página atual.
+### 2. Botão "+" dentro de quadrado arredondado com cor fixa
+- Manter o "Publicar" alinhado na mesma barra que os outros (mesma altura, mesmo tamanho de fonte) — não voltar ao círculo elevado.
+- O ícone `Plus` passa a ficar dentro de um pequeno quadrado de cantos arredondados (`rounded-lg`), com cor de fundo fixa (`bg-primary text-primary-foreground`), tamanho aproximado `h-7 w-7`, ícone `h-4 w-4`.
+- O label `Publicar` continua abaixo, no mesmo tamanho dos demais.
+- Esse quadrado mantém a cor fixa sempre (não muda com toque nem com rota), apenas o label segue a regra normal dos demais itens.
 
 ### Sem alterações
-- Nenhuma mudança em desktop (a barra continua `md:hidden`).
-- Sem mudanças em `RecentListings.tsx` nem em outros arquivos.
+- Nada muda em desktop, em `RecentListings.tsx` ou em outros arquivos.
+- Nenhuma alteração de lógica/navegação.
