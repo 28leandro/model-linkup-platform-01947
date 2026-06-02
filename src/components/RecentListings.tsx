@@ -27,14 +27,14 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
   return (
     <div className="container mx-auto px-2 sm:px-3 py-6 sm:py-8">
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t('listings.recent')}</h2>
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 xs:gap-3 sm:gap-4 lg:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-6">
         {listings.map((listing) => (
-          <div key={listing.id} className="group relative hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden">
-            <div className="absolute top-2 right-2 z-10">
+          <div key={listing.id} className="group relative w-full hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden border">
+            <div className="absolute top-1.5 right-1.5 z-10">
               <FavoriteButton listingId={listing.id} className="bg-background/80 backdrop-blur-sm" />
             </div>
             <Link to={`/listing/${listing.id}`}>
-              <div className="overflow-hidden bg-muted aspect-[5/4] md:aspect-video">
+              <div className="overflow-hidden bg-muted aspect-square lg:aspect-video">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
@@ -52,15 +52,15 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                   </div>
                 )}
               </div>
-              <div className="p-3 sm:p-4">
-                <div className="flex items-center gap-1.5 mb-1.5">
+              <div className="p-2 sm:p-3 lg:p-4">
+                <div className="flex items-center gap-1 mb-1 flex-wrap">
                   {(() => {
                     const b = getCategoryBadge(listing.type, isPt);
                     if (!b) return null;
                     const { Icon, label } = b;
                     return (
-                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                        <Icon className="h-3.5 w-3.5" />
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium text-muted-foreground">
+                        <Icon className="h-3 w-3" />
                         {label}
                       </span>
                     );
@@ -69,15 +69,15 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                     const cond = getConditionMeta((listing as any).condition);
                     if (!cond) return null;
                     return (
-                      <span className={cn("inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-medium", cond.color)}>
+                      <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium", cond.color)}>
                         {isPt ? cond.label_pt : cond.label_es}
                       </span>
                     );
                   })()}
                 </div>
-                <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
+                <h3 className="font-medium text-sm sm:text-base lg:text-lg mb-1 line-clamp-2">{listing.title}</h3>
                 {listing.price && listing.price > 0 && (
-                  <p className="text-primary font-bold text-sm sm:text-base mb-1">
+                  <p className="text-primary font-bold text-sm lg:text-base mb-1">
                     {formatPrice(listing.price, (listing as any).currency)}
                   </p>
                 )}
@@ -86,7 +86,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                   mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
                   fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
                 />
-                <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getPublicCity(listing)}</p>
+                <p className="text-[11px] sm:text-xs lg:text-sm text-muted-foreground mt-1.5 line-clamp-1">{getPublicCity(listing)}</p>
               </div>
             </Link>
           </div>
