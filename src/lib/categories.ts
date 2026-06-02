@@ -115,8 +115,7 @@ export const CATEGORIES: Category[] = [
     desc_es: "Venta y alquiler de propiedades",
     desc_pt: "Venda e aluguel de propriedades",
     icon: Home,
-    accent: "from-accent/0 to-accent/0 md:group-hover:from-accent md:group-hover:to-accent",
-    ghost: true,
+    accent: "from-transparent to-transparent group-hover:from-accent group-hover:to-accent group-hover:text-accent-foreground",
     subcategories: [
       { id: "casa",        label_es: "Casa",            label_pt: "Casa",            icon: Home },
       { id: "departamento", label_es: "Departamento",   label_pt: "Departamento",    icon: Building2 },
@@ -159,8 +158,7 @@ export const CATEGORIES: Category[] = [
     desc_es: "Ropa, accesorios, perfumes",
     desc_pt: "Roupas, acessórios, perfumes",
     icon: Shirt,
-    accent: "from-accent/0 to-accent/0 md:group-hover:from-accent md:group-hover:to-accent",
-    ghost: true,
+    accent: "from-transparent to-transparent group-hover:from-accent group-hover:to-accent group-hover:text-accent-foreground",
     subcategories: [
       { id: "masculino",  label_es: "Roupas",           label_pt: "Roupas",           icon: Shirt },
       { id: "feminino",   label_es: "Calzados",         label_pt: "Calçados",         icon: Footprints },
@@ -193,8 +191,7 @@ export const CATEGORIES: Category[] = [
     desc_es: "Informática, celulares, gaming y más",
     desc_pt: "Informática, celulares, gaming e mais",
     icon: Cpu,
-    accent: "from-accent/0 to-accent/0 md:group-hover:from-accent md:group-hover:to-accent",
-    ghost: true,
+    accent: "from-transparent to-transparent group-hover:from-accent group-hover:to-accent group-hover:text-accent-foreground",
     subcategories: [
       { id: "informatica",   label_es: "Informática y Tablets",  label_pt: "Informática e Tablets", icon: Laptop,     brands: ["Apple", "Samsung", "Lenovo", "HP", "Dell", "Asus"] },
       { id: "celulares",     label_es: "Celulares y Smartphones", label_pt: "Celulares e Smartphones", icon: Smartphone, brands: ["iPhone", "Samsung Galaxy", "Xiaomi", "Motorola", "Huawei"] },
