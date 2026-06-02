@@ -67,8 +67,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
       </Button>
       <Button
         size={mobile ? "lg" : "default"}
-        variant="outline"
-        className={`flex items-center gap-2 bg-transparent border-input text-foreground transition-colors hover:bg-primary hover:text-primary-foreground hover:border-primary ${mobile ? "w-full justify-start" : ""}`}
+        className={`flex items-center gap-2 transition-colors hover:bg-accent hover:text-accent-foreground ${mobile ? "w-full justify-start" : ""}`}
         onClick={() => {
           setMobileMenuOpen(false);
           if (user) {
@@ -124,9 +123,8 @@ const Header = ({ onLoginClick }: HeaderProps) => {
             </div>
             <Button
               type="button"
-              variant="outline"
               size="icon"
-              className="h-10 w-10 rounded-full shrink-0 bg-transparent border-input text-foreground transition-colors hover:bg-primary hover:text-primary-foreground hover:border-primary"
+              className="h-10 w-10 rounded-full shrink-0 transition-colors hover:bg-accent hover:text-accent-foreground"
               onClick={() =>
                 window.dispatchEvent(new CustomEvent("global-search", { detail: desktopQuery }))
               }
