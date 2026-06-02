@@ -29,7 +29,7 @@ const BottomNav = () => {
 
   const itemClass = (active: boolean) =>
     `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium transition-colors rounded-md mx-0.5 active:bg-accent active:text-accent-foreground ${
-      active ? "bg-primary/10 text-primary font-semibold" : "text-muted-foreground"
+      active ? "text-primary" : "text-foreground"
     }`;
 
   return (
