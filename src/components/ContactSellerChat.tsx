@@ -141,9 +141,7 @@ const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, o
           >
             {isLoading && <p className="text-xs text-muted-foreground">Cargando…</p>}
             {!isLoading && messages.length === 0 && (
-              <p className="text-xs text-muted-foreground">
-                Aún no hay mensajes. Inicia la conversación sobre "{listingTitle}".
-              </p>
+              <div className="flex-1 flex items-center justify-center" />
             )}
             {messages.map((m) => {
               const mine = m.sender_id === currentUserId;
