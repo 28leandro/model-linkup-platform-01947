@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { LogIn, LogOut, Heart, MapPin } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import { LoginDialog } from "@/components/LoginDialog";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 
 const BottomNav = () => {
   const { t } = useLanguage();
@@ -15,6 +16,7 @@ const BottomNav = () => {
   const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const unreadCount = useUnreadMessages();
 
   // If we're viewing a listing, focus the map on that listing
   const listingMatch = location.pathname.match(/^\/listing\/([^/]+)/);
@@ -79,7 +81,17 @@ const BottomNav = () => {
           </Link>
 
           <Link to="/inbox" className={itemClass(isActive("/inbox"))} aria-label={t("nav.chat")}>
-            <MessageCircle className="h-5 w-5" />
+            <span className="relative">
+              <MessageCircle className="h-5 w-5" />
+              {unreadCount > 0 && (
+                <span
+                  className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center leading-none"
+                  aria-label={`${unreadCount} mensagens não lidas`}
+                >
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+            </span>
             <span>{t("nav.chat")}</span>
           </Link>
 
