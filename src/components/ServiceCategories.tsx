@@ -12,13 +12,17 @@ const ServiceCategories = () => {
       <div className="flex gap-2 sm:gap-3 overflow-x-auto -mx-3 px-3 sm:-mx-4 sm:px-4 snap-x snap-mandatory [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {CATEGORIES.map((cat, idx) => {
           const Icon = cat.icon;
+          const neutralIds = new Set(["real-estate", "fashion", "tech"]);
+          const isNeutral = neutralIds.has(cat.id);
           const isBlue = idx % 2 === 0;
           return (
             <Link
               key={cat.id}
               to={`/category/${cat.id}`}
               className={`snap-start shrink-0 group flex items-center gap-2 rounded-full border px-3 py-2 bg-card text-foreground transition-all ${
-                isBlue
+                isNeutral
+                  ? "hover:bg-accent hover:text-accent-foreground"
+                  : isBlue
                   ? "hover:bg-primary hover:text-primary-foreground"
                   : "hover:bg-destructive hover:text-destructive-foreground"
               }`}
