@@ -28,7 +28,7 @@ const BottomNav = () => {
   };
 
   const itemClass = (active: boolean) =>
-    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium transition-colors rounded-md mx-0.5 active:bg-accent/10 active:text-accent ${
+    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium transition-colors rounded-md mx-0.5 active:bg-primary/15 active:text-primary ${
       active ? "text-primary" : "text-muted-foreground"
     }`;
 
@@ -61,27 +61,20 @@ const BottomNav = () => {
             <span>{t("nav.search")}</span>
           </button>
 
-          {/* Centered highlighted Anunciar */}
-          <div className="flex-1 flex items-start justify-center">
-            <Link
-              to={user ? "/post-ad" : "#"}
-              onClick={(e) => {
-                if (!user) {
-                  e.preventDefault();
-                  setLoginOpen(true);
-                }
-              }}
-              aria-label={t("nav.postAd")}
-              className="-mt-5 flex flex-col items-center justify-center"
-            >
-              <span className="h-12 w-12 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center ring-4 ring-background">
-                <Plus className="h-6 w-6" />
-              </span>
-              <span className="mt-0.5 text-[10px] font-medium text-primary">
-                {t("nav.postAd")}
-              </span>
-            </Link>
-          </div>
+          <Link
+            to={user ? "/post-ad" : "#"}
+            onClick={(e) => {
+              if (!user) {
+                e.preventDefault();
+                setLoginOpen(true);
+              }
+            }}
+            aria-label={t("nav.postAd")}
+            className={itemClass(isActive("/post-ad"))}
+          >
+            <Plus className="h-5 w-5" />
+            <span>{t("nav.postAd")}</span>
+          </Link>
 
           <Link to="/inbox" className={itemClass(isActive("/inbox"))} aria-label={t("nav.chat")}>
             <MessageCircle className="h-5 w-5" />
