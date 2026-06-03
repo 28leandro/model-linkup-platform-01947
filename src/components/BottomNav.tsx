@@ -43,7 +43,7 @@ const BottomNav = () => {
       >
         <div className="flex items-stretch justify-around h-full px-2">
           <Link to="/" className={itemClass(isActive("/"))} aria-label={t("header.home") || "Início"}>
-            <Home className="h-5 w-5" />
+            <Home className="h-6 w-6" />
             <span>{t("nav.home")}</span>
           </Link>
 
@@ -59,7 +59,7 @@ const BottomNav = () => {
             className={itemClass(false)}
             aria-label={t("nav.search")}
           >
-            <Search className="h-5 w-5" />
+            <Search className="h-6 w-6" />
             <span>{t("nav.search")}</span>
           </button>
 
@@ -74,15 +74,15 @@ const BottomNav = () => {
             aria-label={t("nav.postAd")}
             className={itemClass(isActive("/post-ad"))}
           >
-            <span className="flex items-center justify-center h-7 w-7 rounded-lg bg-primary text-primary-foreground">
-              <Plus className="h-4 w-4" />
+            <span className="flex items-center justify-center h-8 w-8 rounded-lg bg-primary text-primary-foreground">
+              <Plus className="h-5 w-5" />
             </span>
             <span>{t("nav.postAd")}</span>
           </Link>
 
           <Link to="/inbox" className={itemClass(isActive("/inbox"))} aria-label={t("nav.chat")}>
             <span className="relative">
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-6 w-6" />
               {unreadCount > 0 && (
                 <span
                   className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold flex items-center justify-center leading-none"
@@ -98,7 +98,7 @@ const BottomNav = () => {
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
               <button className={itemClass(false)} aria-label={t("nav.menu")}>
-                <Menu className="h-5 w-5" />
+                <Menu className="h-6 w-6" />
                 <span>{t("nav.menu")}</span>
               </button>
             </SheetTrigger>
