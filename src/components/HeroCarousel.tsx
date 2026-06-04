@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -86,6 +86,10 @@ const HeroCarousel = () => {
   const { language } = useLanguage();
   const isPt = language === "pt";
   const [index, setIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
 
   useEffect(() => {
     const t = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 6000);
@@ -95,12 +99,52 @@ const HeroCarousel = () => {
   const go = (dir: number) =>
     setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
 
+  const handleDragStart = (clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setTranslateX(0);
+  };
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDragging) return;
+    const diff = clientX - startX;
+    setTranslateX(diff);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (translateX > 50) {
+      go(-1);
+    } else if (translateX < -50) {
+      go(1);
+    }
+    setTranslateX(0);
+  };
+
   return (
     <section className="container mx-auto px-3 sm:px-4 pt-4">
-      <div className="relative overflow-hidden rounded-2xl border shadow-sm" style={{ maxHeight: 250 }}>
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden rounded-2xl border shadow-sm select-none touch-pan-y"
+        style={{ maxHeight: 250 }}
+        onMouseDown={(e) => handleDragStart(e.clientX)}
+        onMouseMove={(e) => handleDragMove(e.clientX)}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={handleDragEnd}
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+        onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+        onTouchEnd={handleDragEnd}
+      >
         <div
-          className="flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${index * 100}%)` }}
+          className={cn(
+            "flex transition-transform duration-500 ease-out",
+            isDragging && "duration-0"
+          )}
+          style={{
+            transform: `translateX(calc(-${index * 100}% + ${translateX}px))`,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
         >
           {SLIDES.map((s) => (
             <div
