@@ -124,10 +124,27 @@ const HeroCarousel = () => {
 
   return (
     <section className="container mx-auto px-3 sm:px-4 pt-4">
-      <div className="relative overflow-hidden rounded-2xl border shadow-sm" style={{ maxHeight: 250 }}>
+      <div
+        ref={containerRef}
+        className="relative overflow-hidden rounded-2xl border shadow-sm select-none"
+        style={{ maxHeight: 250 }}
+        onMouseDown={(e) => handleDragStart(e.clientX)}
+        onMouseMove={(e) => handleDragMove(e.clientX)}
+        onMouseUp={handleDragEnd}
+        onMouseLeave={handleDragEnd}
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
+        onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+        onTouchEnd={handleDragEnd}
+      >
         <div
-          className="flex transition-transform duration-500 ease-out"
-          style={{ transform: `translateX(-${index * 100}%)` }}
+          className={cn(
+            "flex transition-transform duration-500 ease-out",
+            isDragging && "duration-0"
+          )}
+          style={{
+            transform: `translateX(calc(-${index * 100}% + ${translateX}px))`,
+            cursor: isDragging ? "grabbing" : "grab",
+          }}
         >
           {SLIDES.map((s) => (
             <div
