@@ -86,6 +86,10 @@ const HeroCarousel = () => {
   const { language } = useLanguage();
   const isPt = language === "pt";
   const [index, setIndex] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [translateX, setTranslateX] = useState(0);
 
   useEffect(() => {
     const t = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 6000);
@@ -94,6 +98,29 @@ const HeroCarousel = () => {
 
   const go = (dir: number) =>
     setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
+
+  const handleDragStart = (clientX: number) => {
+    setIsDragging(true);
+    setStartX(clientX);
+    setTranslateX(0);
+  };
+
+  const handleDragMove = (clientX: number) => {
+    if (!isDragging) return;
+    const diff = clientX - startX;
+    setTranslateX(diff);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+    if (translateX > 50) {
+      go(-1);
+    } else if (translateX < -50) {
+      go(1);
+    }
+    setTranslateX(0);
+  };
 
   return (
     <section className="container mx-auto px-3 sm:px-4 pt-4">
