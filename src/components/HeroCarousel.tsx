@@ -176,14 +176,14 @@ const HeroCarousel = () => {
         <button
           aria-label="Previous slide"
           onClick={() => go(-1)}
-          className="absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 hover:bg-white shadow flex items-center justify-center text-foreground transition"
+          className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 hover:bg-white shadow items-center justify-center text-foreground transition"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
         <button
           aria-label="Next slide"
           onClick={() => go(1)}
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 hover:bg-white shadow flex items-center justify-center text-foreground transition"
+          className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 h-9 w-9 rounded-full bg-white/80 hover:bg-white shadow items-center justify-center text-foreground transition"
         >
           <ChevronRight className="h-5 w-5" />
         </button>
