@@ -28,8 +28,8 @@ const SLIDES: Slide[] = [
     id: "clinica-la",
     title_es: "Lipoplastia mínimamente invasiva",
     title_pt: "Lipoplastia minimamente invasiva",
-    subtitle_es: "Clínica cirúrgica plástica Spa — LA",
-    subtitle_pt: "Clínica cirúrgica plástica Spa — LA",
+    subtitle_es: "Clínica cirúrgica Spa — LA",
+    subtitle_pt: "Clínica cirúrgica Spa — LA",
     cta_es: "Saber más",
     cta_pt: "Saiba mais",
     href: "/category/services",
@@ -218,7 +218,7 @@ const HeroCarousel = () => {
               )}
               {s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
-                  <h2 className="absolute top-3 sm:top-6 left-4 sm:left-10 right-4 sm:right-10 text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm max-w-md">
+                  <h2 className="absolute top-1 sm:top-4 left-4 sm:left-10 right-4 sm:right-10 text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm max-w-md">
                     {isPt ? s.title_pt : s.title_es}
                   </h2>
                   <p className="absolute bottom-3 sm:bottom-6 right-4 sm:right-10 text-xs sm:text-base text-white/90 text-right max-w-[60%]">
