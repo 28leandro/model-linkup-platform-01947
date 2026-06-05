@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import upapLogo from "@/assets/upap-logo.png";
 import smartfitLogo from "@/assets/smartfit-logo.png";
+import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
 
 interface Slide {
   id: string;
@@ -19,9 +20,22 @@ interface Slide {
   accent: string;
   logo?: string;
   confetti?: boolean;
+  bgImage?: string;
 }
 
 const SLIDES: Slide[] = [
+  {
+    id: "clinica-la",
+    title_es: "Lipoplastia mínimamente invasiva",
+    title_pt: "Lipoplastia minimamente invasiva",
+    subtitle_es: "Clínica cirúrgica plástica Spa — LA",
+    subtitle_pt: "Clínica cirúrgica plástica Spa — LA",
+    cta_es: "Saber más",
+    cta_pt: "Saiba mais",
+    href: "/category/services",
+    accent: "from-[#0b1430] via-[#101a3d] to-[#070d22]",
+    bgImage: clinicaLaBanner,
+  },
   {
     id: "upap",
     title_es: "UPAP",
