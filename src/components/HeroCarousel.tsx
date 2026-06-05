@@ -168,7 +168,15 @@ const HeroCarousel = () => {
                 s.accent
               )}
             >
-              <div className="absolute inset-0 bg-black/10" aria-hidden />
+              {s.bgImage && (
+                <img
+                  src={s.bgImage}
+                  alt=""
+                  aria-hidden
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+              )}
+              <div className={cn("absolute inset-0", s.bgImage ? "bg-black/40" : "bg-black/10")} aria-hidden />
               {s.confetti && (
                 <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
                   {Array.from({ length: 28 }).map((_, i) => {
