@@ -216,15 +216,15 @@ const HeroCarousel = () => {
                   className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 h-24 sm:h-36 md:h-44 w-auto drop-shadow-xl object-contain hidden sm:block"
                 />
               )}
-              <div className="relative h-full w-full flex flex-col justify-center px-6 sm:px-10 max-w-3xl">
-                <h2 className="text-xl sm:text-3xl md:text-4xl font-bold leading-tight drop-shadow-sm">
+              <div className="relative h-full w-full flex flex-col justify-center px-4 sm:px-10 max-w-3xl">
+                <h2 className="text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm">
                   {isPt ? s.title_pt : s.title_es}
                 </h2>
-                <p className="mt-2 text-sm sm:text-base text-white/90 max-w-md">
+                <p className="mt-1 text-xs sm:text-base text-white/90 max-w-md">
                   {isPt ? s.subtitle_pt : s.subtitle_es}
                 </p>
-                <div className="mt-4">
-                  <Button asChild variant="secondary" size="sm" className="bg-white text-foreground hover:bg-white/90">
+                <div className="mt-2 sm:mt-4">
+                  <Button asChild variant="secondary" size="sm" className="bg-white text-foreground hover:bg-white/90 text-xs sm:text-sm h-7 sm:h-9">
                     {s.href.startsWith("http") ? (
                       <a href={s.href} target="_blank" rel="noopener noreferrer">
                         {isPt ? s.cta_pt : s.cta_es}
