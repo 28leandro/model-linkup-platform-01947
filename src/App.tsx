@@ -17,11 +17,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import BottomNav from "@/components/BottomNav";
+import SplashScreen from "@/components/SplashScreen";
 
 function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
+        <SplashScreen />
         <div className="pb-16 md:pb-0">
         <Routes>
         <Route path="/" element={<Index />} />
