@@ -6,6 +6,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Car, Home, Wrench, Ruler } from "lucide-react";
 import { formatPrice } from "@/lib/formatPrice";
 import { getPublicCity } from "@/lib/utils";
+import { useMemo } from "react";
+import { getCheapestIds, priceClass } from "@/lib/cheapest";
 
 const AREA_SUBS = ["terreno","comercial","quinta","estancia","oficina","edificio"];
 
@@ -38,6 +40,7 @@ interface SearchResultsProps {
 
 const SearchResults = ({ listings }: SearchResultsProps) => {
   const { t } = useLanguage();
+  const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
 
   return (
     <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
@@ -77,7 +80,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                 </div>
                 <h3 className="font-medium text-base sm:text-lg mb-2 line-clamp-2">{listing.title}</h3>
                 {listing.price && listing.price > 0 && (
-                  <p className="text-primary font-bold text-sm sm:text-base mb-1">
+                  <p className={`${priceClass(cheapestIds.has(listing.id))} font-bold text-sm sm:text-base mb-1`}>
                     {formatPrice(listing.price, (listing as any).currency)}
                   </p>
                 )}
