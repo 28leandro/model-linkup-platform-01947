@@ -155,7 +155,7 @@ const FavoriteThings = () => {
                     />
                     <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getPublicCity(listing)}</p>
                     {listing.price && (
-                      <p className="font-bold text-neutral-900 dark:text-neutral-100 mt-2">
+                      <p className="font-bold text-foreground mt-2">
                         {formatPrice(listing.price, (listing as any).currency)}
                       </p>
                     )}
