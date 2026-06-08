@@ -120,7 +120,7 @@ const MyListings = () => {
                 <Link to={`/listing/${l.id}`} className="font-medium line-clamp-2 hover:underline">
                   {l.title}
                 </Link>
-                <p className="text-sm text-primary font-semibold">
+                <p className="text-sm text-neutral-900 dark:text-neutral-100 font-semibold">
                   {l.price ? formatPrice(l.price, l.currency as any) : "—"}
                 </p>
                 <p className="text-xs text-muted-foreground line-clamp-1">{l.location}</p>
