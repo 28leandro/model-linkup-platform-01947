@@ -297,6 +297,15 @@ const SimilarListings = ({
   const isVehicleView = sameVehicleCategory({ type, category });
   const cityName = (location || "").split(",")[0]?.split("-").pop()?.trim() || location || "";
 
+  // Highlight the cheapest among similar items (already category+region peers).
+  const cheapestIds = (() => {
+    const valid = items.filter((i) => i.price && i.price > 0);
+    if (valid.length < 2) return new Set<string>();
+    let cheapest = valid[0];
+    for (const i of valid) if (Number(i.price) < Number(cheapest.price)) cheapest = i;
+    return new Set<string>([cheapest.id]);
+  })();
+
   if (loading) return null;
   if (items.length === 0) {
     if (isVehicleView) {
@@ -386,7 +395,7 @@ const SimilarListings = ({
               </div>
               <div className="p-2">
                 {item.price && item.price > 0 && (
-                  <p className="text-primary font-semibold text-xs sm:text-sm">
+                  <p className={`${priceClass(cheapestIds.has(item.id))} font-semibold text-xs sm:text-sm`}>
                     {formatPrice(item.price, item.currency || undefined)}
                   </p>
                 )}
