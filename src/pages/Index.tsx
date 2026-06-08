@@ -18,6 +18,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import MobileSearchDialog from "@/components/MobileSearchDialog";
 import { CATEGORIES } from "@/lib/categories";
+import { trackSearch } from "@/lib/cheapest";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -187,6 +188,7 @@ const Index = () => {
       return;
     }
     setHasSearched(true);
+    trackSearch(query);
 
     // Match query against category/subcategory ids and localized labels
     const matchedCategoryIds = new Set<string>();

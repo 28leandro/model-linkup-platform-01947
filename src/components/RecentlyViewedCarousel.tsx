@@ -84,7 +84,7 @@ const RecentlyViewedCarousel = () => {
                 {item.title}
               </p>
               {item.price && item.price > 0 && (
-                <p className="text-primary font-semibold text-xs sm:text-sm mt-1">
+                <p className="text-neutral-900 dark:text-neutral-100 font-semibold text-xs sm:text-sm mt-1">
                   {formatPrice(item.price, item.currency)}
                 </p>
               )}

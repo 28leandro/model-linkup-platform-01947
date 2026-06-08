@@ -403,7 +403,7 @@ const ListingDetail = () => {
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         {listing.realEstateType === 'rent' ? t('detail.rentPerMonth') : t('detail.price')}
                       </p>
-                      <div className="text-base sm:text-lg font-semibold text-primary">
+                      <div className="text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100">
                         <EditableField
                           value={listing.price}
                           type="number"
