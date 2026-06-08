@@ -35,8 +35,10 @@ const groupKey = (l: AnyListing): string | null => {
     return `re|${currency}|${loc}|${areaBucket(Number(area))}|${bedrooms ?? "na"}|${l.subcategory || ""}`;
   }
   // vehicles, electronics/tech, sports, others
-  if (!l.year) return null;
-  return `${type}|${currency}|${l.subcategory || ""}|${l.year}|${loc}`;
+  // Year is preferred but optional — fall back to "na" when missing so anúncios
+  // sem ano ainda formem grupos por categoria + região.
+  const year = l.year ?? "na";
+  return `${type}|${currency}|${l.subcategory || ""}|${year}|${loc}`;
 };
 
 export function getCheapestIds(listings: AnyListing[]): Set<string> {
