@@ -65,7 +65,7 @@ export function getCheapestIds(listings: AnyListing[]): Set<string> {
 
 /** Tailwind class for a price label. Cheapest → primary (highlight); else neutral dark. */
 export const priceClass = (isCheapest: boolean) =>
-  isCheapest ? "text-primary" : "text-neutral-900 dark:text-neutral-100";
+  isCheapest ? "text-primary" : "text-foreground";
 
 // --- Lightweight search history (for future personalization) ---
 const SEARCH_KEY = "recent_searches";
