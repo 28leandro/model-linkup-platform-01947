@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
 import FavoriteButton from "@/components/FavoriteButton";
+import { getCheapestIds, priceClass } from "@/lib/cheapest";
 
 interface SimilarListingsProps {
   currentId: string;
