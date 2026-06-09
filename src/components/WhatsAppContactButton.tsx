@@ -2,6 +2,9 @@ import { Button } from "@/components/ui/button";
 import { MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   listingId: string;
@@ -11,6 +14,8 @@ interface Props {
 
 const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }: Props) => {
   const [phone, setPhone] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let active = true;
@@ -29,17 +34,50 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
 
   const sanitized = phone.replace(/\D/g, "");
   if (!sanitized) return null;
-  const message = `Hola, estoy interesado en el anuncio "${listingTitle}"`;
+
+  const buyerMeta = (user?.user_metadata || {}) as Record<string, string>;
+  const buyerName = buyerMeta.name || user?.email?.split("@")[0] || "";
+  const buyerPhone = buyerMeta.phone || "";
+  const isReady = !!user && !!buyerPhone;
+
+  const listingLink = typeof window !== "undefined"
+    ? `${window.location.origin}/listing/${listingId}`
+    : `/listing/${listingId}`;
+
+  const message =
+    `Olá! Sou ${buyerName} e vi seu anúncio de '${listingTitle}' no site. Tenho interesse!\n\n` +
+    `Meu telefone/WhatsApp para contato é: ${buyerPhone}\n\n` +
+    `Link do anúncio: ${listingLink}`;
+
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
+
+  const handleBlocked = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!user) {
+      toast({
+        title: "Faça login para continuar",
+        description: "Você precisa estar logado para contatar o vendedor pelo WhatsApp.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toast({
+      title: "Telefone não cadastrado",
+      description: "Atualize seu perfil com um telefone válido antes de enviar a mensagem.",
+      variant: "destructive",
+    });
+    navigate("/account-settings");
+  };
 
   if (variant === "inline") {
     return (
       <Button
         asChild
-        className="rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0"
+        className={`rounded-full w-14 h-14 ${isReady ? "bg-green-500 hover:bg-green-600" : "bg-muted hover:bg-muted"} shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0`}
       >
         <a
-          href={url}
+          href={isReady ? url : "#"}
+          onClick={isReady ? undefined : handleBlocked}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contactar por WhatsApp"
@@ -56,11 +94,12 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
       <Button
         asChild
         size="icon"
-        className="h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-green-500 hover:bg-green-600 p-0"
+        className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full ${isReady ? "bg-green-500 hover:bg-green-600" : "bg-muted hover:bg-muted"} p-0`}
         title="Contactar por WhatsApp"
       >
         <a
-          href={url}
+          href={isReady ? url : "#"}
+          onClick={isReady ? undefined : handleBlocked}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contactar por WhatsApp"
@@ -74,10 +113,11 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
   return (
     <Button
       asChild
-        className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center z-50 transition-transform hover:scale-110 p-0"
+        className={`fixed bottom-24 right-4 sm:bottom-6 sm:right-6 rounded-full w-14 h-14 ${isReady ? "bg-green-500 hover:bg-green-600" : "bg-muted hover:bg-muted"} shadow-lg flex items-center justify-center z-50 transition-transform hover:scale-110 p-0`}
     >
       <a
-        href={url}
+        href={isReady ? url : "#"}
+        onClick={isReady ? undefined : handleBlocked}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"
