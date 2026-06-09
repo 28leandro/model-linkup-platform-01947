@@ -45,9 +45,9 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
     : `/listing/${listingId}`;
 
   const message =
-    `Olá! Sou ${buyerName} e vi seu anúncio de '${listingTitle}' no site. Tenho interesse!\n\n` +
-    `Meu telefone/WhatsApp para contato é: ${buyerPhone}\n\n` +
-    `Link do anúncio: ${listingLink}`;
+    `¡Hola! Soy ${buyerName} y vi tu anuncio de '${listingTitle}' en el sitio. ¡Me interesa!\n\n` +
+    `Mi teléfono/WhatsApp de contacto es: ${buyerPhone}\n\n` +
+    `Link del anuncio: ${listingLink}`;
 
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
 
@@ -55,15 +55,15 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
     e.preventDefault();
     if (!user) {
       toast({
-        title: "Faça login para continuar",
-        description: "Você precisa estar logado para contatar o vendedor pelo WhatsApp.",
+        title: "Inicia sesión para continuar",
+        description: "Necesitas estar logueado para contactar al vendedor por WhatsApp.",
         variant: "destructive",
       });
       return;
     }
     toast({
-      title: "Telefone não cadastrado",
-      description: "Atualize seu perfil com um telefone válido antes de enviar a mensagem.",
+      title: "Teléfono no registrado",
+      description: "Actualiza tu perfil con un teléfono válido antes de enviar el mensaje.",
       variant: "destructive",
     });
     navigate("/account-settings");
