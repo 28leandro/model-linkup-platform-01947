@@ -30,7 +30,7 @@ const BottomNav = () => {
   };
 
   const itemClass = (active: boolean) =>
-    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium rounded-md mx-0.5 border border-transparent transition-[border-color] duration-150 active:border-primary focus-visible:border-primary focus:outline-none ${
+    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium mx-0.5 focus:outline-none ${
       active ? "text-primary" : "text-foreground"
     }`;
 
