@@ -173,9 +173,6 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
               <cat.icon className="h-4 w-4 sm:h-5 sm:w-5" />
               {isPt ? cat.label_pt : cat.label_es}
             </h2>
-            <Link to={`/category/${cat.id}`} className="text-xs sm:text-sm text-muted-foreground hover:text-foreground">
-              {items.length}
-            </Link>
           </div>
           {renderGroupRow(cat.id, items)}
         </section>
