@@ -30,7 +30,9 @@ const BottomNav = () => {
   };
 
   const itemClass = (active: boolean) =>
-    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium mx-0.5 focus:outline-none rounded-lg border-2 border-transparent transition-[border-color] duration-150 active:border-primary focus-visible:border-primary text-foreground`;
+    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium mx-0.5 focus:outline-none transition-colors duration-150 active:text-primary ${
+      active ? "text-primary" : "text-foreground"
+    }`;
 
   return (
     <>
