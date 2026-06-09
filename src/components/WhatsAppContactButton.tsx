@@ -35,15 +35,18 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
   const sanitized = phone.replace(/\D/g, "");
   if (!sanitized) return null;
 
+  const cleanText = (value: string) => value.replace(/\s+/g, " ").trim();
+  const cleanPhone = (value: string) => value.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
   const buyerMeta = (user?.user_metadata || {}) as Record<string, string>;
-  const buyerName = buyerMeta.name || user?.email?.split("@")[0] || "";
-  const buyerPhone = buyerMeta.phone || "";
+  const buyerName = cleanText(buyerMeta.name || user?.email?.split("@")[0] || "");
+  const buyerPhone = cleanPhone(buyerMeta.phone || "");
   const isReady = !!user && !!buyerPhone;
 
-  const message =
-    `¡Hola! Soy ${buyerName} y vi tu anuncio de '${listingTitle}' en el sitio:\n\n` +
-    `https://nemu.com.py \n\n` +
-    `¡Me interesa! WhatsApp de contacto es: ${buyerPhone}`;
+  const message = [
+    `¡Hola! Soy ${buyerName} y vi tu anuncio de '${cleanText(listingTitle)}' en el sitio:`,
+    "https://nemu.com.py",
+    `¡Me interesa! WhatsApp de contacto es: ${buyerPhone}`,
+  ].join("\n\n");
 
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
 
