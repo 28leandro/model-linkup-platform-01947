@@ -30,7 +30,7 @@ const BottomNav = () => {
   };
 
   const itemClass = (active: boolean) =>
-    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium transition-colors rounded-md mx-0.5 active:bg-accent active:text-accent-foreground ${
+    `flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium rounded-md mx-0.5 border border-transparent transition-[border-color] duration-150 active:border-primary focus-visible:border-primary focus:outline-none ${
       active ? "text-primary" : "text-foreground"
     }`;
 
@@ -72,7 +72,9 @@ const BottomNav = () => {
               }
             }}
             aria-label={t("nav.postAd")}
-            className={itemClass(isActive("/post-ad"))}
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium mx-0.5 ${
+              isActive("/post-ad") ? "text-primary" : "text-foreground"
+            }`}
           >
             <span className="flex items-center justify-center h-8 w-8 rounded-lg bg-primary text-primary-foreground">
               <Plus className="h-5 w-5" />
