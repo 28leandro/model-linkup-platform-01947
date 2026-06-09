@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import { useMemo } from "react";
-import { Ruler } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Ruler, Plus, ArrowRight } from "lucide-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
 import { Listing } from "@/store/listingsStore";
@@ -21,12 +21,15 @@ const getCategoryBadge = (type?: string, isPt = false) => {
 
 interface RecentListingsProps {
   listings: Listing[];
+  initialLimit?: number;
+  expandMode?: "inline" | "route";
 }
 
-const RecentListings = ({ listings }: RecentListingsProps) => {
+const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: RecentListingsProps) => {
   const { t, language } = useLanguage();
   const isPt = language === "pt";
   const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const groups = useMemo(() => {
     return CATEGORIES.map((cat) => ({
@@ -105,6 +108,51 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
     </div>
   );
 
+  const renderSeeAllCard = (catId: string, remaining: number) => {
+    const handleClick = () => {
+      if (expandMode === "inline") setExpanded((s) => ({ ...s, [catId]: true }));
+    };
+    const inner = (
+      <div className="h-full w-full flex flex-col items-center justify-center gap-2 rounded-xl bg-gradient-to-br from-primary/10 via-muted/40 to-accent/10 border border-border/60 hover:border-primary/40 transition-colors p-4 text-center min-h-[180px]">
+        <div className="rounded-full bg-primary/15 p-3">
+          <Plus className="h-5 w-5 text-primary" />
+        </div>
+        <p className="text-sm sm:text-base font-medium text-foreground">{isPt ? "Ver tudo" : "Ver todo"}</p>
+        <p className="text-[11px] sm:text-xs text-muted-foreground inline-flex items-center gap-1">
+          +{remaining} <ArrowRight className="h-3 w-3" />
+        </p>
+      </div>
+    );
+    const wrapperCls = "group relative shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink cursor-pointer";
+    if (expandMode === "route") {
+      return (
+        <Link key={`see-all-${catId}`} to={`/category/${catId}`} className={wrapperCls}>
+          {inner}
+        </Link>
+      );
+    }
+    return (
+      <button key={`see-all-${catId}`} type="button" onClick={handleClick} className={wrapperCls + " text-left"}>
+        {inner}
+      </button>
+    );
+  };
+
+  const renderGroupRow = (catId: string, items: Listing[]) => {
+    const isExpanded = expanded[catId];
+    if (items.length <= initialLimit || isExpanded) {
+      return renderRow(items);
+    }
+    const visible = items.slice(0, initialLimit);
+    const remaining = items.length - initialLimit;
+    return (
+      <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {visible.map(renderCard)}
+        {renderSeeAllCard(catId, remaining)}
+      </div>
+    );
+  };
+
   return (
     <div className="container mx-auto px-2 sm:px-3 py-6 sm:py-8 space-y-8">
       {groups.map(({ cat, items }) => (
@@ -118,13 +166,13 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
               {items.length}
             </Link>
           </div>
-          {renderRow(items)}
+          {renderGroupRow(cat.id, items)}
         </section>
       ))}
       {uncategorized.length > 0 && (
         <section>
           <h2 className="text-lg sm:text-xl font-light tracking-tight mb-3 sm:mb-4">{t('listings.recent')}</h2>
-          {renderRow(uncategorized)}
+          {renderGroupRow("__uncategorized__", uncategorized)}
         </section>
       )}
     </div>
