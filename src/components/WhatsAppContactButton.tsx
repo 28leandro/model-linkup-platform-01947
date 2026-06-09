@@ -46,8 +46,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
 
   const message =
     `¡Hola! Soy ${buyerName} y vi tu anuncio de '${listingTitle}' en el sitio Nemu.com.py. ¡Me interesa!\n\n` +
-    `Mi teléfono/WhatsApp de contacto es: ${buyerPhone}\n\n` +
-    `Ver anuncio: ${listingLink}`;
+    `Mi teléfono/WhatsApp de contacto es: ${buyerPhone}`;
 
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
 
