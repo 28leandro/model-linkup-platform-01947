@@ -36,7 +36,7 @@ const RecentlyViewedCarousel = () => {
             to={`/listing/${item.id}`}
             className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink"
           >
-            <div className="aspect-square bg-muted overflow-hidden rounded-xl">
+            <div className="aspect-square lg:aspect-video bg-muted overflow-hidden rounded-xl">
               {item.image ? (
                 <img
                   src={item.image}
