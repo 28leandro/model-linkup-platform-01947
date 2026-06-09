@@ -4,7 +4,7 @@ import { MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
-import FavoriteButton from "@/components/FavoriteButton";
+import ListingImageCarousel from "@/components/ListingImageCarousel";
 import { getCheapestIds, priceClass } from "@/lib/cheapest";
 
 interface SimilarListingsProps {
@@ -334,32 +334,18 @@ const SimilarListings = ({
 
       <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item) => {
-          const img = Array.isArray(item.images) ? item.images[0] : undefined;
           return (
             <div key={item.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink">
-              <div className="absolute top-1.5 right-1.5 z-10">
-                <FavoriteButton
+              <div className="rounded-xl overflow-hidden">
+                <ListingImageCarousel
                   listingId={item.id}
-                  size="icon"
-                  className="h-8 w-8 bg-background/80 backdrop-blur-sm rounded-full"
+                  images={Array.isArray(item.images) ? item.images : []}
+                  title={item.title}
+                  href={`/listing/${item.id}`}
+                  noImageLabel={t("listings.noImage")}
                 />
               </div>
               <Link to={`/listing/${item.id}`} className="block">
-                <div className="aspect-square bg-muted overflow-hidden rounded-xl">
-                  {img ? (
-                    <img
-                      src={img}
-                      alt={item.title}
-                      loading="lazy"
-                      decoding="async"
-                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                      {t("listings.noImage")}
-                    </div>
-                  )}
-                </div>
                 <div className="pt-2 sm:pt-2.5 px-0.5">
                   <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
                     {item.title}
