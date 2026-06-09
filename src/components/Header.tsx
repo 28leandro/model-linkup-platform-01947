@@ -144,7 +144,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="icon" aria-label="Menú de usuario">
+                <Button variant="ghost" size="icon" aria-label="Menú de usuario" className="border-0">
                   <User className="w-4 h-4" />
                 </Button>
               </DropdownMenuTrigger>
