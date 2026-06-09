@@ -40,13 +40,9 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
   const buyerPhone = buyerMeta.phone || "";
   const isReady = !!user && !!buyerPhone;
 
-  const listingLink = typeof window !== "undefined"
-    ? `${window.location.origin}/listing/${listingId}`
-    : `/listing/${listingId}`;
-
   const message =
     `¡Hola! Soy ${buyerName} y vi tu anuncio de '${listingTitle}' en el sitio:\n\n` +
-    `https://nemu.com.py\n\n` +
+    `https://nemu.com.py \n\n` +
     `¡Me interesa! WhatsApp de contacto es: ${buyerPhone}`;
 
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
