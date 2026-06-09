@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import VehicleInfo from "@/components/VehicleInfo";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
-import FavoriteButton from "@/components/FavoriteButton";
+import ListingImageCarousel from "@/components/ListingImageCarousel";
 import { formatPrice } from "@/lib/formatPrice";
 import { getPublicCity } from "@/lib/utils";
 import { getCategoryById, getConditionMeta } from "@/lib/categories";
@@ -32,40 +32,28 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
 
   return (
     <div className="container mx-auto px-2 sm:px-3 py-6 sm:py-8">
-      <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">{t('listings.recent')}</h2>
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-6">
+      <h2 className="text-lg sm:text-xl font-light tracking-tight mb-3 sm:mb-4">{t('listings.recent')}</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {listings.map((listing) => (
-          <div key={listing.id} className="group relative w-full hover:shadow-md transition-shadow bg-card rounded-lg overflow-hidden border">
-            <div className="absolute top-1.5 right-1.5 z-10">
-              <FavoriteButton listingId={listing.id} className="bg-background/80 backdrop-blur-sm" />
+          <div key={listing.id} className="group relative w-full bg-transparent rounded-xl overflow-hidden">
+            <div className="rounded-xl overflow-hidden">
+              <ListingImageCarousel
+                listingId={listing.id}
+                images={listing.images || []}
+                title={listing.title}
+                href={`/listing/${listing.id}`}
+                noImageLabel={t('listings.noImage')}
+              />
             </div>
-            <Link to={`/listing/${listing.id}`}>
-              <div className="overflow-hidden bg-muted aspect-square lg:aspect-video">
-                {listing.images && listing.images.length > 0 ? (
-                  <img
-                    src={listing.images[0]}
-                    alt={`${listing.title} - foto principal`}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80';
-                    }}
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-muted text-muted-foreground">
-                    {t('listings.noImage')}
-                  </div>
-                )}
-              </div>
-              <div className="p-2 sm:p-3 lg:p-4">
+            <Link to={`/listing/${listing.id}`} className="block">
+              <div className="pt-2 sm:pt-2.5 px-0.5">
                 <div className="flex items-center gap-1 mb-1 flex-wrap">
                   {(() => {
                     const b = getCategoryBadge(listing.type, isPt);
                     if (!b) return null;
                     const { Icon, label } = b;
                     return (
-                      <span className="inline-flex items-center gap-0.5 rounded-full bg-muted px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium text-muted-foreground">
+                      <span className="inline-flex items-center gap-0.5 rounded-full bg-muted/60 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium text-muted-foreground">
                         <Icon className="h-3 w-3" />
                         {label}
                       </span>
@@ -81,9 +69,9 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                     );
                   })()}
                 </div>
-                <h3 className="font-medium text-sm sm:text-base lg:text-lg mb-1 line-clamp-2">{listing.title}</h3>
+                <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">{listing.title}</h3>
                 {listing.price && listing.price > 0 && (
-                  <p className={`${priceClass(cheapestIds.has(listing.id))} font-bold text-sm lg:text-base mb-1`}>
+                  <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0.5`}>
                     {formatPrice(listing.price, (listing as any).currency)}
                   </p>
                 )}
@@ -98,7 +86,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
                     {Number((listing as any).area).toLocaleString("es-PY")} m²
                   </p>
                 )}
-                <p className="text-[11px] sm:text-xs lg:text-sm text-muted-foreground mt-1.5 line-clamp-1">{getPublicCity(listing)}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">{getPublicCity(listing)}</p>
               </div>
             </Link>
           </div>
