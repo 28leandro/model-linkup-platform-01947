@@ -3,7 +3,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Send, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
@@ -28,8 +27,6 @@ interface Message {
 const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, onLoginRequired }: Props) => {
   const qc = useQueryClient();
   const [text, setText] = useState("");
-  const [guestName, setGuestName] = useState("");
-  const [guestContact, setGuestContact] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const queryKey = ["messages", listingId, currentUserId, sellerId];
@@ -51,27 +48,19 @@ const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, o
 
   const sendMutation = useMutation({
     mutationFn: async (content: string) => {
+      if (!currentUserId) throw new Error("Inicia sesión para enviar mensajes");
       const payload: any = {
         receiver_id: sellerId,
         ad_id: listingId,
         content,
+        sender_id: currentUserId,
       };
-      if (currentUserId) {
-        payload.sender_id = currentUserId;
-      } else {
-        payload.guest_name = guestName.trim();
-        payload.guest_contact = guestContact.trim();
-      }
       const { error } = await supabase.from("messages").insert(payload);
       if (error) throw error;
     },
     onSuccess: () => {
       setText("");
-      if (currentUserId) {
-        qc.invalidateQueries({ queryKey });
-      } else {
-        toast.success("Mensagem enviada! O vendedor entrará em contato.");
-      }
+      qc.invalidateQueries({ queryKey });
     },
     onError: (e: any) => toast.error(e.message || "Erro ao enviar mensaje"),
   });
@@ -114,14 +103,8 @@ const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, o
       return;
     }
     if (!currentUserId) {
-      if (!guestName.trim()) {
-        toast.error("Por favor, informe seu nome");
-        return;
-      }
-      if (!guestContact.trim() || guestContact.trim().length < 3) {
-        toast.error("Por favor, informe um email ou telefone válido");
-        return;
-      }
+      onLoginRequired?.();
+      return;
     }
     sendMutation.mutate(content);
   };
@@ -165,25 +148,6 @@ const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, o
           </div>
         )}
 
-        {!currentUserId && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-            <Input
-              value={guestName}
-              onChange={(e) => setGuestName(e.target.value)}
-              placeholder="Seu nome"
-              maxLength={100}
-              className="text-base sm:text-sm"
-            />
-            <Input
-              value={guestContact}
-              onChange={(e) => setGuestContact(e.target.value)}
-              placeholder="Email ou telefone"
-              maxLength={200}
-              className="text-base sm:text-sm"
-            />
-          </div>
-        )}
-
         <div className="flex flex-col sm:flex-row gap-2">
           <Textarea
             value={text}
@@ -208,7 +172,6 @@ const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, o
 
         {!currentUserId && (
           <p className="text-[11px] text-muted-foreground mt-2">
-            Envia sin registrarte.{" "}
             <button
               type="button"
               onClick={() => onLoginRequired?.()}
@@ -216,7 +179,7 @@ const ContactSellerChat = ({ listingId, listingTitle, sellerId, currentUserId, o
             >
               Iniciar sesión
             </button>{" "}
-            para ver respuestas en el chat.
+            para enviar un mensaje al vendedor.
           </p>
         )}
       </CardContent>
