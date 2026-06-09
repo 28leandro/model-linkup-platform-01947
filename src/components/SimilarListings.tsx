@@ -336,11 +336,7 @@ const SimilarListings = ({
         {items.map((item) => {
           const img = Array.isArray(item.images) ? item.images[0] : undefined;
           return (
-            <Link
-              key={item.id}
-              to={`/listing/${item.id}`}
-              className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink"
-            >
+            <div key={item.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink">
               <div className="absolute top-1.5 right-1.5 z-10">
                 <FavoriteButton
                   listingId={item.id}
@@ -348,41 +344,43 @@ const SimilarListings = ({
                   className="h-8 w-8 bg-background/80 backdrop-blur-sm rounded-full"
                 />
               </div>
-              <div className="aspect-square bg-muted overflow-hidden rounded-xl">
-                {img ? (
-                  <img
-                    src={img}
-                    alt={item.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                    {t("listings.noImage")}
-                  </div>
-                )}
-              </div>
-              <div className="pt-2 sm:pt-2.5 px-0.5">
-                <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
-                  {item.title}
-                </h3>
-                {item.price && item.price > 0 && (
-                  <p className={`${priceClass(cheapestIds.has(item.id))} font-semibold text-sm lg:text-base mb-0.5`}>
-                    {formatPrice(item.price, item.currency || undefined)}
+              <Link to={`/listing/${item.id}`} className="block">
+                <div className="aspect-square bg-muted overflow-hidden rounded-xl">
+                  {img ? (
+                    <img
+                      src={img}
+                      alt={item.title}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
+                      {t("listings.noImage")}
+                    </div>
+                  )}
+                </div>
+                <div className="pt-2 sm:pt-2.5 px-0.5">
+                  <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
+                    {item.title}
+                  </h3>
+                  {item.price && item.price > 0 && (
+                    <p className={`${priceClass(cheapestIds.has(item.id))} font-semibold text-sm lg:text-base mb-0.5`}>
+                      {formatPrice(item.price, item.currency || undefined)}
+                    </p>
+                  )}
+                  {item.location && (
+                    <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light flex items-center gap-1">
+                      <MapPin className="w-3 h-3 shrink-0" />
+                      <span className="truncate">{item.location}</span>
+                    </p>
+                  )}
+                  <p className="text-[10px] text-muted-foreground mt-0.5 font-light">
+                    {formatDate(item.created_at)}
                   </p>
-                )}
-                {item.location && (
-                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light flex items-center gap-1">
-                    <MapPin className="w-3 h-3 shrink-0" />
-                    <span className="truncate">{item.location}</span>
-                  </p>
-                )}
-                <p className="text-[10px] text-muted-foreground mt-0.5 font-light">
-                  {formatDate(item.created_at)}
-                </p>
-              </div>
-            </Link>
+                </div>
+              </Link>
+            </div>
           );
         })}
       </div>
