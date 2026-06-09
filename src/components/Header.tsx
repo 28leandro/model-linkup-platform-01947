@@ -82,10 +82,14 @@ const Header = ({ onLoginClick }: HeaderProps) => {
         {t('header.postAd')}
       </Button>
       {!user && (
-        <Button 
-          variant="ghost"
+        <Button
+          variant={mobile ? "ghost" : "outline"}
           size={mobile ? "lg" : "default"}
-          className={`flex items-center gap-2 transition-colors hover:bg-secondary hover:text-secondary-foreground ${mobile ? "w-full justify-start" : ""}`}
+          className={
+            mobile
+              ? "flex items-center gap-2 transition-colors hover:bg-secondary hover:text-secondary-foreground w-full justify-start"
+              : "flex items-center gap-2 bg-transparent text-foreground border-input transition-colors hover:bg-primary hover:text-primary-foreground hover:border-primary"
+          }
           onClick={() => {
             onLoginClick();
             setMobileMenuOpen(false);
