@@ -42,7 +42,7 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
   }, [listings]);
 
   const renderCard = (listing: Listing) => (
-    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[calc(50%-0.375rem)] sm:w-[calc(50%-0.5rem)] snap-start lg:w-auto lg:shrink">
+    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink">
       <div className="rounded-xl overflow-hidden">
         <ListingImageCarousel
           listingId={listing.id}
