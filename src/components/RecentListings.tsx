@@ -33,9 +33,9 @@ const RecentListings = ({ listings }: RecentListingsProps) => {
   return (
     <div className="container mx-auto px-2 sm:px-3 py-6 sm:py-8">
       <h2 className="text-lg sm:text-xl font-light tracking-tight mb-3 sm:mb-4">{t('listings.recent')}</h2>
-      <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 scrollbar-hide">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {listings.map((listing) => (
-          <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden flex-shrink-0 w-[75%] sm:w-[45%] snap-start lg:w-auto lg:flex-shrink">
+          <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden">
             <div className="rounded-xl overflow-hidden">
               <ListingImageCarousel
                 listingId={listing.id}
