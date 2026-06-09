@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
+import ListingImageCarousel from "@/components/ListingImageCarousel";
 
 const RecentlyViewedCarousel = () => {
   const { items, clear } = useRecentlyViewed();
@@ -31,41 +32,37 @@ const RecentlyViewedCarousel = () => {
 
       <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item) => (
-          <Link
+          <div
             key={item.id}
-            to={`/listing/${item.id}`}
             className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink"
           >
-            <div className="aspect-square lg:aspect-video bg-muted overflow-hidden rounded-xl">
-              {item.image ? (
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  loading="lazy"
-                  className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-xs text-muted-foreground">
-                  {t("listings.noImage")}
-                </div>
-              )}
+            <div className="rounded-xl overflow-hidden">
+              <ListingImageCarousel
+                listingId={item.id}
+                images={item.image ? [item.image] : []}
+                title={item.title}
+                href={`/listing/${item.id}`}
+                noImageLabel={t("listings.noImage")}
+              />
             </div>
-            <div className="pt-2 sm:pt-2.5 px-0.5">
-              <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
-                {item.title}
-              </h3>
-              {item.price && item.price > 0 && (
-                <p className="text-foreground font-semibold text-sm lg:text-base mb-0.5">
-                  {formatPrice(item.price, item.currency)}
-                </p>
-              )}
-              {item.location && (
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">
-                  {item.location}
-                </p>
-              )}
-            </div>
-          </Link>
+            <Link to={`/listing/${item.id}`} className="block">
+              <div className="pt-2 sm:pt-2.5 px-0.5">
+                <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
+                  {item.title}
+                </h3>
+                {item.price && item.price > 0 && (
+                  <p className="text-foreground font-semibold text-sm lg:text-base mb-0.5">
+                    {formatPrice(item.price, item.currency)}
+                  </p>
+                )}
+                {item.location && (
+                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">
+                    {item.location}
+                  </p>
+                )}
+              </div>
+            </Link>
+          </div>
         ))}
       </div>
     </section>
