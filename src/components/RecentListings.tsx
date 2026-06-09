@@ -140,15 +140,26 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
 
   const renderGroupRow = (catId: string, items: Listing[]) => {
     const isExpanded = expanded[catId];
-    if (items.length <= initialLimit || isExpanded) {
-      return renderRow(items);
-    }
-    const visible = items.slice(0, initialLimit);
+    const needsLimit = items.length > initialLimit && !isExpanded;
     const remaining = items.length - initialLimit;
     return (
       <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {visible.map(renderCard)}
-        {renderSeeAllCard(catId, remaining)}
+        {items.map((listing, idx) => {
+          // On mobile (<lg), hide items beyond initialLimit unless expanded.
+          // On desktop (lg+), always show every item.
+          const hideOnMobile = needsLimit && idx >= initialLimit;
+          if (!hideOnMobile) return renderCard(listing);
+          return (
+            <div key={listing.id} className="hidden lg:contents">
+              {renderCard(listing)}
+            </div>
+          );
+        })}
+        {needsLimit && (
+          <div className="contents lg:hidden">
+            {renderSeeAllCard(catId, remaining)}
+          </div>
+        )}
       </div>
     );
   };
