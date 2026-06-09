@@ -72,7 +72,9 @@ const BottomNav = () => {
               }
             }}
             aria-label={t("nav.postAd")}
-            className={itemClass(isActive("/post-ad"))}
+            className={`flex flex-col items-center justify-center gap-0.5 flex-1 h-full text-[10px] font-medium mx-0.5 ${
+              isActive("/post-ad") ? "text-primary" : "text-foreground"
+            }`}
           >
             <span className="flex items-center justify-center h-8 w-8 rounded-lg bg-primary text-primary-foreground">
               <Plus className="h-5 w-5" />
