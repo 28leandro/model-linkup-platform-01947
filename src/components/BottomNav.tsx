@@ -147,18 +147,18 @@ const BottomNav = () => {
                     {t("auth.logout")}
                   </Button>
                 ) : (
-                  <Button
-                    variant="default"
-                    size="lg"
-                    className="w-full justify-start flex items-center gap-2"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setLoginOpen(true);
-                    }}
-                  >
-                    <LogIn className="w-4 h-4" />
-                    {t("header.login")}
-                  </Button>
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full justify-start flex items-center gap-2 bg-transparent text-foreground border-input transition-colors hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    setLoginOpen(true);
+                  }}
+                >
+                  <LogIn className="w-4 h-4" />
+                  {t("header.login")}
+                </Button>
                 )}
               </div>
             </SheetContent>
