@@ -20,7 +20,7 @@ const ListingImageCarousel = ({
   images,
   title,
   href,
-  aspectClassName = "aspect-square lg:aspect-video",
+  aspectClassName = "aspect-square lg:aspect-[4/3]",
   noImageLabel,
 }: ListingImageCarouselProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
