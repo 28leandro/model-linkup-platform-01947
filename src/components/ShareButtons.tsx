@@ -19,7 +19,16 @@ const ShareButtons = ({ title, url }: ShareButtonsProps) => {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
   
-  const shareUrl = url || window.location.href;
+  // Always share via the canonical brand domain so previews show "nemu.com.py"
+  const CANONICAL_HOST = "https://www.nemu.com.py";
+  const rawUrl = url || window.location.href;
+  let shareUrl = rawUrl;
+  try {
+    const u = new URL(rawUrl);
+    shareUrl = `${CANONICAL_HOST}${u.pathname}${u.search}${u.hash}`;
+  } catch {
+    shareUrl = rawUrl;
+  }
   const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
 
