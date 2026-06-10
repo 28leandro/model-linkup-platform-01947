@@ -22,6 +22,7 @@ import { trackRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import ContactSellerChat from "@/components/ContactSellerChat";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 import SimilarListings from "@/components/SimilarListings";
+import SEO from "@/components/SEO";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -158,8 +159,38 @@ const ListingDetail = () => {
     );
   }
 
+  const seoTitle = `${listing.title} | NEMU.py`;
+  const seoDesc = (listing.description || `${listing.title} publicado en NEMU.py, el marketplace de Paraguay.`)
+    .toString()
+    .slice(0, 160);
+  const seoImage = listing.images && listing.images.length > 0 ? listing.images[0] : undefined;
+  const productLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: listing.title,
+    description: seoDesc,
+    image: seoImage,
+    offers: listing.price
+      ? {
+          "@type": "Offer",
+          price: listing.price,
+          priceCurrency: (listing as any).currency || "PYG",
+          availability: "https://schema.org/InStock",
+          url: `https://nemu.com.py/listing/${id}`,
+        }
+      : undefined,
+  };
+
   return (
     <>
+      <SEO
+        title={seoTitle}
+        description={seoDesc}
+        canonical={`/listing/${id}`}
+        ogType="product"
+        ogImage={seoImage}
+        structuredData={productLd}
+      />
       <Header onLoginClick={() => setShowLoginDialog(true)} />
       <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
       <div className="min-h-screen bg-background">

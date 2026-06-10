@@ -12,6 +12,42 @@ import ListingFilter, { SortOption, FilterOptions } from "@/components/ListingFi
 import { getPublicCity } from "@/lib/utils";
 import { getCategoryById } from "@/lib/categories";
 import { Badge } from "@/components/ui/badge";
+import SEO from "@/components/SEO";
+
+const CATEGORY_SEO: Record<string, { title: string; description: string }> = {
+  "vehicles": {
+    title: "Vehículos en venta en Paraguay | NEMU.py",
+    description: "Buscá autos, camionetas, motos y otros vehículos publicados en Paraguay. Compará opciones y contactá directamente con vendedores en NEMU.py.",
+  },
+  "real-estate": {
+    title: "Inmuebles en Paraguay | Casas, terrenos y departamentos | NEMU.py",
+    description: "Encontrá casas, departamentos, terrenos y propiedades en Paraguay. Explorá publicaciones actualizadas en NEMU.py.",
+  },
+  "real-estate-sale": {
+    title: "Inmuebles en venta en Paraguay | NEMU.py",
+    description: "Casas, departamentos y terrenos en venta en Paraguay. Publicaciones actualizadas en NEMU.py.",
+  },
+  "real-estate-rent": {
+    title: "Inmuebles en alquiler en Paraguay | NEMU.py",
+    description: "Casas, departamentos y propiedades en alquiler en Paraguay. Encontrá tu próximo hogar en NEMU.py.",
+  },
+  "services": {
+    title: "Servicios en Paraguay | NEMU.py",
+    description: "Descubrí servicios disponibles en Paraguay y contactá fácilmente con proveedores desde NEMU.py.",
+  },
+  "home-garden": {
+    title: "Hogar y Jardín en Paraguay | NEMU.py",
+    description: "Muebles, decoración y productos para el hogar y jardín en Paraguay. Encontrá lo que necesitás en NEMU.py.",
+  },
+  "tech": {
+    title: "Tecnología en Paraguay | NEMU.py",
+    description: "Celulares, computadoras, electrónica y tecnología en Paraguay. Compará y comprá en NEMU.py.",
+  },
+  "fashion": {
+    title: "Moda en Paraguay | NEMU.py",
+    description: "Ropa, calzado y accesorios en Paraguay. Publicaciones actualizadas en NEMU.py.",
+  },
+};
 
 const CategoryPage = () => {
   const { id } = useParams();
@@ -159,8 +195,18 @@ const CategoryPage = () => {
     }
   }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type, subFilter, meta]);
 
+  const seoEntry = CATEGORY_SEO[id || ""] ?? {
+    title: "Categoría | NEMU.py",
+    description: "Explorá publicaciones en NEMU.py, el marketplace de Paraguay para vehículos, inmuebles y servicios.",
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={seoEntry.title}
+        description={seoEntry.description}
+        canonical={`/category/${id || ""}`}
+      />
       <header className="bg-background shadow-sm sticky top-0 z-50">
         <div className="container mx-auto px-3 sm:px-4 py-3 sm:py-4">
           <Button asChild variant="ghost" size="sm" className="mb-2">

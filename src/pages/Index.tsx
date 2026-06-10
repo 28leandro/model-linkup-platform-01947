@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import MobileSearchDialog from "@/components/MobileSearchDialog";
 import { CATEGORIES } from "@/lib/categories";
 import { trackSearch } from "@/lib/cheapest";
+import SEO from "@/components/SEO";
 
 const Index = () => {
   const { t } = useLanguage();
@@ -333,6 +334,15 @@ const Index = () => {
 
   return (
     <div className="min-h-screen">
+      <SEO
+        title="NEMU.py | Marketplace de vehículos, inmuebles y servicios en Paraguay"
+        description="Encontrá vehículos, inmuebles y servicios en Paraguay. Publicá, buscá y contactá vendedores fácilmente desde NEMU.py."
+        canonical="/"
+        ogType="website"
+      />
+      <h1 className="sr-only">
+        Marketplace de vehículos, inmuebles y servicios en Paraguay
+      </h1>
       <Header onLoginClick={() => setLoginDialogOpen(true)} />
 
       <div className="container mx-auto px-3 sm:px-4 pt-4">

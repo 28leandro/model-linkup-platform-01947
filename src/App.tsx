@@ -13,6 +13,7 @@ import ResetPassword from "./pages/ResetPassword";
 import PagoparTest from "./pages/PagoparTest";
 import MyListings from "./pages/MyListings";
 import AccountSettings from "./pages/AccountSettings";
+import NotFound from "./pages/NotFound";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -42,6 +43,7 @@ function App() {
         <Route path="/pagopar-test" element={<PagoparTest />} />
         <Route path="/my-listings" element={<MyListings />} />
         <Route path="/account" element={<AccountSettings />} />
+        <Route path="*" element={<NotFound />} />
         </Routes>
         </div>
         <BottomNav />

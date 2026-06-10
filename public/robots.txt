@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Rutas privadas / autenticadas
+Disallow: /account
+Disallow: /my-listings
+Disallow: /inbox
+Disallow: /favorites
+Disallow: /post-ad
+Disallow: /auth/
+Disallow: /payment/
+Disallow: /payment-success
+Disallow: /photo-paywall
+Disallow: /pagopar-test
+
+Sitemap: https://nemu.com.py/sitemap.xml
