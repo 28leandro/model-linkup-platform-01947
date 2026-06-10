@@ -18,25 +18,31 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import BottomNav from "@/components/BottomNav";
-        <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/post-ad" element={<PostAd />} />
-        <Route path="/post-ad/:id" element={<PostAd />} />
-        <Route path="/listing/:id" element={<ListingDetail />} />
-        <Route path="/category/:id" element={<CategoryPage />} />
-        <Route path="/favorites" element={<FavoriteThings />} />
-        <Route path="/map" element={<MapView />} />
-        <Route path="/payment/success" element={<PaymentSuccess />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path="/refund-policy" element={<RefundPolicy />} />
-          <Route path="/photo-paywall" element={<PhotoPaywall />} />
-        <Route path="/inbox" element={<Inbox />} />
-        <Route path="/auth/reset-password" element={<ResetPassword />} />
-        <Route path="/pagopar-test" element={<PagoparTest />} />
-        <Route path="/my-listings" element={<MyListings />} />
-        <Route path="/account" element={<AccountSettings />} />
-        <Route path="*" element={<NotFound />} />
-        </Routes>
+
+function App() {
+  return (
+    <ErrorBoundary>
+      <AuthProvider>
+        <div className="pb-16 md:pb-0">
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/post-ad" element={<PostAd />} />
+            <Route path="/post-ad/:id" element={<PostAd />} />
+            <Route path="/listing/:id" element={<ListingDetail />} />
+            <Route path="/category/:id" element={<CategoryPage />} />
+            <Route path="/favorites" element={<FavoriteThings />} />
+            <Route path="/map" element={<MapView />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/photo-paywall" element={<PhotoPaywall />} />
+            <Route path="/inbox" element={<Inbox />} />
+            <Route path="/auth/reset-password" element={<ResetPassword />} />
+            <Route path="/pagopar-test" element={<PagoparTest />} />
+            <Route path="/my-listings" element={<MyListings />} />
+            <Route path="/account" element={<AccountSettings />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </div>
         <BottomNav />
         <Toaster />
