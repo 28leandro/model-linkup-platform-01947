@@ -47,11 +47,11 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
         {listings.length > 0 ? t('listings.searchResults') : t('search.noResults')}
       </h2>
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-8 gap-3 sm:gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-2 gap-3 sm:gap-4 lg:flex lg:flex-wrap">
         {listings.map((listing) => (
-          <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-card border overflow-hidden h-full flex flex-col">
+          <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-card border overflow-hidden h-full flex flex-col lg:w-[240px] lg:h-[360px] lg:flex-shrink-0">
             <Link to={`/listing/${listing.id}`} className="h-full flex flex-col">
-              <div className="aspect-[4/3] lg:aspect-[3/4] bg-muted overflow-hidden">
+              <div className="aspect-[4/3] lg:aspect-auto lg:h-[180px] lg:flex-shrink-0 bg-muted overflow-hidden">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
