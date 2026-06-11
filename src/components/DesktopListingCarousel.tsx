@@ -11,7 +11,7 @@ interface DesktopListingCarouselProps {
 
 const DesktopListingCarousel = ({
   children,
-  slideBasisClass = "lg:basis-1/3 xl:basis-1/4",
+  slideBasisClass = "lg:basis-1/4 xl:basis-1/5",
 }: DesktopListingCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
@@ -45,7 +45,7 @@ const DesktopListingCarousel = ({
   return (
     <div className="relative">
       <div ref={emblaRef} className="overflow-hidden">
-        <div className="flex gap-6">
+        <div className="flex gap-4">
           {children.map((child, i) => (
             <div
               key={i}
