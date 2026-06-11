@@ -46,7 +46,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   }, [listings]);
 
   const renderCard = (listing: Listing) => (
-    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-full lg:shrink-0">
+    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-full lg:shrink-0 h-full flex flex-col">
       <div className="rounded-xl overflow-hidden">
         <ListingImageCarousel
           listingId={listing.id}
@@ -56,12 +56,12 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
           noImageLabel={t('listings.noImage')}
         />
       </div>
-      <Link to={`/listing/${listing.id}`} className="block">
-        <div className="pt-2 sm:pt-2.5 px-0.5">
-          <div className="flex items-center gap-1 mb-1 flex-wrap">
+      <Link to={`/listing/${listing.id}`} className="block flex-1 flex flex-col">
+        <div className="pt-2 sm:pt-2.5 px-0.5 flex-1 flex flex-col">
+          <div className="flex items-center gap-1 mb-1 flex-wrap min-h-[20px]">
             {(() => {
               const cond = getConditionMeta((listing as any).condition);
-              if (!cond) return null;
+              if (!cond) return <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium opacity-0">—</span>;
               return (
                 <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium", cond.color)}>
                   {isPt ? cond.label_pt : cond.label_es}
@@ -70,23 +70,29 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
             })()}
           </div>
           <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">{listing.title}</h3>
-          {listing.price && listing.price > 0 && (
-            <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0.5`}>
-              {formatPrice(listing.price, (listing as any).currency)}
-            </p>
-          )}
-          <VehicleInfo
-            year={(listing as any).year}
-            mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
-            fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
-          />
+          <div className="min-h-[20px]">
+            {listing.price && listing.price > 0 ? (
+              <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0.5`}>
+                {formatPrice(listing.price, (listing as any).currency)}
+              </p>
+            ) : (
+              <p className="font-semibold text-sm lg:text-base mb-0.5 opacity-0">—</p>
+            )}
+          </div>
+          <div className="min-h-[20px]">
+            <VehicleInfo
+              year={(listing as any).year}
+              mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
+              fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
+            />
+          </div>
           {listing.type === "real-estate" && AREA_SUBS.includes((listing as any).subcategory) && (listing as any).area > 0 && (
             <p className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground mt-1">
               <Ruler className="h-3 w-3" />
               {Number((listing as any).area).toLocaleString("es-PY")} m²
             </p>
           )}
-          <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">{getPublicCity(listing)}</p>
+          <p className="text-[11px] sm:text-xs text-muted-foreground mt-auto line-clamp-1 font-light">{getPublicCity(listing)}</p>
         </div>
       </Link>
     </div>
