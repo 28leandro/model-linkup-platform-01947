@@ -46,14 +46,15 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   }, [listings]);
 
   const renderCard = (listing: Listing) => (
-    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-full lg:shrink-0 h-full flex flex-col">
-      <div className="rounded-xl overflow-hidden">
+    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-[240px] lg:h-[360px] lg:flex-shrink-0 flex flex-col">
+      <div className="rounded-xl overflow-hidden lg:h-[180px] lg:flex-shrink-0">
         <ListingImageCarousel
           listingId={listing.id}
           images={listing.images || []}
           title={listing.title}
           href={`/listing/${listing.id}`}
           noImageLabel={t('listings.noImage')}
+          aspectClassName="aspect-square lg:aspect-auto lg:h-full"
         />
       </div>
       <Link to={`/listing/${listing.id}`} className="block flex-1 flex flex-col">
