@@ -113,7 +113,7 @@ const ListingMap = ({ latitude, longitude, title, location }: ListingMapProps) =
     navigator.geolocation.getCurrentPosition(
       (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
       () => {},
-      { enableHighAccuracy: true, timeout: 8000 }
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     );
   }, [hasCoords]);
 
