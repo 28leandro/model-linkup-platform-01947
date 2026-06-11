@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { Ruler, Plus, ArrowRight } from "lucide-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
+import DesktopListingCarousel from "@/components/DesktopListingCarousel";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
@@ -45,7 +46,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   }, [listings]);
 
   const renderCard = (listing: Listing) => (
-    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink">
+    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-full lg:shrink-0">
       <div className="rounded-xl overflow-hidden">
         <ListingImageCarousel
           listingId={listing.id}
@@ -91,12 +92,6 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
     </div>
   );
 
-  const renderRow = (items: Listing[]) => (
-    <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {items.map(renderCard)}
-    </div>
-  );
-
   const renderSeeAllCard = (catId: string, remaining: number) => {
     const handleClick = () => {
       if (expandMode === "inline") setExpanded((s) => ({ ...s, [catId]: true }));
@@ -112,7 +107,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
         </p>
       </div>
     );
-    const wrapperCls = "group relative shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink cursor-pointer";
+    const wrapperCls = "group relative shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-full lg:shrink-0 cursor-pointer";
     if (expandMode === "route") {
       return (
         <Link key={`see-all-${catId}`} to={`/category/${catId}`} className={wrapperCls}>
@@ -132,24 +127,23 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
     const needsLimit = items.length > initialLimit && !isExpanded;
     const remaining = items.length - initialLimit;
     return (
-      <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {items.map((listing, idx) => {
-          // On mobile (<lg), hide items beyond initialLimit unless expanded.
-          // On desktop (lg+), always show every item.
-          const hideOnMobile = needsLimit && idx >= initialLimit;
-          if (!hideOnMobile) return renderCard(listing);
-          return (
-            <div key={listing.id} className="hidden lg:contents">
-              {renderCard(listing)}
-            </div>
-          );
-        })}
-        {needsLimit && (
-          <div className="contents lg:hidden">
-            {renderSeeAllCard(catId, remaining)}
-          </div>
-        )}
-      </div>
+      <>
+        {/* Mobile: horizontal scroll-snap row */}
+        <div className="lg:hidden flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {items.map((listing, idx) => {
+            const hide = needsLimit && idx >= initialLimit;
+            if (hide) return null;
+            return renderCard(listing);
+          })}
+          {needsLimit && renderSeeAllCard(catId, remaining)}
+        </div>
+        {/* Desktop: embla carousel with arrows + progress bars */}
+        <div className="hidden lg:block">
+          <DesktopListingCarousel>
+            {items.map((listing) => renderCard(listing))}
+          </DesktopListingCarousel>
+        </div>
+      </>
     );
   };
 
