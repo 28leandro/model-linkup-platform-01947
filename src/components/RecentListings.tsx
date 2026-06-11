@@ -46,19 +46,18 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   }, [listings]);
 
   const renderCard = (listing: Listing) => (
-    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-[220px] lg:h-[380px] lg:flex-shrink-0 flex flex-col">
-      <div className="rounded-xl overflow-hidden lg:h-[220px] lg:flex-shrink-0">
+    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink">
+      <div className="rounded-xl overflow-hidden">
         <ListingImageCarousel
           listingId={listing.id}
           images={listing.images || []}
           title={listing.title}
           href={`/listing/${listing.id}`}
           noImageLabel={t('listings.noImage')}
-          aspectClassName="aspect-square lg:aspect-auto lg:h-full"
         />
       </div>
-      <Link to={`/listing/${listing.id}`} className="block flex-1 flex flex-col">
-        <div className="pt-2 sm:pt-2.5 px-0.5 flex-1 flex flex-col">
+      <Link to={`/listing/${listing.id}`} className="block">
+        <div className="pt-2 sm:pt-2.5 px-0.5">
           <div className="flex items-center gap-1 mb-1 flex-wrap min-h-[20px]">
             {(() => {
               const cond = getConditionMeta((listing as any).condition);
@@ -93,7 +92,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
               {Number((listing as any).area).toLocaleString("es-PY")} m²
             </p>
           )}
-          <p className="text-[11px] sm:text-xs text-muted-foreground mt-auto line-clamp-1 font-light">{getPublicCity(listing)}</p>
+          <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 line-clamp-1 font-light">{getPublicCity(listing)}</p>
         </div>
       </Link>
     </div>
