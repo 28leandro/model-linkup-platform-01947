@@ -51,7 +51,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
         {listings.map((listing) => (
           <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-card border overflow-hidden">
             <Link to={`/listing/${listing.id}`}>
-              <div className="aspect-[4/3] bg-muted overflow-hidden">
+              <div className="aspect-[4/3] lg:aspect-[3/4] bg-muted overflow-hidden">
                 {listing.images && listing.images.length > 0 ? (
                   <img
                     src={listing.images[0]}
