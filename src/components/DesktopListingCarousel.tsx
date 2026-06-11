@@ -11,7 +11,7 @@ interface DesktopListingCarouselProps {
 
 const DesktopListingCarousel = ({
   children,
-  slideBasisClass = "lg:basis-[360px]",
+  slideBasisClass = "lg:basis-[342px]",
 }: DesktopListingCarouselProps) => {
   const [emblaRef, emblaApi] = useEmblaCarousel({
     align: "start",
