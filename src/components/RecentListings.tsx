@@ -46,7 +46,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   }, [listings]);
 
   const renderCard = (listing: Listing) => (
-    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-[220px] lg:h-auto lg:flex-shrink-0 flex flex-col">
+    <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-[220px] lg:h-[380px] lg:flex-shrink-0 flex flex-col">
       <div className="rounded-xl overflow-hidden lg:h-[220px] lg:flex-shrink-0">
         <ListingImageCarousel
           listingId={listing.id}
