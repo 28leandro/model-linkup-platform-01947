@@ -49,8 +49,8 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
       </h2>
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-7 xl:grid-cols-8 gap-3 sm:gap-4">
         {listings.map((listing) => (
-          <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-card border overflow-hidden">
-            <Link to={`/listing/${listing.id}`}>
+          <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-card border overflow-hidden h-full flex flex-col">
+            <Link to={`/listing/${listing.id}`} className="h-full flex flex-col">
               <div className="aspect-[4/3] lg:aspect-[3/4] bg-muted overflow-hidden">
                 {listing.images && listing.images.length > 0 ? (
                   <img
@@ -69,32 +69,42 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                   </div>
                 )}
               </div>
-              <CardContent className="p-3 sm:p-4">
-                <div className="flex items-center gap-1.5 mb-1.5">
-                  {getCategoryIcon(listing.type) && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-                      {getCategoryIcon(listing.type)}
-                      {getCategoryLabel(listing.type)}
-                    </span>
+              <CardContent className="p-3 sm:p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <div className="flex items-center gap-1.5 mb-1.5 min-h-[20px]">
+                    {getCategoryIcon(listing.type) ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+                        {getCategoryIcon(listing.type)}
+                        {getCategoryLabel(listing.type)}
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground opacity-0">—</span>
+                    )}
+                  </div>
+                  <h3 className="font-medium text-base sm:text-lg mb-2 line-clamp-2">{listing.title}</h3>
+                  <div className="min-h-[20px]">
+                    {listing.price && listing.price > 0 ? (
+                      <p className={`${priceClass(cheapestIds.has(listing.id))} font-bold text-sm sm:text-base mb-1`}>
+                        {formatPrice(listing.price, (listing as any).currency)}
+                      </p>
+                    ) : (
+                      <p className="font-bold text-sm sm:text-base mb-1 opacity-0">—</p>
+                    )}
+                  </div>
+                  <div className="min-h-[20px]">
+                    <VehicleInfo
+                      year={(listing as any).year}
+                      mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
+                      fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
+                    />
+                  </div>
+                  {listing.type === "real-estate" && AREA_SUBS.includes((listing as any).subcategory) && (listing as any).area > 0 && (
+                    <p className="inline-flex items-center gap-1 text-xs text-muted-foreground mt-1">
+                      <Ruler className="h-3 w-3" />
+                      {Number((listing as any).area).toLocaleString("es-PY")} m²
+                    </p>
                   )}
                 </div>
-                <h3 className="font-medium text-base sm:text-lg mb-2 line-clamp-2">{listing.title}</h3>
-                {listing.price && listing.price > 0 && (
-                  <p className={`${priceClass(cheapestIds.has(listing.id))} font-bold text-sm sm:text-base mb-1`}>
-                    {formatPrice(listing.price, (listing as any).currency)}
-                  </p>
-                )}
-                <VehicleInfo
-                  year={(listing as any).year}
-                  mileage={(listing as any).mileage ?? (listing as any).attributes?.mileage}
-                  fuelType={(listing as any).fuel_type ?? (listing as any).fuelType}
-                />
-                {listing.type === "real-estate" && AREA_SUBS.includes((listing as any).subcategory) && (listing as any).area > 0 && (
-                  <p className="inline-flex items-center gap-1 text-xs text-muted-foreground mt-1">
-                    <Ruler className="h-3 w-3" />
-                    {Number((listing as any).area).toLocaleString("es-PY")} m²
-                  </p>
-                )}
                 <p className="text-xs sm:text-sm text-muted-foreground mt-2 line-clamp-1">{getPublicCity(listing)}</p>
               </CardContent>
             </Link>
