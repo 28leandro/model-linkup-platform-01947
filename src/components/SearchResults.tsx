@@ -47,7 +47,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
       <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4">
         {listings.length > 0 ? t('listings.searchResults') : t('search.noResults')}
       </h2>
-      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
         {listings.map((listing) => (
           <Card key={listing.id} className="group hover:shadow-lg transition-shadow duration-200 bg-card border overflow-hidden">
             <Link to={`/listing/${listing.id}`}>
