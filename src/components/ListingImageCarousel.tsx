@@ -36,7 +36,7 @@ const ListingImageCarousel = ({
   };
 
   return (
-    <div className={cn("relative overflow-hidden bg-muted", aspectClassName)}>
+    <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
         <Link to={href} className="absolute inset-0 block" draggable={false}>
           <img
@@ -44,7 +44,7 @@ const ListingImageCarousel = ({
             alt={title}
             loading="lazy"
             draggable={false}
-            className="w-full h-full object-cover select-none"
+            className="w-full h-full object-cover select-none transition-transform duration-500 ease-out group-hover:scale-110"
             onError={(e) => {
               (e.target as HTMLImageElement).src = FALLBACK;
             }}
