@@ -5,6 +5,7 @@ import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
+import DesktopListingCarousel from "@/components/DesktopListingCarousel";
 
 const RecentlyViewedCarousel = () => {
   const { items, clear } = useRecentlyViewed();
@@ -30,8 +31,8 @@ const RecentlyViewedCarousel = () => {
         </Button>
       </div>
 
-      <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {items.map((item) => (
+      {(() => {
+        const renderCard = (item: typeof items[number]) => (
           <div
             key={item.id}
             className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink"
@@ -50,21 +51,35 @@ const RecentlyViewedCarousel = () => {
                 <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
                   {item.title}
                 </h3>
-                {item.price && item.price > 0 && (
+                {item.price && item.price > 0 ? (
                   <p className="text-foreground font-semibold text-sm lg:text-base mb-0.5">
                     {formatPrice(item.price, item.currency)}
                   </p>
+                ) : (
+                  <p className="font-semibold text-sm lg:text-base mb-0.5 opacity-0">—</p>
                 )}
-                {item.location && (
-                  <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">
-                    {item.location}
-                  </p>
-                )}
+                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">
+                  {item.location || "\u00a0"}
+                </p>
               </div>
             </Link>
           </div>
-        ))}
-      </div>
+        );
+        return (
+          <>
+            {/* Mobile: horizontal scroll */}
+            <div className="lg:hidden flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {items.map(renderCard)}
+            </div>
+            {/* Desktop: same carousel as other rows for uniform card size */}
+            <div className="hidden lg:block">
+              <DesktopListingCarousel>
+                {items.map(renderCard)}
+              </DesktopListingCarousel>
+            </div>
+          </>
+        );
+      })()}
     </section>
   );
 };
