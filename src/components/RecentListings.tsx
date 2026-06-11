@@ -59,17 +59,6 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
         <div className="pt-2 sm:pt-2.5 px-0.5">
           <div className="flex items-center gap-1 mb-1 flex-wrap">
             {(() => {
-              const b = getCategoryBadge(listing.type, isPt);
-              if (!b) return null;
-              const { Icon, label } = b;
-              return (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-muted/60 px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium text-muted-foreground">
-                  <Icon className="h-3 w-3" />
-                  {label}
-                </span>
-              );
-            })()}
-            {(() => {
               const cond = getConditionMeta((listing as any).condition);
               if (!cond) return null;
               return (
