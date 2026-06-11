@@ -86,22 +86,6 @@ const DesktopListingCarousel = ({
         <ChevronRight className="h-5 w-5" />
       </button>
 
-      {snaps.length > 1 && (
-        <div className="mt-3 flex items-center justify-center gap-1.5">
-          {snaps.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Go to slide ${i + 1}`}
-              onClick={() => emblaApi?.scrollTo(i)}
-              className={cn(
-                "h-1 rounded-full transition-all",
-                i === selected ? "w-6 bg-foreground" : "w-3 bg-muted-foreground/30"
-              )}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 };
