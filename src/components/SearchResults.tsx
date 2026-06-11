@@ -57,7 +57,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                     src={listing.images[0]}
                     alt={listing.title}
                     loading="lazy"
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=500&q=80';
