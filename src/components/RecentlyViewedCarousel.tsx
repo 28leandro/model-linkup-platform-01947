@@ -14,7 +14,7 @@ const RecentlyViewedCarousel = () => {
   if (items.length === 0) return null;
 
   return (
-    <section className="container mx-auto px-2 sm:px-3 py-6 sm:py-8">
+    <section className="container mx-auto px-2 sm:px-3 lg:px-6 py-6 sm:py-8">
       <div className="flex items-center justify-between mb-3 sm:mb-4">
         <h2 className="text-lg sm:text-xl font-light tracking-tight flex items-center gap-2">
           <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
