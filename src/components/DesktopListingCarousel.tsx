@@ -44,12 +44,12 @@ const DesktopListingCarousel = ({
 
   return (
     <div className="relative">
-      <div ref={emblaRef} className="overflow-hidden">
-        <div className="flex gap-4">
+      <div ref={emblaRef} className="overflow-hidden h-full">
+        <div className="flex gap-4 items-stretch h-full">
           {children.map((child, i) => (
             <div
               key={i}
-              className={cn("min-w-0 shrink-0 grow-0", slideBasisClass)}
+              className={cn("min-w-0 shrink-0 grow-0 h-full", slideBasisClass)}
             >
               {child}
             </div>
