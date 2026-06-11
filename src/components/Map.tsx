@@ -98,7 +98,7 @@ const Map = ({ listings, onMarkerClick, center, zoom = 6 }: MapProps) => {
       () => {
         // Silent fallback to default Asunción
       },
-      { enableHighAccuracy: true, timeout: 5000 }
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     );
   }, [center]);
 

@@ -222,7 +222,7 @@ const MapView = () => {
     navigator.geolocation.getCurrentPosition(
       (pos) => setUserPos([pos.coords.latitude, pos.coords.longitude]),
       () => setGeoError("No se pudo obtener tu ubicación"),
-      { enableHighAccuracy: true, timeout: 8000 }
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     );
   }, [focusId]);
 
