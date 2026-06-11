@@ -136,7 +136,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
     return (
       <>
         {/* Mobile: horizontal scroll-snap row */}
-        <div className="lg:hidden flex gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="lg:hidden flex gap-2.5 sm:gap-3 overflow-x-auto snap-x snap-mandatory scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {items.map((listing, idx) => {
             const hide = needsLimit && idx >= initialLimit;
             if (hide) return null;
@@ -155,7 +155,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   };
 
   return (
-    <div className="container mx-auto px-2 sm:px-3 py-6 sm:py-8 space-y-8">
+    <div className="container mx-auto px-2 sm:px-3 lg:px-6 py-6 sm:py-8 space-y-8">
       {groups.map(({ cat, items }) => (
         <section key={cat.id}>
           <div className="flex items-center justify-between mb-3 sm:mb-4">
