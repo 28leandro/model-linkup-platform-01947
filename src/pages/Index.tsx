@@ -11,6 +11,7 @@ import RecentListings from "@/components/RecentListings";
 import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import Footer from "@/components/Footer";
 import StoreBadgesBar from "@/components/StoreBadgesBar";
+import NeuraAd from "@/components/NeuraAd";
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
 import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter";
 import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
@@ -360,6 +361,8 @@ const Index = () => {
       {!hasSearched && <HeroCarousel />}
 
       {!hasSearched && <RecentlyViewedCarousel />}
+
+      {!hasSearched && <NeuraAd />}
 
       <div className="container mx-auto px-3 sm:px-4 py-4">
         <ListingFilter
