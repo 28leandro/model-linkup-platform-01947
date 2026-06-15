@@ -362,8 +362,6 @@ const Index = () => {
 
       {!hasSearched && <RecentlyViewedCarousel />}
 
-      {!hasSearched && <NeuraAd />}
-
       <div className="container mx-auto px-3 sm:px-4 py-4">
         <ListingFilter
           sortOption={sortOption}
