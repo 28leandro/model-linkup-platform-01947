@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -62,6 +62,17 @@ const SLIDES: Slide[] = [
     logo: smartfitLogo,
   },
   {
+    id: "neura",
+    title_es: "NEURA",
+    title_pt: "NEURA",
+    subtitle_es: "Menos caos. Más control. Más ventas.",
+    subtitle_pt: "Menos caos. Mais controle. Mais vendas.",
+    cta_es: "Digitalizar mi negocio",
+    cta_pt: "Digitalizar meu negócio",
+    href: "https://www.neura.com.py",
+    accent: "from-slate-700 via-slate-600 to-slate-800",
+  },
+  {
     id: "tech",
     title_es: "Tecnología al mejor precio",
     title_pt: "Tecnologia ao melhor preço",
@@ -84,15 +95,15 @@ const SLIDES: Slide[] = [
     accent: "from-stone-400 via-stone-500 to-zinc-500",
   },
   {
-    id: "neura",
-    title_es: "NEURA",
-    title_pt: "NEURA",
-    subtitle_es: "Menos caos. Más control. Más ventas.",
-    subtitle_pt: "Menos caos. Mais controle. Mais vendas.",
-    cta_es: "Digitalizar mi negocio",
-    cta_pt: "Digitalizar meu negócio",
-    href: "https://www.neura.com.py",
-    accent: "from-slate-700 via-slate-600 to-slate-800",
+    id: "vehicles",
+    title_es: "Tu próximo vehículo",
+    title_pt: "Seu próximo veículo",
+    subtitle_es: "Miles de autos y motos en Paraguay",
+    subtitle_pt: "Milhares de carros e motos no Paraguai",
+    cta_es: "Ver Vehículos",
+    cta_pt: "Ver Veículos",
+    href: "/category/vehicles",
+    accent: "from-zinc-500 via-slate-500 to-slate-600",
   },
 ];
 
@@ -234,6 +245,46 @@ const HeroCarousel = () => {
                         <Link to={s.href}>{isPt ? s.cta_pt : s.cta_es}</Link>
                       )}
                     </Button>
+                  </div>
+                </div>
+              ) : s.id === "neura" ? (
+                <div className="relative h-full w-full px-4 sm:px-10 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                  <span className="absolute top-3 right-3 text-[10px] uppercase tracking-wider font-semibold text-white/80 bg-white/20 backdrop-blur px-2 py-0.5 rounded-full border border-white/30">
+                    {isPt ? "Patrocinado" : "Publicidad"}
+                  </span>
+                  <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2 shrink-0 pt-4 sm:pt-0">
+                    <div className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white/15 text-white">
+                      <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </div>
+                    <div>
+                      <div className="text-lg sm:text-xl md:text-2xl font-extrabold tracking-tight leading-none">
+                        NEURA
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-white/80 mt-0.5">
+                        Ecosistemas digitales
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base md:text-lg font-semibold leading-snug">
+                      Menos caos. <span className="text-primary-foreground">Más control.</span> Más ventas.
+                    </p>
+                    <p className="text-xs sm:text-sm text-white/80 mt-1 line-clamp-2">
+                      {isPt
+                        ? "Sites, lojas online, automação e contabilidade para sua empresa vender mais."
+                        : "Sitios web, tiendas online, automatización y contabilidad para que tu empresa venda más."}
+                    </p>
+                  </div>
+                  <div className="shrink-0 pb-4 sm:pb-0">
+                    <a
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full bg-white text-foreground px-4 py-2 text-xs sm:text-sm font-semibold hover:gap-3 transition-all"
+                    >
+                      {isPt ? s.cta_pt : s.cta_es}
+                      <ArrowRight className="h-4 w-4" />
+                    </a>
                   </div>
                 </div>
               ) : (
