@@ -247,6 +247,46 @@ const HeroCarousel = () => {
                     </Button>
                   </div>
                 </div>
+              ) : s.id === "neura" ? (
+                <div className="relative h-full w-full px-4 sm:px-10 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+                  <span className="absolute top-3 right-3 text-[10px] uppercase tracking-wider font-semibold text-white/80 bg-white/20 backdrop-blur px-2 py-0.5 rounded-full border border-white/30">
+                    {isPt ? "Patrocinado" : "Publicidad"}
+                  </span>
+                  <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2 shrink-0 pt-4 sm:pt-0">
+                    <div className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-white/15 text-white">
+                      <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
+                    </div>
+                    <div>
+                      <div className="text-lg sm:text-xl md:text-2xl font-extrabold tracking-tight leading-none">
+                        NEURA
+                      </div>
+                      <div className="text-[10px] sm:text-xs text-white/80 mt-0.5">
+                        Ecosistemas digitales
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm sm:text-base md:text-lg font-semibold leading-snug">
+                      Menos caos. <span className="text-primary-foreground">Más control.</span> Más ventas.
+                    </p>
+                    <p className="text-xs sm:text-sm text-white/80 mt-1 line-clamp-2">
+                      {isPt
+                        ? "Sites, lojas online, automação e contabilidade para sua empresa vender mais."
+                        : "Sitios web, tiendas online, automatización y contabilidad para que tu empresa venda más."}
+                    </p>
+                  </div>
+                  <div className="shrink-0 pb-4 sm:pb-0">
+                    <a
+                      href={s.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 rounded-full bg-white text-foreground px-4 py-2 text-xs sm:text-sm font-semibold hover:gap-3 transition-all"
+                    >
+                      {isPt ? s.cta_pt : s.cta_es}
+                      <ArrowRight className="h-4 w-4" />
+                    </a>
+                  </div>
+                </div>
               ) : (
                 <div className="relative h-full w-full flex flex-col justify-center px-4 sm:px-10 max-w-3xl">
                   <h2 className="text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm">
