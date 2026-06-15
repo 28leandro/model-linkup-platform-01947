@@ -11,7 +11,7 @@ import RecentListings from "@/components/RecentListings";
 import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
 import Footer from "@/components/Footer";
 import StoreBadgesBar from "@/components/StoreBadgesBar";
-import NeuraAd from "@/components/NeuraAd";
+
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
 import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter";
 import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
