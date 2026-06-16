@@ -70,7 +70,8 @@ const SLIDES: Slide[] = [
     cta_es: "Digitalizar mi negocio",
     cta_pt: "Digitalizar meu negócio",
     href: "https://www.neura.com.py",
-    accent: "from-[#0a1628] via-[#0f1f3d] to-[#020817]",
+    accent: "from-[#f0fdf4] via-[#ecfdf5] to-[#e6f7ed]",
+    logo: undefined,
   },
   {
     id: "tech",
@@ -248,28 +249,28 @@ const HeroCarousel = () => {
                   </div>
                 </div>
               ) : s.id === "neura" ? (
-                <div className="relative h-full w-full px-4 sm:px-10 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
-                  <span className="absolute top-3 right-3 text-[10px] uppercase tracking-wider font-semibold text-white/80 bg-white/10 backdrop-blur px-2 py-0.5 rounded-full border border-white/20">
+                <div className="relative h-full w-full px-4 sm:px-10 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 text-slate-900">
+                  <span className="absolute top-3 right-3 text-[10px] uppercase tracking-wider font-semibold text-slate-500 bg-slate-900/5 backdrop-blur px-2 py-0.5 rounded-full border border-slate-900/10">
                     {isPt ? "Patrocinado" : "Publicidad"}
                   </span>
                   <div className="flex items-center gap-3 sm:flex-col sm:items-start sm:gap-2 shrink-0 pt-4 sm:pt-0">
-                    <div className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-[#00E5A0]/15 text-[#00E5A0] border border-[#00E5A0]/30">
+                    <div className="flex items-center justify-center h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-[#00E5A0]/15 text-[#059669] border border-[#00E5A0]/30">
                       <Sparkles className="h-5 w-5 sm:h-6 sm:w-6" />
                     </div>
                     <div>
                       <div className="text-lg sm:text-xl md:text-2xl font-extrabold tracking-tight leading-none">
                         NEURA
                       </div>
-                      <div className="text-[10px] sm:text-xs text-[#7CC4FF] mt-0.5">
+                      <div className="text-[10px] sm:text-xs text-[#059669] mt-0.5">
                         Ecosistemas digitales
                       </div>
                     </div>
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm sm:text-base md:text-lg font-semibold leading-snug">
-                      Menos caos. <span className="text-[#3FA9FF]">Más control.</span> <span className="text-[#00E5A0]">Más ventas.</span>
+                      Menos caos. <span className="text-[#2563eb]">Más control.</span> <span className="text-[#059669]">Más ventas.</span>
                     </p>
-                    <p className="text-xs sm:text-sm text-white/80 mt-1 line-clamp-2">
+                    <p className="text-xs sm:text-sm text-slate-600 mt-1 line-clamp-2">
                       {isPt
                         ? "Sites, lojas online, automação e contabilidade para sua empresa vender mais."
                         : "Sitios web, tiendas online, automatización y contabilidad para que tu empresa venda más."}
