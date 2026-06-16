@@ -58,7 +58,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
         />
       </div>
       <Link to={`/listing/${listing.id}`} className="block">
-        <div className="pt-2 sm:pt-2.5 px-0.5">
+        <div className="pt-1 sm:pt-1 px-0.5">
           <div className="flex items-center gap-1 mb-1 flex-wrap min-h-[20px]">
             {(() => {
               const cond = getConditionMeta((listing as any).condition);
