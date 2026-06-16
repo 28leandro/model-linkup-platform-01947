@@ -49,8 +49,7 @@ export const useImageUpload = () => {
         }
 
         if (!width || !height) {
-          reject(new Error('Não foi possível ler as dimensões da imagem.'));
-          return;
+          throw new Error('Não foi possível ler as dimensões da imagem.');
         }
 
         const MAX_DIM = 1200;
@@ -67,8 +66,7 @@ export const useImageUpload = () => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          reject(new Error('Canvas indisponível no navegador.'));
-          return;
+          throw new Error('Canvas indisponível no navegador.');
         }
         ctx.drawImage(bitmap as CanvasImageSource, 0, 0, width, height);
         if ('close' in bitmap && typeof (bitmap as ImageBitmap).close === 'function') {
