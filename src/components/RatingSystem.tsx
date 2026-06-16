@@ -222,8 +222,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <StarRow value={Math.round(average)} size={18} />
-              <span>{average ? average.toFixed(2) : "—"}</span>
+              <span className="font-semibold text-xl">{average ? average.toFixed(1) : "—"}</span>
               <span className="text-sm text-muted-foreground font-normal">
                 · {ratings.length} {ratings.length === 1 ? "evaluación" : "evaluaciones"}
               </span>
@@ -249,7 +248,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
                       {new Date(r.created_at).toLocaleDateString("es", { year: "numeric", month: "long" })}
                     </p>
                   </div>
-                  <StarRow value={r.rating} />
+                  <span className="text-sm font-semibold text-foreground whitespace-nowrap">{r.rating}/15</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {CRITERIA.map((c) => (
@@ -296,8 +295,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
     <div className="bg-muted/40 p-4 rounded-lg space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <StarRow value={Math.round(average)} size={20} />
-          <span className="font-semibold text-lg">{average ? average.toFixed(2) : "—"}</span>
+          <span className="font-semibold text-lg">{average ? average.toFixed(1) : "—"}</span>
           <button
             type="button"
             onClick={() => setOpenList(true)}
