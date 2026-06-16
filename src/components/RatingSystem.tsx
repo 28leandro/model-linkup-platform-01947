@@ -362,7 +362,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
                         <Star
                           className={`w-7 h-7 transition-colors ${
                             s <= (hover || current)
-                              ? "fill-yellow-400 text-yellow-400"
+                              ? "fill-foreground text-foreground"
                               : "text-muted-foreground/40"
                           }`}
                         />
