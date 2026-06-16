@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
-import { useListingsStore } from "@/store/listingsStore";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { supabase } from "@/integrations/supabase/client";
@@ -175,14 +174,14 @@ const MapView = () => {
   const [searchParams] = useSearchParams();
   const focusId = searchParams.get("focus");
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
-  const listings = useListingsStore((state) => state.listings);
   const navigate = useNavigate();
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
   const [focusedListing, setFocusedListing] = useState<any | null>(null);
+  const [mapListings, setMapListings] = useState<any[]>([]);
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
 
-  const listingsWithCoords = listings.filter(
+  const listingsWithCoords = mapListings.filter(
     (listing) => listing.latitude && listing.longitude
   );
 
@@ -190,7 +189,22 @@ const MapView = () => {
     setSelectedListing(listing.id);
   };
 
-  const selectedListingData = listings.find(l => l.id === selectedListing);
+  const selectedListingData = mapListings.find(l => l.id === selectedListing);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("listings_public")
+        .select("*")
+        .not("latitude", "is", null)
+        .not("longitude", "is", null);
+      if (!cancelled) setMapListings(data || []);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Fetch the focused listing from backend (source of truth)
   useEffect(() => {
