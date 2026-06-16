@@ -140,14 +140,14 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
       toast({ title: "Tu comentario debe tener al menos 20 caracteres", variant: "destructive" });
       return;
     }
+    const total = p + l + pr;
     setSubmitting(true);
     try {
-      const avg = Math.max(1, Math.min(5, Math.round((p + l + pr) / 3)));
       if (myRating) {
         const { error } = await supabase
           .from("listing_ratings")
           .update({
-            rating: avg,
+            rating: total,
             comment: trimmed,
             rating_punctuality: p,
             rating_location: l,
@@ -162,7 +162,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
           .insert({
             listing_id: listingId,
             user_id: user.id,
-            rating: avg,
+            rating: total,
             comment: trimmed,
             rating_punctuality: p,
             rating_location: l,
@@ -205,10 +205,10 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
           type="button"
           onClick={() => setOpenList(true)}
           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          aria-label={`${average.toFixed(2)} de 5 estrellas · ${ratings.length} evaluaciones`}
+          aria-label={`${average.toFixed(1)} puntos · ${ratings.length} evaluaciones`}
         >
           <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-          <span className="font-medium text-foreground">{average.toFixed(2)}</span>
+          <span className="font-medium text-foreground">{average.toFixed(1)}</span>
           <span>· {ratings.length}</span>
         </button>
         {renderListDialog()}
@@ -222,8 +222,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <StarRow value={Math.round(average)} size={18} />
-              <span>{average ? average.toFixed(2) : "—"}</span>
+              <span className="font-semibold text-xl">{average ? average.toFixed(1) : "—"}</span>
               <span className="text-sm text-muted-foreground font-normal">
                 · {ratings.length} {ratings.length === 1 ? "evaluación" : "evaluaciones"}
               </span>
@@ -249,7 +248,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
                       {new Date(r.created_at).toLocaleDateString("es", { year: "numeric", month: "long" })}
                     </p>
                   </div>
-                  <StarRow value={r.rating} />
+                  <span className="text-sm font-semibold text-foreground whitespace-nowrap">{r.rating}/15</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {CRITERIA.map((c) => (
@@ -296,8 +295,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
     <div className="bg-muted/40 p-4 rounded-lg space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <StarRow value={Math.round(average)} size={20} />
-          <span className="font-semibold text-lg">{average ? average.toFixed(2) : "—"}</span>
+          <span className="font-semibold text-lg">{average ? average.toFixed(1) : "—"}</span>
           <button
             type="button"
             onClick={() => setOpenList(true)}
