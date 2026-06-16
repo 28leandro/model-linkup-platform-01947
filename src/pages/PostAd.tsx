@@ -305,6 +305,10 @@ const PostAd = () => {
       return;
     }
 
+    setIsSubmitting(true);
+    setSubmitError("");
+
+    try {
     // Upload new images to Cloud storage
     let uploadedImageUrls: string[] = [];
     if (imageFiles.length > 0) {
@@ -474,6 +478,20 @@ const PostAd = () => {
         description: userMessage,
         variant: "destructive",
       });
+      setSubmitError(userMessage);
+      return;
+    }
+    } catch (error: any) {
+      console.error('Publish flow error:', error);
+      const userMessage = getErrorMessage(error);
+      setSubmitError(userMessage);
+      toast({
+        title: t('postAd.saveError'),
+        description: userMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
