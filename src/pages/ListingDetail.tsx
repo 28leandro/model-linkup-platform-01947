@@ -23,6 +23,7 @@ import ContactSellerChat from "@/components/ContactSellerChat";
 import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 import SimilarListings from "@/components/SimilarListings";
 import SEO from "@/components/SEO";
+import { RatingSystem } from "@/components/RatingSystem";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
@@ -462,6 +463,16 @@ const ListingDetail = () => {
                   onLoginRequired={() => setShowLoginDialog(true)}
                 />
               ) : null}
+
+              {listing.user_id && (
+                <div className="mt-4">
+                  <RatingSystem
+                    listingId={listing.id}
+                    listingOwnerId={listing.user_id}
+                    listingCategory={listing.category}
+                  />
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

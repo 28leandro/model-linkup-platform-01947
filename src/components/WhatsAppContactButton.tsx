@@ -50,6 +50,14 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
 
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
 
+  const trackContact = () => {
+    if (!user) return;
+    // Fire-and-forget: register pending contact + notify seller.
+    supabase.functions.invoke("whatsapp-contact-init", {
+      body: { listing_id: listingId },
+    }).catch(() => {});
+  };
+
   const handleBlocked = (e: React.MouseEvent) => {
     e.preventDefault();
     if (!user) {
@@ -76,7 +84,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
       >
         <a
           href={isReady ? url : "#"}
-          onClick={isReady ? undefined : handleBlocked}
+          onClick={isReady ? (() => trackContact()) : handleBlocked}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contactar por WhatsApp"
@@ -98,7 +106,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
       >
         <a
           href={isReady ? url : "#"}
-          onClick={isReady ? undefined : handleBlocked}
+          onClick={isReady ? (() => trackContact()) : handleBlocked}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Contactar por WhatsApp"
@@ -116,7 +124,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
     >
       <a
         href={isReady ? url : "#"}
-        onClick={isReady ? undefined : handleBlocked}
+        onClick={isReady ? (() => trackContact()) : handleBlocked}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Contactar por WhatsApp"
