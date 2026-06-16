@@ -16,24 +16,36 @@ export type Database = {
     Tables: {
       listing_ratings: {
         Row: {
+          comment: string
           created_at: string
           id: string
           listing_id: string
           rating: number
+          seller_response: string | null
+          seller_response_at: string | null
+          updated_at: string
           user_id: string
         }
         Insert: {
+          comment: string
           created_at?: string
           id?: string
           listing_id: string
           rating: number
+          seller_response?: string | null
+          seller_response_at?: string | null
+          updated_at?: string
           user_id: string
         }
         Update: {
+          comment?: string
           created_at?: string
           id?: string
           listing_id?: string
           rating?: number
+          seller_response?: string | null
+          seller_response_at?: string | null
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
@@ -260,6 +272,48 @@ export type Database = {
         }
         Relationships: []
       }
+      service_contacts: {
+        Row: {
+          buyer_id: string
+          channel: string
+          confirmed_at: string | null
+          contacted_at: string
+          created_at: string
+          declined_at: string | null
+          id: string
+          invite_sent_at: string | null
+          listing_id: string
+          seller_id: string
+          updated_at: string
+        }
+        Insert: {
+          buyer_id: string
+          channel: string
+          confirmed_at?: string | null
+          contacted_at?: string
+          created_at?: string
+          declined_at?: string | null
+          id?: string
+          invite_sent_at?: string | null
+          listing_id: string
+          seller_id: string
+          updated_at?: string
+        }
+        Update: {
+          buyer_id?: string
+          channel?: string
+          confirmed_at?: string | null
+          contacted_at?: string
+          created_at?: string
+          declined_at?: string | null
+          id?: string
+          invite_sent_at?: string | null
+          listing_id?: string
+          seller_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_favorites: {
         Row: {
           created_at: string
@@ -402,6 +456,7 @@ export type Database = {
       }
     }
     Functions: {
+      can_rate_service: { Args: { listing_uuid: string }; Returns: boolean }
       get_listing_average_rating: {
         Args: { listing_uuid: string }
         Returns: number
@@ -411,6 +466,21 @@ export type Database = {
         Returns: string
       }
       get_listing_owner: { Args: { listing_uuid: string }; Returns: string }
+      get_listing_ratings_with_profiles: {
+        Args: { listing_uuid: string }
+        Returns: {
+          comment: string
+          created_at: string
+          id: string
+          rating: number
+          reviewer_avatar: string
+          reviewer_name: string
+          seller_response: string
+          seller_response_at: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_my_listing_phone: { Args: { listing_uuid: string }; Returns: string }
       has_role: {
         Args: {
