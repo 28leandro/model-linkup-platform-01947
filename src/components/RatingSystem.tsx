@@ -45,7 +45,7 @@ const StarRow = ({ value, size = 16 }: { value: number; size?: number }) => (
       <Star
         key={s}
         style={{ width: size, height: size }}
-        className={s <= value ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/40"}
+        className={s <= value ? "fill-foreground text-foreground" : "text-muted-foreground/40"}
       />
     ))}
   </div>
