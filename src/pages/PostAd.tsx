@@ -23,6 +23,8 @@ import { getVehicleBrands, getVehicleModels } from "@/lib/vehicleBrands";
 
 const FREE_PHOTOS = 3;
 const MAX_PHOTOS_UNLOCKED = 10;
+// Payment system temporarily disabled — all photo uploads up to MAX_PHOTOS_UNLOCKED are free.
+const PHOTOS_FREE_FOR_ALL = true;
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -55,9 +57,7 @@ const PostAd = () => {
     longitude: -57.5759 
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
-  const [photosUnlocked, setPhotosUnlocked] = useState(false);
-  const [testCode, setTestCode] = useState("");
-  const [redeemingCode, setRedeemingCode] = useState(false);
+  const [photosUnlocked, setPhotosUnlocked] = useState(PHOTOS_FREE_FOR_ALL);
 
   // Real-time validation helpers
   const titleError = title.length > 0 && title.trim().length < 5
@@ -140,38 +140,6 @@ const PostAd = () => {
   }, [editingListing?.id]);
 
   const maxPhotos = photosUnlocked ? MAX_PHOTOS_UNLOCKED : FREE_PHOTOS;
-
-  const redeemTestCode = async () => {
-    if (!testCode.trim()) {
-      toast({ title: "Ingresa un código", variant: "destructive" });
-      return;
-    }
-
-    setRedeemingCode(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("redeem-test-token", {
-        body: { listing_id: id, code: testCode.trim() },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      setPhotosUnlocked(true);
-      window.sessionStorage.setItem("test_photo_unlock", "true");
-      if (id) {
-        window.sessionStorage.removeItem("test_photo_code");
-      } else {
-        window.sessionStorage.setItem("test_photo_code", testCode.trim());
-      }
-      toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
-    } catch (error: any) {
-      toast({
-        title: "Código inválido",
-        description: error.message || "No se pudo aplicar el código",
-        variant: "destructive",
-      });
-    } finally {
-      setRedeemingCode(false);
-    }
-  };
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -441,16 +409,6 @@ const PostAd = () => {
     try {
       if (isEditing && editingListing) {
         const diff = buildDiff();
-        // Guard: prevent saving more than free photos without unlock
-        if (!photosUnlocked && finalImages.length > FREE_PHOTOS) {
-          toast({
-            title: "Pago necesario",
-            description: "Desbloquea hasta 10 fotos para guardar más de 3 fotos.",
-            variant: "destructive",
-          });
-          navigate(`/photo-paywall?listing_id=${editingListing.id}`);
-          return;
-        }
         if (Object.keys(diff).length === 0) {
           toast({ title: t('postAd.updated'), description: "Sin cambios para guardar" });
           navigate(-1);
@@ -470,10 +428,7 @@ const PostAd = () => {
         navigate(-1);
         return;
       } else {
-        const totalPhotos = finalImages.length;
-        const requiresPayment = totalPhotos > FREE_PHOTOS && !photosUnlocked;
-        const savedTestCode = totalPhotos > FREE_PHOTOS ? window.sessionStorage.getItem("test_photo_code") : null;
-        const insertData = { ...fullData, is_published: !requiresPayment, photos_unlocked: photosUnlocked };
+        const insertData = { ...fullData, is_published: true, photos_unlocked: true };
 
         const { data: inserted, error } = await supabase
           .from('listings')
@@ -484,25 +439,6 @@ const PostAd = () => {
         if (error) throw error;
 
         addListing(fullData);
-
-        if (inserted && savedTestCode) {
-          const { data: redeemData, error: redeemError } = await supabase.functions.invoke("redeem-test-token", {
-            body: { listing_id: inserted.id, code: savedTestCode },
-          });
-          if (redeemError) throw redeemError;
-          if ((redeemData as any)?.error) throw new Error((redeemData as any).error);
-          window.sessionStorage.removeItem("test_photo_code");
-          window.sessionStorage.removeItem("test_photo_unlock");
-          toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
-          navigate("/");
-          return;
-        }
-
-        if (requiresPayment && inserted) {
-          toast({ title: "Pago necesario", description: "Desbloquea hasta 10 fotos para publicar este anuncio" });
-          navigate(`/photo-paywall?listing_id=${inserted.id}`);
-          return;
-        }
 
         toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
         navigate("/");
@@ -1025,39 +961,8 @@ const PostAd = () => {
                   {t('postAd.photos')}
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  {photosUnlocked
-                    ? `${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos liberadas`
-                    : `${Math.min(previews.length, FREE_PHOTOS)}/${FREE_PHOTOS} fotos gratuito · hasta ${MAX_PHOTOS_UNLOCKED} fotos con código o pago`}
+                  {`${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos`}
                 </p>
-                {!photosUnlocked && (
-                  <div className="space-y-3 p-3 rounded-md border bg-muted/30">
-                      <p className="text-sm text-muted-foreground">
-                      {previews.length >= FREE_PHOTOS
-                        ? "Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos."
-                        : "¿Tienes un código de prueba? Aplícalo para subir hasta 10 fotos."}
-                    </p>
-                    <div className="flex gap-2">
-                      <Input
-                        value={testCode}
-                        onChange={(e) => setTestCode(e.target.value)}
-                        placeholder="Código de prueba"
-                        className="h-11 sm:h-10"
-                      />
-                      <Button type="button" variant="outline" onClick={redeemTestCode} disabled={redeemingCode}>
-                        {redeemingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        Aplicar
-                      </Button>
-                    </div>
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => navigate(`/photo-paywall${id ? `?listing_id=${id}` : ""}`)}
-                    >
-                      Pagar con Pagopar
-                    </Button>
-                  </div>
-                )}
                 <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 sm:gap-4">
                   {previews.map((preview, index) => (
                     <div key={index} className="relative aspect-square">
