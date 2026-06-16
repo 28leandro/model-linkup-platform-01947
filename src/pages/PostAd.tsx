@@ -313,12 +313,10 @@ const PostAd = () => {
     let uploadedImageUrls: string[] = [];
     if (imageFiles.length > 0) {
       uploadedImageUrls = await uploadMultipleImages(imageFiles);
-      if (uploadedImageUrls.length === 0) {
-        toast({
-          title: t('postAd.error'),
-          description: t('postAd.uploadError'),
-          variant: "destructive",
-        });
+      if (uploadedImageUrls.length !== imageFiles.length) {
+        const uploadMessage = `${t('postAd.uploadError')} (${uploadedImageUrls.length}/${imageFiles.length})`;
+        toast({ title: t('postAd.error'), description: uploadMessage, variant: "destructive" });
+        setSubmitError(uploadMessage);
         return;
       }
     }
@@ -462,22 +460,8 @@ const PostAd = () => {
       }
     } catch (error: any) {
       console.error('Database error:', error);
-      
-      let userMessage = t('postAd.saveErrorDesc');
-      
-      if (error.code === '23505') {
-        userMessage = t('postAd.duplicateError');
-      } else if (error.code === '23503') {
-        userMessage = t('postAd.fieldError');
-      } else if (error.message?.includes('RLS') || error.message?.includes('policy')) {
-        userMessage = t('postAd.permissionError');
-      }
-      
-      toast({
-        title: t('postAd.saveError'),
-        description: userMessage,
-        variant: "destructive",
-      });
+      const userMessage = getErrorMessage(error);
+      toast({ title: t('postAd.saveError'), description: userMessage, variant: "destructive" });
       setSubmitError(userMessage);
       return;
     }
