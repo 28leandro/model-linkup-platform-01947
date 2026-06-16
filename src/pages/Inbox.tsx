@@ -8,7 +8,7 @@ import { LoginDialog } from "@/components/LoginDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, MessageSquare } from "lucide-react";
+import { ArrowLeft, Send, MessageSquare, Star, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface Message {
@@ -19,6 +19,29 @@ interface Message {
   content: string;
   created_at: string;
 }
+
+type ParsedSystem =
+  | { kind: "wa_confirm"; contactId: string; text: string }
+  | { kind: "rate_invite"; listingId: string; text: string }
+  | null;
+
+const parseSystem = (content: string): ParsedSystem => {
+  if (content.startsWith("__SYS_WA_CONFIRM__:")) {
+    const rest = content.slice("__SYS_WA_CONFIRM__:".length);
+    const sep = rest.indexOf("::");
+    if (sep > 0) {
+      return { kind: "wa_confirm", contactId: rest.slice(0, sep), text: rest.slice(sep + 2) };
+    }
+  }
+  if (content.startsWith("__SYS_RATE_INVITE__:")) {
+    const rest = content.slice("__SYS_RATE_INVITE__:".length);
+    const sep = rest.indexOf("::");
+    if (sep > 0) {
+      return { kind: "rate_invite", listingId: rest.slice(0, sep), text: rest.slice(sep + 2) };
+    }
+  }
+  return null;
+};
 
 interface ThreadInfo {
   ad_id: string;
@@ -166,6 +189,18 @@ const Inbox = () => {
     qc.invalidateQueries({ queryKey: ["inbox", user.id] });
   };
 
+  const handleWaConfirm = async (contactId: string, answer: "yes" | "no") => {
+    const { error } = await supabase.functions.invoke("whatsapp-contact-confirm", {
+      body: { contact_id: contactId, answer },
+    });
+    if (error) {
+      toast.error("No se pudo registrar tu respuesta");
+      return;
+    }
+    toast.success(answer === "yes" ? "Marcado como atendido" : "Marcado como no atendido");
+    qc.invalidateQueries({ queryKey: ["inbox", user!.id] });
+  };
+
   return (
     <>
       <Header onLoginClick={() => setShowLogin(true)} />
@@ -243,6 +278,54 @@ const Inbox = () => {
                       <div className="flex-1 overflow-y-auto space-y-2 bg-muted/30 rounded-md p-3">
                         {threadMessages.map((m) => {
                           const mine = m.sender_id === user.id;
+                          const sys = !m.sender_id ? parseSystem(m.content) : null;
+                          if (sys?.kind === "wa_confirm") {
+                            return (
+                              <div key={m.id} className="flex justify-center">
+                                <div className="max-w-[90%] w-full bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm">
+                                  <p className="text-amber-900 whitespace-pre-wrap">{sys.text}</p>
+                                  <div className="flex gap-2 mt-2">
+                                    <Button
+                                      size="sm"
+                                      onClick={() => handleWaConfirm(sys.contactId, "yes")}
+                                      className="bg-green-600 hover:bg-green-700"
+                                    >
+                                      <CheckCircle2 className="w-4 h-4 mr-1" /> Sí, lo atendí
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleWaConfirm(sys.contactId, "no")}
+                                    >
+                                      <XCircle className="w-4 h-4 mr-1" /> No
+                                    </Button>
+                                  </div>
+                                  <p className="text-[10px] text-amber-700 mt-2">
+                                    {new Date(m.created_at).toLocaleString()}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          }
+                          if (sys?.kind === "rate_invite") {
+                            return (
+                              <div key={m.id} className="flex justify-center">
+                                <div className="max-w-[90%] w-full bg-primary/5 border border-primary/30 rounded-xl p-3 text-sm">
+                                  <p className="whitespace-pre-wrap">{sys.text}</p>
+                                  <Button
+                                    size="sm"
+                                    className="mt-2"
+                                    onClick={() => navigate(`/listing/${sys.listingId}`)}
+                                  >
+                                    <Star className="w-4 h-4 mr-1" /> Dejar evaluación
+                                  </Button>
+                                  <p className="text-[10px] text-muted-foreground mt-2">
+                                    {new Date(m.created_at).toLocaleString()}
+                                  </p>
+                                </div>
+                              </div>
+                            );
+                          }
                           return (
                             <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                               <div
