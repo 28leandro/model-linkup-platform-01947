@@ -19,6 +19,8 @@ interface RatingSystemProps {
   listingId: string;
   listingOwnerId: string;
   listingCategory?: string | null;
+  /** When true, render only a compact star + average badge that opens the reviews modal. */
+  compactBadge?: boolean;
 }
 
 interface RatingRow {
@@ -32,6 +34,9 @@ interface RatingRow {
   seller_response_at: string | null;
   reviewer_name: string;
   reviewer_avatar: string | null;
+  rating_punctuality: number | null;
+  rating_location: number | null;
+  rating_professionalism: number | null;
 }
 
 const StarRow = ({ value, size = 16 }: { value: number; size?: number }) => (
@@ -49,7 +54,13 @@ const StarRow = ({ value, size = 16 }: { value: number; size?: number }) => (
 const initialsFrom = (name: string) =>
   name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
 
-export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: RatingSystemProps) => {
+const CRITERIA: { key: "rating_punctuality" | "rating_location" | "rating_professionalism"; label: string; hint: string }[] = [
+  { key: "rating_punctuality", label: "Puntualidad", hint: "¿Llegó / respondió a tiempo?" },
+  { key: "rating_location", label: "Estado del lugar", hint: "Bueno, más o menos, pésimo" },
+  { key: "rating_professionalism", label: "Profesionalismo", hint: "Trato, calidad y respeto" },
+];
+
+export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compactBadge = false }: RatingSystemProps) => {
   const { user } = useAuth();
   const { toast } = useToast();
   const isOwner = user?.id === listingOwnerId;
@@ -60,8 +71,12 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: Rat
   const [canRate, setCanRate] = useState(false);
   const [openList, setOpenList] = useState(false);
   const [openForm, setOpenForm] = useState(false);
-  const [formStars, setFormStars] = useState(0);
-  const [formHover, setFormHover] = useState(0);
+  const [formCriteria, setFormCriteria] = useState<Record<string, number>>({
+    rating_punctuality: 0,
+    rating_location: 0,
+    rating_professionalism: 0,
+  });
+  const [hoverKey, setHoverKey] = useState<{ key: string; value: number } | null>(null);
   const [formComment, setFormComment] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [respondingId, setRespondingId] = useState<string | null>(null);
@@ -97,10 +112,14 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: Rat
 
   useEffect(() => {
     if (openForm && myRating) {
-      setFormStars(myRating.rating);
+      setFormCriteria({
+        rating_punctuality: myRating.rating_punctuality || myRating.rating,
+        rating_location: myRating.rating_location || myRating.rating,
+        rating_professionalism: myRating.rating_professionalism || myRating.rating,
+      });
       setFormComment(myRating.comment);
     } else if (openForm) {
-      setFormStars(0);
+      setFormCriteria({ rating_punctuality: 0, rating_location: 0, rating_professionalism: 0 });
       setFormComment("");
     }
   }, [openForm, myRating]);
@@ -110,8 +129,11 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: Rat
   const submitRating = async () => {
     if (!user) return;
     const trimmed = formComment.trim();
-    if (formStars < 1 || formStars > 5) {
-      toast({ title: "Elegí entre 1 y 5 estrellas", variant: "destructive" });
+    const p = formCriteria.rating_punctuality;
+    const l = formCriteria.rating_location;
+    const pr = formCriteria.rating_professionalism;
+    if (p < 1 || l < 1 || pr < 1) {
+      toast({ title: "Calificá los 3 criterios (1 a 5 estrellas)", variant: "destructive" });
       return;
     }
     if (trimmed.length < 20) {
@@ -120,17 +142,32 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: Rat
     }
     setSubmitting(true);
     try {
+      const avg = Math.max(1, Math.min(5, Math.round((p + l + pr) / 3)));
       if (myRating) {
         const { error } = await supabase
           .from("listing_ratings")
-          .update({ rating: formStars, comment: trimmed })
+          .update({
+            rating: avg,
+            comment: trimmed,
+            rating_punctuality: p,
+            rating_location: l,
+            rating_professionalism: pr,
+          })
           .eq("id", myRating.id);
         if (error) throw error;
         toast({ title: "Evaluación actualizada" });
       } else {
         const { error } = await supabase
           .from("listing_ratings")
-          .insert({ listing_id: listingId, user_id: user.id, rating: formStars, comment: trimmed });
+          .insert({
+            listing_id: listingId,
+            user_id: user.id,
+            rating: avg,
+            comment: trimmed,
+            rating_punctuality: p,
+            rating_location: l,
+            rating_professionalism: pr,
+          });
         if (error) throw error;
         toast({ title: "Gracias por tu evaluación" });
       }
@@ -159,12 +196,108 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: Rat
     await refresh();
   };
 
+  // Compact badge variant (small discrete star + average under the photo)
+  if (compactBadge) {
+    if (ratings.length === 0) return null;
+    return (
+      <>
+        <button
+          type="button"
+          onClick={() => setOpenList(true)}
+          className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          aria-label={`${average.toFixed(2)} de 5 estrellas · ${ratings.length} evaluaciones`}
+        >
+          <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+          <span className="font-medium text-foreground">{average.toFixed(2)}</span>
+          <span>· {ratings.length}</span>
+        </button>
+        {renderListDialog()}
+      </>
+    );
+  }
+
+  function renderListDialog() {
+    return (
+      <Dialog open={openList} onOpenChange={setOpenList}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <StarRow value={Math.round(average)} size={18} />
+              <span>{average ? average.toFixed(2) : "—"}</span>
+              <span className="text-sm text-muted-foreground font-normal">
+                · {ratings.length} {ratings.length === 1 ? "evaluación" : "evaluaciones"}
+              </span>
+            </DialogTitle>
+            <DialogDescription>Experiencias de personas que contrataron este servicio.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-5">
+            {ratings.length === 0 && (
+              <p className="text-sm text-muted-foreground py-6 text-center">
+                Todavía no hay evaluaciones para este servicio.
+              </p>
+            )}
+            {ratings.map((r) => (
+              <div key={r.id} className="border-b pb-4 last:border-b-0">
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar className="h-10 w-10">
+                    {r.reviewer_avatar && <AvatarImage src={r.reviewer_avatar} alt={r.reviewer_name} />}
+                    <AvatarFallback>{initialsFrom(r.reviewer_name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{r.reviewer_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleDateString("es", { year: "numeric", month: "long" })}
+                    </p>
+                  </div>
+                  <StarRow value={r.rating} />
+                </div>
+                <div className="grid grid-cols-3 gap-2 mb-2">
+                  {CRITERIA.map((c) => (
+                    <div key={c.key} className="text-xs">
+                      <p className="text-muted-foreground truncate">{c.label}</p>
+                      <StarRow value={(r as any)[c.key] || 0} size={12} />
+                    </div>
+                  ))}
+                </div>
+                <p className="text-sm whitespace-pre-wrap break-words">{r.comment}</p>
+                {r.seller_response && (
+                  <div className="mt-3 ml-6 pl-3 border-l-2 border-primary/40 bg-muted/40 p-3 rounded-r">
+                    <p className="text-xs font-medium mb-1">Respuesta del anunciante</p>
+                    <p className="text-sm whitespace-pre-wrap break-words">{r.seller_response}</p>
+                  </div>
+                )}
+                {isOwner && !r.seller_response && (
+                  <div className="mt-3 ml-6">
+                    {respondingId === r.id ? (
+                      <div className="space-y-2">
+                        <Textarea rows={2} maxLength={1000} value={responseText}
+                          onChange={(e) => setResponseText(e.target.value)}
+                          placeholder="Escribí tu respuesta pública..." />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => submitResponse(r.id)}>Publicar respuesta</Button>
+                          <Button size="sm" variant="ghost" onClick={() => { setRespondingId(null); setResponseText(""); }}>Cancelar</Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button size="sm" variant="link" className="px-0"
+                        onClick={() => { setRespondingId(r.id); setResponseText(""); }}>Responder</Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
     <div className="bg-muted/40 p-4 rounded-lg space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
           <StarRow value={Math.round(average)} size={20} />
-          <span className="font-semibold text-lg">{average ? average.toFixed(1) : "—"}</span>
+          <span className="font-semibold text-lg">{average ? average.toFixed(2) : "—"}</span>
           <button
             type="button"
             onClick={() => setOpenList(true)}
@@ -197,99 +330,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: Rat
         </p>
       )}
 
-      {/* Reviews modal */}
-      <Dialog open={openList} onOpenChange={setOpenList}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <StarRow value={Math.round(average)} size={18} />
-              <span>{average ? average.toFixed(1) : "—"}</span>
-              <span className="text-sm text-muted-foreground font-normal">
-                · {ratings.length} {ratings.length === 1 ? "evaluación" : "evaluaciones"}
-              </span>
-            </DialogTitle>
-            <DialogDescription>Experiencias de personas que contrataron este servicio.</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-5">
-            {ratings.length === 0 && (
-              <p className="text-sm text-muted-foreground py-6 text-center">
-                Todavía no hay evaluaciones para este servicio.
-              </p>
-            )}
-            {ratings.map((r) => (
-              <div key={r.id} className="border-b pb-4 last:border-b-0">
-                <div className="flex items-center gap-3 mb-2">
-                  <Avatar className="h-10 w-10">
-                    {r.reviewer_avatar && <AvatarImage src={r.reviewer_avatar} alt={r.reviewer_name} />}
-                    <AvatarFallback>{initialsFrom(r.reviewer_name)}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm truncate">{r.reviewer_name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(r.created_at).toLocaleDateString("es", {
-                        year: "numeric",
-                        month: "long",
-                      })}
-                    </p>
-                  </div>
-                  <StarRow value={r.rating} />
-                </div>
-                <p className="text-sm whitespace-pre-wrap break-words">{r.comment}</p>
-
-                {r.seller_response && (
-                  <div className="mt-3 ml-6 pl-3 border-l-2 border-primary/40 bg-muted/40 p-3 rounded-r">
-                    <p className="text-xs font-medium mb-1">Respuesta del anunciante</p>
-                    <p className="text-sm whitespace-pre-wrap break-words">{r.seller_response}</p>
-                  </div>
-                )}
-
-                {isOwner && !r.seller_response && (
-                  <div className="mt-3 ml-6">
-                    {respondingId === r.id ? (
-                      <div className="space-y-2">
-                        <Textarea
-                          rows={2}
-                          maxLength={1000}
-                          value={responseText}
-                          onChange={(e) => setResponseText(e.target.value)}
-                          placeholder="Escribí tu respuesta pública..."
-                        />
-                        <div className="flex gap-2">
-                          <Button size="sm" onClick={() => submitResponse(r.id)}>
-                            Publicar respuesta
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => {
-                              setRespondingId(null);
-                              setResponseText("");
-                            }}
-                          >
-                            Cancelar
-                          </Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <Button
-                        size="sm"
-                        variant="link"
-                        className="px-0"
-                        onClick={() => {
-                          setRespondingId(r.id);
-                          setResponseText("");
-                        }}
-                      >
-                        Responder
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-      </Dialog>
+      {renderListDialog()}
 
       {/* Rating form modal */}
       <Dialog open={openForm} onOpenChange={setOpenForm}>
@@ -297,33 +338,40 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: Rat
           <DialogHeader>
             <DialogTitle>{myRating ? "Editar evaluación" : "¿Cómo fue tu experiencia?"}</DialogTitle>
             <DialogDescription>
-              Contale a otros usuarios cómo te atendieron. Tu evaluación será pública.
+              Calificá los 3 criterios y dejá un comentario. Tu evaluación será pública.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
-              <p className="text-sm font-medium mb-2">Tu puntuación</p>
-              <div className="flex items-center gap-1">
-                {[1, 2, 3, 4, 5].map((s) => (
-                  <button
-                    key={s}
-                    type="button"
-                    onMouseEnter={() => setFormHover(s)}
-                    onMouseLeave={() => setFormHover(0)}
-                    onClick={() => setFormStars(s)}
-                    className="p-1"
-                  >
-                    <Star
-                      className={`w-8 h-8 transition-colors ${
-                        s <= (formHover || formStars)
-                          ? "fill-yellow-400 text-yellow-400"
-                          : "text-muted-foreground/40"
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
+            {CRITERIA.map((c) => {
+              const current = formCriteria[c.key];
+              const hover = hoverKey?.key === c.key ? hoverKey.value : 0;
+              return (
+                <div key={c.key}>
+                  <p className="text-sm font-medium">{c.label}</p>
+                  <p className="text-xs text-muted-foreground mb-1">{c.hint}</p>
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onMouseEnter={() => setHoverKey({ key: c.key, value: s })}
+                        onMouseLeave={() => setHoverKey(null)}
+                        onClick={() => setFormCriteria((prev) => ({ ...prev, [c.key]: s }))}
+                        className="p-0.5"
+                      >
+                        <Star
+                          className={`w-7 h-7 transition-colors ${
+                            s <= (hover || current)
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-muted-foreground/40"
+                          }`}
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
             <div>
               <p className="text-sm font-medium mb-2">
                 Tu comentario <span className="text-muted-foreground font-normal">(mínimo 20 caracteres)</span>
