@@ -5,7 +5,7 @@ import { toast } from '@/components/ui/use-toast';
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
   const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
-  const MAX_UPLOAD_SIZE = 4.5 * 1024 * 1024;
+  const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
 
   const getUserId = async (): Promise<string | null> => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -113,8 +113,9 @@ export const useImageUpload = () => {
         return null;
       }
 
-      // Validate file type
-      if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
+      const fileName = file.name.toLowerCase();
+      const looksLikeSupportedImage = /\.(jpe?g|png|webp)$/i.test(fileName);
+      if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && !looksLikeSupportedImage) {
         toast({
           title: "Tipo de arquivo inválido",
           description: "Apenas JPG, PNG e WEBP são permitidos",
@@ -144,8 +145,8 @@ export const useImageUpload = () => {
         });
         return null;
       }
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
-      const filePath = `${userId}/${fileName}`;
+      const storageFileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+      const filePath = `${userId}/${storageFileName}`;
       
       const { data, error } = await supabase.storage
         .from('listing-images')
@@ -199,9 +200,12 @@ export const useImageUpload = () => {
   };
 
   const uploadMultipleImages = async (files: File[]): Promise<string[]> => {
-    const uploadPromises = files.map(file => uploadImage(file));
-    const results = await Promise.all(uploadPromises);
-    return results.filter((url): url is string => url !== null);
+    const uploadedUrls: string[] = [];
+    for (const file of files) {
+      const url = await uploadImage(file);
+      if (url) uploadedUrls.push(url);
+    }
+    return uploadedUrls;
   };
 
   return { uploadImage, uploadMultipleImages, uploading };
