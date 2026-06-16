@@ -141,38 +141,6 @@ const PostAd = () => {
 
   const maxPhotos = photosUnlocked ? MAX_PHOTOS_UNLOCKED : FREE_PHOTOS;
 
-  const redeemTestCode = async () => {
-    if (!testCode.trim()) {
-      toast({ title: "Ingresa un código", variant: "destructive" });
-      return;
-    }
-
-    setRedeemingCode(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("redeem-test-token", {
-        body: { listing_id: id, code: testCode.trim() },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      setPhotosUnlocked(true);
-      window.sessionStorage.setItem("test_photo_unlock", "true");
-      if (id) {
-        window.sessionStorage.removeItem("test_photo_code");
-      } else {
-        window.sessionStorage.setItem("test_photo_code", testCode.trim());
-      }
-      toast({ title: "¡Código aplicado!", description: "Ahora puedes subir hasta 10 fotos." });
-    } catch (error: any) {
-      toast({
-        title: "Código inválido",
-        description: error.message || "No se pudo aplicar el código",
-        variant: "destructive",
-      });
-    } finally {
-      setRedeemingCode(false);
-    }
-  };
-
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const total = files.length + previews.length;
