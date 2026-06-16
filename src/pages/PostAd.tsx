@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { ImagePlus, X, ArrowLeft, Loader2 } from "lucide-react";
+import { ImagePlus, X, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
@@ -58,6 +58,8 @@ const PostAd = () => {
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
   const [photosUnlocked, setPhotosUnlocked] = useState(PHOTOS_FREE_FOR_ALL);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Real-time validation helpers
   const titleError = title.length > 0 && title.trim().length < 5
@@ -70,6 +72,16 @@ const PostAd = () => {
     const n = Number(v);
     if (Number.isNaN(n)) return "";
     return Math.max(1900, Math.min(currentYear + 1, n));
+  };
+
+  const getErrorMessage = (error: any) => {
+    const raw = String(error?.message || error?.details || error?.hint || "").trim();
+    if (!raw) return t('postAd.saveErrorDesc');
+    if (raw.includes('row-level security') || raw.includes('permission denied')) {
+      return `${t('postAd.permissionError')} (${raw})`;
+    }
+    if (error?.code) return `${raw} [${error.code}]`;
+    return raw;
   };
 
   // Redirect if not authenticated
@@ -143,6 +155,19 @@ const PostAd = () => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    const invalidFile = files.find((file) => {
+      const name = file.name.toLowerCase();
+      return !file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && !/\.(jpe?g|png|webp)$/i.test(name);
+    });
+    if (invalidFile) {
+      toast({
+        title: "Formato de foto inválido",
+        description: "Use fotos JPG, PNG ou WEBP. Fotos HEIC/Live do iPhone devem ser convertidas para JPG.",
+        variant: "destructive",
+      });
+      e.target.value = "";
+      return;
+    }
     const total = files.length + previews.length;
     if (!photosUnlocked && total > FREE_PHOTOS) {
       toast({
@@ -191,6 +216,8 @@ const PostAd = () => {
       return;
     }
 
+    setSubmitError("");
+
     if (uploading) {
       toast({
         title: t('postAd.wait'),
@@ -201,7 +228,22 @@ const PostAd = () => {
 
     // Title length guard (real-time helper already shown)
     if (title.trim().length < 5) {
+      setSubmitError("El título debe tener al menos 5 caracteres.");
       toast({ title: "Título muy corto", description: "El título debe tener al menos 5 caracteres.", variant: "destructive" });
+      return;
+    }
+
+    if (!category) {
+      const msg = t('postAd.categoryError');
+      setSubmitError(msg);
+      toast({ title: t('postAd.validationError'), description: msg, variant: "destructive" });
+      return;
+    }
+
+    if (!attributes.city?.trim()) {
+      const msg = "Informe a cidade do anúncio.";
+      setSubmitError(msg);
+      toast({ title: t('postAd.validationError'), description: msg, variant: "destructive" });
       return;
     }
 
@@ -293,16 +335,17 @@ const PostAd = () => {
       return;
     }
 
+    setIsSubmitting(true);
+
+    try {
     // Upload new images to Cloud storage
     let uploadedImageUrls: string[] = [];
     if (imageFiles.length > 0) {
       uploadedImageUrls = await uploadMultipleImages(imageFiles);
-      if (uploadedImageUrls.length === 0) {
-        toast({
-          title: t('postAd.error'),
-          description: t('postAd.uploadError'),
-          variant: "destructive",
-        });
+      if (uploadedImageUrls.length !== imageFiles.length) {
+        const uploadMessage = `${t('postAd.uploadError')} (${uploadedImageUrls.length}/${imageFiles.length})`;
+        toast({ title: t('postAd.error'), description: uploadMessage, variant: "destructive" });
+        setSubmitError(uploadMessage);
         return;
       }
     }
@@ -438,30 +481,30 @@ const PostAd = () => {
         
         if (error) throw error;
 
-        addListing(fullData);
+        addListing(inserted || fullData);
 
         toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
-        navigate("/");
+        navigate(inserted?.id ? `/listing/${inserted.id}` : "/my-listings");
         return;
       }
     } catch (error: any) {
       console.error('Database error:', error);
-      
-      let userMessage = t('postAd.saveErrorDesc');
-      
-      if (error.code === '23505') {
-        userMessage = t('postAd.duplicateError');
-      } else if (error.code === '23503') {
-        userMessage = t('postAd.fieldError');
-      } else if (error.message?.includes('RLS') || error.message?.includes('policy')) {
-        userMessage = t('postAd.permissionError');
-      }
-      
+      const userMessage = getErrorMessage(error);
+      toast({ title: t('postAd.saveError'), description: userMessage, variant: "destructive" });
+      setSubmitError(userMessage);
+      return;
+    }
+    } catch (error: any) {
+      console.error('Publish flow error:', error);
+      const userMessage = getErrorMessage(error);
+      setSubmitError(userMessage);
       toast({
         title: t('postAd.saveError'),
         description: userMessage,
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -494,6 +537,12 @@ const PostAd = () => {
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              {submitError && (
+                <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <p className="break-words">{submitError}</p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="title">{t('postAd.adTitle')}</Label>
                 <Input
@@ -501,7 +550,6 @@ const PostAd = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder=""
-                  required
                   className="h-11 sm:h-10"
                 />
                 {titleError && (
@@ -850,7 +898,6 @@ const PostAd = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={t('postAd.descriptionPlaceholder')}
-                    required
                     className="min-h-[120px]"
                   />
                 </div>
@@ -920,7 +967,6 @@ const PostAd = () => {
                     value={attributes.city || ""}
                     onChange={(e) => setAttr("city", e.target.value)}
                     placeholder="Ej: Asunción"
-                    required
                     className="h-11 sm:h-10"
                   />
                 </div>
@@ -1016,8 +1062,9 @@ const PostAd = () => {
                 >
                   {t('postAd.cancel')}
                 </Button>
-                <Button type="submit" disabled={uploading} className="w-full sm:w-auto">
-                  {uploading ? t('postAd.uploading') : isEditing ? t('postAd.saveChanges') : t('postAd.publish')}
+                <Button type="submit" disabled={uploading || isSubmitting} className="w-full sm:w-auto">
+                  {(uploading || isSubmitting) && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {uploading || isSubmitting ? t('postAd.uploading') : isEditing ? t('postAd.saveChanges') : t('postAd.publish')}
                 </Button>
               </div>
             </form>

@@ -5,16 +5,15 @@ import { toast } from '@/components/ui/use-toast';
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
   const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
-  const MAX_UPLOAD_SIZE = 4.5 * 1024 * 1024;
+  const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
 
   const getUserId = async (): Promise<string | null> => {
     const { data: { user } } = await supabase.auth.getUser();
     return user?.id || null;
   };
 
-  const compressImage = (file: File): Promise<Blob> => {
-    return new Promise(async (resolve, reject) => {
-      try {
+  const compressImage = async (file: File): Promise<Blob> => {
+    try {
         // Try modern createImageBitmap first (better mobile support, handles EXIF)
         let bitmap: ImageBitmap | HTMLImageElement | null = null;
         let width = 0;
@@ -50,8 +49,7 @@ export const useImageUpload = () => {
         }
 
         if (!width || !height) {
-          reject(new Error('Não foi possível ler as dimensões da imagem.'));
-          return;
+          throw new Error('Não foi possível ler as dimensões da imagem.');
         }
 
         const MAX_DIM = 1200;
@@ -68,14 +66,14 @@ export const useImageUpload = () => {
         canvas.height = height;
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          reject(new Error('Canvas indisponível no navegador.'));
-          return;
+          throw new Error('Canvas indisponível no navegador.');
         }
         ctx.drawImage(bitmap as CanvasImageSource, 0, 0, width, height);
         if ('close' in bitmap && typeof (bitmap as ImageBitmap).close === 'function') {
           (bitmap as ImageBitmap).close();
         }
 
+        return await new Promise<Blob>((resolve, reject) => {
         const tryQuality = (quality: number) => {
           canvas.toBlob((blob) => {
             if (!blob) {
@@ -90,10 +88,10 @@ export const useImageUpload = () => {
           }, 'image/jpeg', quality);
         };
         tryQuality(0.82);
-      } catch (err) {
-        reject(err instanceof Error ? err : new Error('Falha ao processar imagem.'));
-      }
-    });
+        });
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Falha ao processar imagem.');
+    }
   };
 
   const uploadImage = async (file: File): Promise<string | null> => {
@@ -113,8 +111,9 @@ export const useImageUpload = () => {
         return null;
       }
 
-      // Validate file type
-      if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/)) {
+      const fileName = file.name.toLowerCase();
+      const looksLikeSupportedImage = /\.(jpe?g|png|webp)$/i.test(fileName);
+      if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && !looksLikeSupportedImage) {
         toast({
           title: "Tipo de arquivo inválido",
           description: "Apenas JPG, PNG e WEBP são permitidos",
@@ -144,8 +143,8 @@ export const useImageUpload = () => {
         });
         return null;
       }
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
-      const filePath = `${userId}/${fileName}`;
+      const storageFileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+      const filePath = `${userId}/${storageFileName}`;
       
       const { data, error } = await supabase.storage
         .from('listing-images')
@@ -199,9 +198,12 @@ export const useImageUpload = () => {
   };
 
   const uploadMultipleImages = async (files: File[]): Promise<string[]> => {
-    const uploadPromises = files.map(file => uploadImage(file));
-    const results = await Promise.all(uploadPromises);
-    return results.filter((url): url is string => url !== null);
+    const uploadedUrls: string[] = [];
+    for (const file of files) {
+      const url = await uploadImage(file);
+      if (url) uploadedUrls.push(url);
+    }
+    return uploadedUrls;
   };
 
   return { uploadImage, uploadMultipleImages, uploading };

@@ -10,14 +10,14 @@ export const listingSchema = z.object({
     .min(20, "A descrição deve ter pelo menos 20 caracteres")
     .max(2000, "A descrição deve ter no máximo 2000 caracteres"),
   phone: z.string()
-    .regex(/^[\d\s\-\+\(\)]+$/, "Formato de telefone inválido")
-    .min(8, "Telefone muito curto")
-    .max(20, "Telefone muito longo")
+    .trim()
+    .max(30, "Telefone muito longo")
+    .refine((val) => val === "" || val.replace(/\D/g, "").length >= 6, "Telefone muito curto")
     .optional()
     .or(z.literal("")),
   category: z.string()
     .min(1, "Selecione uma categoria válida")
-    .refine((val) => ["vehicles", "real-estate", "services", "home-garden", "tech"].includes(val), {
+    .refine((val) => ["vehicles", "real-estate", "services", "home-garden", "tech", "fashion", "sport"].includes(val), {
       message: "Selecione uma categoria válida"
     }),
   price: z.number()
