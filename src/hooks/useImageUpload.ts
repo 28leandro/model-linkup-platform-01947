@@ -4,6 +4,8 @@ import { toast } from '@/components/ui/use-toast';
 
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
+  const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
+  const MAX_UPLOAD_SIZE = 4.5 * 1024 * 1024;
 
   const getUserId = async (): Promise<string | null> => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -39,9 +41,18 @@ export const useImageUpload = () => {
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
           
-          canvas.toBlob((blob) => {
-            if (blob) resolve(blob);
-          }, 'image/jpeg', 0.8);
+          const createBlob = (quality: number) => {
+            canvas.toBlob((blob) => {
+              if (!blob) return;
+              if (blob.size <= MAX_UPLOAD_SIZE || quality <= 0.45) {
+                resolve(blob);
+                return;
+              }
+              createBlob(quality - 0.1);
+            }, 'image/jpeg', quality);
+          };
+
+          createBlob(0.82);
         };
         img.src = e.target?.result as string;
       };
@@ -56,11 +67,11 @@ export const useImageUpload = () => {
         throw new Error('Você precisa estar logado para fazer upload de imagens.');
       }
 
-      // Validate file size (max 25MB original; será comprimida a JPEG 80% / 1200px)
-      if (file.size > 25 * 1024 * 1024) {
+      // Validate original file size; upload is compressed below 5MB afterward.
+      if (file.size > MAX_ORIGINAL_SIZE) {
         toast({
           title: "Arquivo muito grande",
-          description: `O arquivo excede o limite de 25MB`,
+          description: `O arquivo excede o limite de 50MB`,
           variant: "destructive",
         });
         return null;
@@ -78,8 +89,15 @@ export const useImageUpload = () => {
 
       setUploading(true);
       const compressedBlob = await compressImage(file);
-      const fileExt = file.name.split('.').pop() || 'jpg';
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      if (compressedBlob.size > MAX_UPLOAD_SIZE) {
+        toast({
+          title: "Imagem muito grande",
+          description: "A imagem não pôde ser reduzida abaixo de 5MB.",
+          variant: "destructive",
+        });
+        return null;
+      }
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
       const filePath = `${userId}/${fileName}`;
       
       const { data, error } = await supabase.storage
