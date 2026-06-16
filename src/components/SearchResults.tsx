@@ -61,7 +61,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
               />
             </div>
             <Link to={`/listing/${listing.id}`} className="block">
-              <div className="pt-2 sm:pt-2.5 px-0.5">
+              <div className="pt-1 sm:pt-1 px-0.5">
                 <div className="flex items-center gap-1.5 mb-1 min-h-[20px]">
                   {getCategoryIcon(listing.type) ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
