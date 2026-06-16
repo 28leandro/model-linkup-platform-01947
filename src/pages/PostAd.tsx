@@ -481,10 +481,10 @@ const PostAd = () => {
         
         if (error) throw error;
 
-        addListing(fullData);
+        addListing(inserted || fullData);
 
         toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
-        navigate("/");
+        navigate(inserted?.id ? `/listing/${inserted.id}` : "/my-listings");
         return;
       }
     } catch (error: any) {
