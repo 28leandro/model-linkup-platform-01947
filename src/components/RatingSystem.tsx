@@ -140,14 +140,14 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
       toast({ title: "Tu comentario debe tener al menos 20 caracteres", variant: "destructive" });
       return;
     }
+    const total = p + l + pr;
     setSubmitting(true);
     try {
-      const avg = Math.max(1, Math.min(5, Math.round((p + l + pr) / 3)));
       if (myRating) {
         const { error } = await supabase
           .from("listing_ratings")
           .update({
-            rating: avg,
+            rating: total,
             comment: trimmed,
             rating_punctuality: p,
             rating_location: l,
@@ -162,7 +162,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
           .insert({
             listing_id: listingId,
             user_id: user.id,
-            rating: avg,
+            rating: total,
             comment: trimmed,
             rating_punctuality: p,
             rating_location: l,
