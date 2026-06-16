@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { ImagePlus, X, ArrowLeft, Loader2 } from "lucide-react";
+import { ImagePlus, X, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useListingsStore } from "@/store/listingsStore";
 import LocationPicker from "@/components/LocationPicker";
@@ -58,6 +58,8 @@ const PostAd = () => {
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
   const [photosUnlocked, setPhotosUnlocked] = useState(PHOTOS_FREE_FOR_ALL);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   // Real-time validation helpers
   const titleError = title.length > 0 && title.trim().length < 5
@@ -70,6 +72,16 @@ const PostAd = () => {
     const n = Number(v);
     if (Number.isNaN(n)) return "";
     return Math.max(1900, Math.min(currentYear + 1, n));
+  };
+
+  const getErrorMessage = (error: any) => {
+    const raw = String(error?.message || error?.details || error?.hint || "").trim();
+    if (!raw) return t('postAd.saveErrorDesc');
+    if (raw.includes('row-level security') || raw.includes('permission denied')) {
+      return `${t('postAd.permissionError')} (${raw})`;
+    }
+    if (error?.code) return `${raw} [${error.code}]`;
+    return raw;
   };
 
   // Redirect if not authenticated
