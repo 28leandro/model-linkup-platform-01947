@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { LoginDialog } from "@/components/LoginDialog";
 import Header from "@/components/Header";
 import Map from "@/components/Map";
+import type { Listing } from "@/store/listingsStore";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Navigation } from "lucide-react";
@@ -42,7 +43,7 @@ const listingIcon = L.divIcon({
 });
 
 interface FocusedMapProps {
-  listing: any;
+  listing: Listing;
   userPos: [number, number] | null;
 }
 
@@ -176,8 +177,8 @@ const MapView = () => {
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const navigate = useNavigate();
   const [selectedListing, setSelectedListing] = useState<string | null>(null);
-  const [focusedListing, setFocusedListing] = useState<any | null>(null);
-  const [mapListings, setMapListings] = useState<any[]>([]);
+  const [focusedListing, setFocusedListing] = useState<Listing | null>(null);
+  const [mapListings, setMapListings] = useState<Listing[]>([]);
   const [userPos, setUserPos] = useState<[number, number] | null>(null);
   const [geoError, setGeoError] = useState<string | null>(null);
 
@@ -185,7 +186,7 @@ const MapView = () => {
     (listing) => listing.latitude && listing.longitude
   );
 
-  const handleMarkerClick = (listing: any) => {
+  const handleMarkerClick = (listing: Listing) => {
     setSelectedListing(listing.id);
   };
 
@@ -199,7 +200,7 @@ const MapView = () => {
         .select("*")
         .not("latitude", "is", null)
         .not("longitude", "is", null);
-      if (!cancelled) setMapListings(data || []);
+      if (!cancelled) setMapListings((data || []) as Listing[]);
     })();
     return () => {
       cancelled = true;
@@ -219,7 +220,7 @@ const MapView = () => {
         .select("*")
         .eq("id", focusId)
         .maybeSingle();
-      if (!cancelled) setFocusedListing(data || null);
+      if (!cancelled) setFocusedListing((data as Listing) || null);
     })();
     return () => {
       cancelled = true;
