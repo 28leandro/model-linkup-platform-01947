@@ -58,8 +58,8 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
         />
       </div>
       <Link to={`/listing/${listing.id}`} className="block">
-        <div className="pt-1 sm:pt-1 px-0.5">
-          <div className="flex items-center gap-1 mb-1 flex-wrap min-h-[20px]">
+        <div className="pt-0.5 px-0.5 leading-tight">
+          <div className="flex items-center gap-1 mb-0.5 flex-wrap min-h-[18px]">
             {(() => {
               const cond = getConditionMeta((listing as any).condition);
               if (!cond) return <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium opacity-0">—</span>;
@@ -70,17 +70,17 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
               );
             })()}
           </div>
-          <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">{listing.title}</h3>
-          <ListingRatingBadge listingId={listing.id} category={(listing as any).category ?? listing.type} className="mb-0.5" />
+          <h3 className="font-normal text-sm sm:text-base mb-0 line-clamp-1 text-foreground">{listing.title}</h3>
           <div className="min-h-[20px]">
             {listing.price && listing.price > 0 ? (
-              <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0.5`}>
+              <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0`}>
                 {formatPrice(listing.price, (listing as any).currency)}
               </p>
             ) : (
-              <p className="font-semibold text-sm lg:text-base mb-0.5 opacity-0">—</p>
+              <p className="font-semibold text-sm lg:text-base mb-0 opacity-0">—</p>
             )}
           </div>
+          <ListingRatingBadge listingId={listing.id} category={(listing as any).category ?? listing.type} className="mb-0.5" />
           <div className="min-h-[20px]">
             <VehicleInfo
               year={(listing as any).year}
@@ -89,12 +89,12 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
             />
           </div>
           {listing.type === "real-estate" && AREA_SUBS.includes((listing as any).subcategory) && (listing as any).area > 0 && (
-            <p className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground mt-1">
+            <p className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground mt-0.5">
               <Ruler className="h-3 w-3" />
               {Number((listing as any).area).toLocaleString("es-PY")} m²
             </p>
           )}
-          <p className="text-[11px] sm:text-xs text-muted-foreground mt-1 line-clamp-1 font-light">{getPublicCity(listing)}</p>
+          <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">{getPublicCity(listing)}</p>
         </div>
       </Link>
     </div>
