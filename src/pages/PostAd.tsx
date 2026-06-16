@@ -409,16 +409,6 @@ const PostAd = () => {
     try {
       if (isEditing && editingListing) {
         const diff = buildDiff();
-        // Guard: prevent saving more than free photos without unlock
-        if (!photosUnlocked && finalImages.length > FREE_PHOTOS) {
-          toast({
-            title: "Pago necesario",
-            description: "Desbloquea hasta 10 fotos para guardar más de 3 fotos.",
-            variant: "destructive",
-          });
-          navigate(`/photo-paywall?listing_id=${editingListing.id}`);
-          return;
-        }
         if (Object.keys(diff).length === 0) {
           toast({ title: t('postAd.updated'), description: "Sin cambios para guardar" });
           navigate(-1);
@@ -438,10 +428,7 @@ const PostAd = () => {
         navigate(-1);
         return;
       } else {
-        const totalPhotos = finalImages.length;
-        const requiresPayment = totalPhotos > FREE_PHOTOS && !photosUnlocked;
-        const savedTestCode = totalPhotos > FREE_PHOTOS ? window.sessionStorage.getItem("test_photo_code") : null;
-        const insertData = { ...fullData, is_published: !requiresPayment, photos_unlocked: photosUnlocked };
+        const insertData = { ...fullData, is_published: true, photos_unlocked: true };
 
         const { data: inserted, error } = await supabase
           .from('listings')
@@ -452,25 +439,6 @@ const PostAd = () => {
         if (error) throw error;
 
         addListing(fullData);
-
-        if (inserted && savedTestCode) {
-          const { data: redeemData, error: redeemError } = await supabase.functions.invoke("redeem-test-token", {
-            body: { listing_id: inserted.id, code: savedTestCode },
-          });
-          if (redeemError) throw redeemError;
-          if ((redeemData as any)?.error) throw new Error((redeemData as any).error);
-          window.sessionStorage.removeItem("test_photo_code");
-          window.sessionStorage.removeItem("test_photo_unlock");
-          toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
-          navigate("/");
-          return;
-        }
-
-        if (requiresPayment && inserted) {
-          toast({ title: "Pago necesario", description: "Desbloquea hasta 10 fotos para publicar este anuncio" });
-          navigate(`/photo-paywall?listing_id=${inserted.id}`);
-          return;
-        }
 
         toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
         navigate("/");
