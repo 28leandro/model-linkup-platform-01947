@@ -993,39 +993,8 @@ const PostAd = () => {
                   {t('postAd.photos')}
                 </Label>
                 <p className="text-xs text-muted-foreground">
-                  {photosUnlocked
-                    ? `${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos liberadas`
-                    : `${Math.min(previews.length, FREE_PHOTOS)}/${FREE_PHOTOS} fotos gratuito · hasta ${MAX_PHOTOS_UNLOCKED} fotos con código o pago`}
+                  {`${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos`}
                 </p>
-                {!photosUnlocked && (
-                  <div className="space-y-3 p-3 rounded-md border bg-muted/30">
-                      <p className="text-sm text-muted-foreground">
-                      {previews.length >= FREE_PHOTOS
-                        ? "Has usado las 3 fotos gratuitas. Desbloquea hasta 10 fotos."
-                        : "¿Tienes un código de prueba? Aplícalo para subir hasta 10 fotos."}
-                    </p>
-                    <div className="flex gap-2">
-                      <Input
-                        value={testCode}
-                        onChange={(e) => setTestCode(e.target.value)}
-                        placeholder="Código de prueba"
-                        className="h-11 sm:h-10"
-                      />
-                      <Button type="button" variant="outline" onClick={redeemTestCode} disabled={redeemingCode}>
-                        {redeemingCode && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                        Aplicar
-                      </Button>
-                    </div>
-                    <Button
-                      type="button"
-                      size="sm"
-                      className="w-full"
-                      onClick={() => navigate(`/photo-paywall${id ? `?listing_id=${id}` : ""}`)}
-                    >
-                      Pagar con Pagopar
-                    </Button>
-                  </div>
-                )}
                 <div className="grid grid-cols-2 xs:grid-cols-3 gap-3 sm:gap-4">
                   {previews.map((preview, index) => (
                     <div key={index} className="relative aspect-square">
