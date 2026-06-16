@@ -550,7 +550,6 @@ const PostAd = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder=""
-                  required
                   className="h-11 sm:h-10"
                 />
                 {titleError && (
@@ -899,7 +898,6 @@ const PostAd = () => {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder={t('postAd.descriptionPlaceholder')}
-                    required
                     className="min-h-[120px]"
                   />
                 </div>
@@ -969,7 +967,6 @@ const PostAd = () => {
                     value={attributes.city || ""}
                     onChange={(e) => setAttr("city", e.target.value)}
                     placeholder="Ej: Asunción"
-                    required
                     className="h-11 sm:h-10"
                   />
                 </div>
