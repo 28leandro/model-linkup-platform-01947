@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
+import ListingRatingBadge from "@/components/ListingRatingBadge";
 import { getCheapestIds, priceClass } from "@/lib/cheapest";
 
 interface SimilarListingsProps {
@@ -350,6 +351,7 @@ const SimilarListings = ({
                   <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
                     {item.title}
                   </h3>
+                  <ListingRatingBadge listingId={item.id} category={(item as any).category ?? (item as any).type} className="mb-0.5" />
                   {item.price && item.price > 0 && (
                     <p className={`${priceClass(cheapestIds.has(item.id))} font-semibold text-sm lg:text-base mb-0.5`}>
                       {formatPrice(item.price, item.currency || undefined)}

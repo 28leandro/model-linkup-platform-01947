@@ -4,6 +4,7 @@ import { Ruler, Plus, ArrowRight } from "lucide-react";
 import VehicleInfo from "@/components/VehicleInfo";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
 import DesktopListingCarousel from "@/components/DesktopListingCarousel";
+import ListingRatingBadge from "@/components/ListingRatingBadge";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
@@ -70,6 +71,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
             })()}
           </div>
           <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">{listing.title}</h3>
+          <ListingRatingBadge listingId={listing.id} category={(listing as any).category ?? listing.type} className="mb-0.5" />
           <div className="min-h-[20px]">
             {listing.price && listing.price > 0 ? (
               <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0.5`}>

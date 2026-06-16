@@ -13,6 +13,7 @@ import { getPublicCity } from "@/lib/utils";
 import { getCategoryById } from "@/lib/categories";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
+import ListingRatingBadge from "@/components/ListingRatingBadge";
 
 const CATEGORY_SEO: Record<string, { title: string; description: string }> = {
   "vehicles": {
@@ -344,6 +345,7 @@ const CategoryPage = () => {
                     </div>
                     <div className="p-3 sm:p-4">
                       <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
+                      <ListingRatingBadge listingId={listing.id} category={(listing as any).category ?? (listing as any).type} className="mb-1" />
                       <div className="mb-2">
                         <VehicleInfo
                           year={(listing as any).year}
