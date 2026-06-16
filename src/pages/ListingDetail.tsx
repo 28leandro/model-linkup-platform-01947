@@ -293,18 +293,6 @@ const ListingDetail = () => {
               </div>
             )}
 
-            {/* Compact rating badge below the featured photo */}
-            {listing.user_id && (
-              <div className="max-w-md sm:max-w-lg mx-auto mb-3 sm:mb-4">
-                <RatingSystem
-                  listingId={listing.id}
-                  listingOwnerId={listing.user_id}
-                  listingCategory={listing.category}
-                  compactBadge
-                />
-              </div>
-            )}
-
             <h1 className="text-xl sm:text-2xl font-bold mb-2">
               <EditableField
                 value={listing.title}
@@ -338,6 +326,17 @@ const ListingDetail = () => {
                   </p>
                 )}
               </div>
+              {/* Compact rating badge below the description */}
+              {listing.user_id && (
+                <div className="mt-2">
+                  <RatingSystem
+                    listingId={listing.id}
+                    listingOwnerId={listing.user_id}
+                    listingCategory={listing.category}
+                    compactBadge
+                  />
+                </div>
+              )}
             </div>
             
             <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
