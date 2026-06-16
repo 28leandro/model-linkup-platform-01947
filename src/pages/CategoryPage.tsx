@@ -344,6 +344,7 @@ const CategoryPage = () => {
                     </div>
                     <div className="p-3 sm:p-4">
                       <h3 className="font-medium text-base sm:text-lg mb-1 line-clamp-2">{listing.title}</h3>
+                      <ListingRatingBadge listingId={listing.id} category={(listing as any).category ?? (listing as any).type} className="mb-1" />
                       <div className="mb-2">
                         <VehicleInfo
                           year={(listing as any).year}
