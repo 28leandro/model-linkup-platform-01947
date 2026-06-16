@@ -205,7 +205,7 @@ const ListingDetail = () => {
         <Card>
           <CardContent className="p-3 sm:p-6">
             {/* Galeria de Fotos — carrossel com swipe e dots */}
-            <div className="relative aspect-[4/3] sm:aspect-[16/10] sm:max-h-[280px] md:max-h-[320px] lg:max-h-[360px] sm:max-w-xl sm:mx-auto bg-muted rounded-lg mb-3 sm:mb-4 overflow-hidden">
+            <div className="relative aspect-[4/3] sm:aspect-[16/10] max-h-[260px] sm:max-h-[220px] md:max-h-[260px] lg:max-h-[300px] max-w-md sm:max-w-lg mx-auto bg-muted rounded-lg mb-2 overflow-hidden">
               <div className="overflow-hidden h-full" ref={emblaRef}>
                 <div className="flex h-full touch-pan-y">
                   {(listing.images && listing.images.length > 0
@@ -272,7 +272,7 @@ const ListingDetail = () => {
 
             {/* Miniaturas */}
             {listing.images && listing.images.length > 1 && (
-              <div className="grid grid-cols-4 xs:grid-cols-5 gap-1.5 sm:gap-2 mb-4 sm:mb-6">
+              <div className="grid grid-cols-4 xs:grid-cols-5 gap-1.5 sm:gap-2 mb-2 sm:mb-3 max-w-md sm:max-w-lg mx-auto">
                 {listing.images.map((image, index) => (
                   <button
                     key={index}
@@ -293,7 +293,17 @@ const ListingDetail = () => {
               </div>
             )}
 
-            {/* WhatsApp button next to photos removed — now sits next to Share */}
+            {/* Compact rating badge below the featured photo */}
+            {listing.user_id && (
+              <div className="max-w-md sm:max-w-lg mx-auto mb-3 sm:mb-4">
+                <RatingSystem
+                  listingId={listing.id}
+                  listingOwnerId={listing.user_id}
+                  listingCategory={listing.category}
+                  compactBadge
+                />
+              </div>
+            )}
 
             <h1 className="text-xl sm:text-2xl font-bold mb-2">
               <EditableField
