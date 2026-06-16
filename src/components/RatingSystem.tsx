@@ -1,191 +1,357 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { useLanguage } from "@/contexts/LanguageContext";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface RatingSystemProps {
   listingId: string;
   listingOwnerId: string;
-  onRatingChange?: (newAverage: number) => void;
+  listingCategory?: string | null;
 }
 
-export const RatingSystem = ({ listingId, listingOwnerId, onRatingChange }: RatingSystemProps) => {
+interface RatingRow {
+  id: string;
+  user_id: string;
+  rating: number;
+  comment: string;
+  created_at: string;
+  updated_at: string;
+  seller_response: string | null;
+  seller_response_at: string | null;
+  reviewer_name: string;
+  reviewer_avatar: string | null;
+}
+
+const StarRow = ({ value, size = 16 }: { value: number; size?: number }) => (
+  <div className="flex items-center gap-0.5">
+    {[1, 2, 3, 4, 5].map((s) => (
+      <Star
+        key={s}
+        style={{ width: size, height: size }}
+        className={s <= value ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/40"}
+      />
+    ))}
+  </div>
+);
+
+const initialsFrom = (name: string) =>
+  name.split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]?.toUpperCase()).join("") || "?";
+
+export const RatingSystem = ({ listingId, listingOwnerId, listingCategory }: RatingSystemProps) => {
   const { user } = useAuth();
-  const { t } = useLanguage();
   const { toast } = useToast();
-  const [userRating, setUserRating] = useState<number | null>(null);
-  const [hoverRating, setHoverRating] = useState<number>(0);
-  const [averageRating, setAverageRating] = useState<number>(0);
-  const [totalRatings, setTotalRatings] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(false);
-
   const isOwner = user?.id === listingOwnerId;
-  const canRate = user && !isOwner;
+  const isService = listingCategory === "services";
 
-  useEffect(() => {
-    fetchRatings();
-  }, [listingId, user]);
+  const [ratings, setRatings] = useState<RatingRow[]>([]);
+  const [average, setAverage] = useState(0);
+  const [canRate, setCanRate] = useState(false);
+  const [openList, setOpenList] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
+  const [formStars, setFormStars] = useState(0);
+  const [formHover, setFormHover] = useState(0);
+  const [formComment, setFormComment] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [respondingId, setRespondingId] = useState<string | null>(null);
+  const [responseText, setResponseText] = useState("");
 
-  const fetchRatings = async () => {
-    // Fetch average rating
-    const { data: avgData } = await supabase
-      .rpc('get_listing_average_rating', { listing_uuid: listingId });
-    
-    if (avgData !== null) {
-      setAverageRating(Number(avgData));
-      onRatingChange?.(Number(avgData));
-    }
+  const myRating = useMemo(
+    () => (user ? ratings.find((r) => r.user_id === user.id) : null),
+    [ratings, user]
+  );
 
-    // Fetch total ratings count
-    const { count } = await supabase
-      .from('listing_ratings')
-      .select('*', { count: 'exact', head: true })
-      .eq('listing_id', listingId);
-    
-    setTotalRatings(count || 0);
+  const refresh = async () => {
+    const { data } = await supabase.rpc("get_listing_ratings_with_profiles", {
+      listing_uuid: listingId,
+    });
+    const list = ((data as RatingRow[]) || []);
+    setRatings(list);
+    setAverage(list.length ? list.reduce((s, r) => s + r.rating, 0) / list.length : 0);
 
-    // Fetch user's rating if logged in
-    if (user) {
-      const { data: userRatingData } = await supabase
-        .from('listing_ratings')
-        .select('rating')
-        .eq('listing_id', listingId)
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (userRatingData) {
-        setUserRating(userRatingData.rating);
-      }
+    if (user && !isOwner) {
+      const { data: canData } = await supabase.rpc("can_rate_service", {
+        listing_uuid: listingId,
+      });
+      setCanRate(!!canData);
+    } else {
+      setCanRate(false);
     }
   };
 
-  const handleRate = async (rating: number) => {
-    if (!canRate) {
-      if (!user) {
-        toast({
-          title: t('rating.loginRequired'),
-          variant: 'destructive',
-        });
-      } else if (isOwner) {
-        toast({
-          title: t('rating.cannotRateOwn'),
-          variant: 'destructive',
-        });
-      }
+  useEffect(() => {
+    if (isService) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [listingId, user, isService]);
+
+  useEffect(() => {
+    if (openForm && myRating) {
+      setFormStars(myRating.rating);
+      setFormComment(myRating.comment);
+    } else if (openForm) {
+      setFormStars(0);
+      setFormComment("");
+    }
+  }, [openForm, myRating]);
+
+  if (!isService) return null;
+
+  const submitRating = async () => {
+    if (!user) return;
+    const trimmed = formComment.trim();
+    if (formStars < 1 || formStars > 5) {
+      toast({ title: "Elegí entre 1 y 5 estrellas", variant: "destructive" });
       return;
     }
-
-    setIsLoading(true);
-
-    try {
-      if (userRating) {
-        // Update existing rating
-        const { error } = await supabase
-          .from('listing_ratings')
-          .update({ rating })
-          .eq('listing_id', listingId)
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-        toast({ title: t('rating.updated') });
-      } else {
-        // Insert new rating
-        const { error } = await supabase
-          .from('listing_ratings')
-          .insert({ 
-            listing_id: listingId, 
-            user_id: user.id, 
-            rating 
-          });
-
-        if (error) throw error;
-        toast({ title: t('rating.submitted') });
-      }
-
-      setUserRating(rating);
-      await fetchRatings();
-    } catch (error) {
-      console.error('Error rating:', error);
-      toast({
-        title: t('rating.error'),
-        variant: 'destructive',
-      });
-    } finally {
-      setIsLoading(false);
+    if (trimmed.length < 20) {
+      toast({ title: "Tu comentario debe tener al menos 20 caracteres", variant: "destructive" });
+      return;
     }
+    setSubmitting(true);
+    try {
+      if (myRating) {
+        const { error } = await supabase
+          .from("listing_ratings")
+          .update({ rating: formStars, comment: trimmed })
+          .eq("id", myRating.id);
+        if (error) throw error;
+        toast({ title: "Evaluación actualizada" });
+      } else {
+        const { error } = await supabase
+          .from("listing_ratings")
+          .insert({ listing_id: listingId, user_id: user.id, rating: formStars, comment: trimmed });
+        if (error) throw error;
+        toast({ title: "Gracias por tu evaluación" });
+      }
+      setOpenForm(false);
+      await refresh();
+    } catch (e: any) {
+      toast({ title: e.message || "No se pudo guardar", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const submitResponse = async (ratingId: string) => {
+    const trimmed = responseText.trim();
+    if (!trimmed) return;
+    const { error } = await supabase
+      .from("listing_ratings")
+      .update({ seller_response: trimmed })
+      .eq("id", ratingId);
+    if (error) {
+      toast({ title: error.message, variant: "destructive" });
+      return;
+    }
+    setRespondingId(null);
+    setResponseText("");
+    await refresh();
   };
 
   return (
-    <div className="bg-muted/50 p-4 rounded-lg">
-      <div className="flex flex-col gap-3">
-        {/* Average Rating Display */}
+    <div className="bg-muted/40 p-4 rounded-lg space-y-3">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                className={`w-5 h-5 ${
-                  star <= averageRating
-                    ? 'fill-yellow-400 text-yellow-400'
-                    : 'text-gray-300'
-                }`}
-              />
-            ))}
-          </div>
-          <span className="text-lg font-semibold">{averageRating.toFixed(1)}</span>
-          <span className="text-sm text-muted-foreground">
-            ({totalRatings} {totalRatings === 1 ? t('rating.vote') : t('rating.votes')})
-          </span>
+          <StarRow value={Math.round(average)} size={20} />
+          <span className="font-semibold text-lg">{average ? average.toFixed(1) : "—"}</span>
+          <button
+            type="button"
+            onClick={() => setOpenList(true)}
+            className="text-sm text-muted-foreground underline hover:text-foreground"
+          >
+            {ratings.length === 0
+              ? "Sin evaluaciones aún"
+              : `Ver ${ratings.length} ${ratings.length === 1 ? "evaluación" : "evaluaciones"}`}
+          </button>
         </div>
-
-        {/* User Rating Section */}
-        {canRate && (
-          <div className="border-t pt-3 mt-1">
-            <p className="text-sm text-muted-foreground mb-2">
-              {userRating ? t('rating.yourRating') : t('rating.rateThis')}
-            </p>
-            <div className="flex items-center gap-1">
-              {[1, 2, 3, 4, 5].map((star) => (
-                <Button
-                  key={star}
-                  variant="ghost"
-                  size="sm"
-                  disabled={isLoading}
-                  className="p-1 h-auto hover:bg-transparent"
-                  onMouseEnter={() => setHoverRating(star)}
-                  onMouseLeave={() => setHoverRating(0)}
-                  onClick={() => handleRate(star)}
-                >
-                  <Star
-                    className={`w-7 h-7 transition-colors ${
-                      star <= (hoverRating || userRating || 0)
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300 hover:text-yellow-300'
-                    }`}
-                  />
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Message for owners */}
-        {isOwner && (
-          <p className="text-sm text-muted-foreground italic">
-            {t('rating.ownerMessage')}
-          </p>
-        )}
-
-        {/* Message for non-logged users */}
-        {!user && (
-          <p className="text-sm text-muted-foreground">
-            {t('rating.loginToRate')}
-          </p>
+        {user && !isOwner && (
+          <Button
+            size="sm"
+            variant={myRating ? "outline" : "default"}
+            disabled={!canRate && !myRating}
+            onClick={() => setOpenForm(true)}
+            title={
+              !canRate && !myRating
+                ? "Disponible 24h después de contactar al prestador"
+                : undefined
+            }
+          >
+            {myRating ? "Editar mi evaluación" : "Dejar evaluación"}
+          </Button>
         )}
       </div>
+      {!canRate && !myRating && user && !isOwner && (
+        <p className="text-xs text-muted-foreground">
+          Podrás evaluar este servicio 24 horas después de contactar al prestador.
+        </p>
+      )}
+
+      {/* Reviews modal */}
+      <Dialog open={openList} onOpenChange={setOpenList}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <StarRow value={Math.round(average)} size={18} />
+              <span>{average ? average.toFixed(1) : "—"}</span>
+              <span className="text-sm text-muted-foreground font-normal">
+                · {ratings.length} {ratings.length === 1 ? "evaluación" : "evaluaciones"}
+              </span>
+            </DialogTitle>
+            <DialogDescription>Experiencias de personas que contrataron este servicio.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-5">
+            {ratings.length === 0 && (
+              <p className="text-sm text-muted-foreground py-6 text-center">
+                Todavía no hay evaluaciones para este servicio.
+              </p>
+            )}
+            {ratings.map((r) => (
+              <div key={r.id} className="border-b pb-4 last:border-b-0">
+                <div className="flex items-center gap-3 mb-2">
+                  <Avatar className="h-10 w-10">
+                    {r.reviewer_avatar && <AvatarImage src={r.reviewer_avatar} alt={r.reviewer_name} />}
+                    <AvatarFallback>{initialsFrom(r.reviewer_name)}</AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{r.reviewer_name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleDateString("es", {
+                        year: "numeric",
+                        month: "long",
+                      })}
+                    </p>
+                  </div>
+                  <StarRow value={r.rating} />
+                </div>
+                <p className="text-sm whitespace-pre-wrap break-words">{r.comment}</p>
+
+                {r.seller_response && (
+                  <div className="mt-3 ml-6 pl-3 border-l-2 border-primary/40 bg-muted/40 p-3 rounded-r">
+                    <p className="text-xs font-medium mb-1">Respuesta del anunciante</p>
+                    <p className="text-sm whitespace-pre-wrap break-words">{r.seller_response}</p>
+                  </div>
+                )}
+
+                {isOwner && !r.seller_response && (
+                  <div className="mt-3 ml-6">
+                    {respondingId === r.id ? (
+                      <div className="space-y-2">
+                        <Textarea
+                          rows={2}
+                          maxLength={1000}
+                          value={responseText}
+                          onChange={(e) => setResponseText(e.target.value)}
+                          placeholder="Escribí tu respuesta pública..."
+                        />
+                        <div className="flex gap-2">
+                          <Button size="sm" onClick={() => submitResponse(r.id)}>
+                            Publicar respuesta
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              setRespondingId(null);
+                              setResponseText("");
+                            }}
+                          >
+                            Cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <Button
+                        size="sm"
+                        variant="link"
+                        className="px-0"
+                        onClick={() => {
+                          setRespondingId(r.id);
+                          setResponseText("");
+                        }}
+                      >
+                        Responder
+                      </Button>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rating form modal */}
+      <Dialog open={openForm} onOpenChange={setOpenForm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{myRating ? "Editar evaluación" : "¿Cómo fue tu experiencia?"}</DialogTitle>
+            <DialogDescription>
+              Contale a otros usuarios cómo te atendieron. Tu evaluación será pública.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <p className="text-sm font-medium mb-2">Tu puntuación</p>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onMouseEnter={() => setFormHover(s)}
+                    onMouseLeave={() => setFormHover(0)}
+                    onClick={() => setFormStars(s)}
+                    className="p-1"
+                  >
+                    <Star
+                      className={`w-8 h-8 transition-colors ${
+                        s <= (formHover || formStars)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-muted-foreground/40"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-sm font-medium mb-2">
+                Tu comentario <span className="text-muted-foreground font-normal">(mínimo 20 caracteres)</span>
+              </p>
+              <Textarea
+                rows={5}
+                maxLength={1000}
+                value={formComment}
+                onChange={(e) => setFormComment(e.target.value)}
+                placeholder="Contá cómo fue el contacto, la calidad del servicio, la puntualidad..."
+              />
+              <p className="text-xs text-muted-foreground mt-1 text-right">
+                {formComment.trim().length}/1000
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpenForm(false)} disabled={submitting}>
+              Cancelar
+            </Button>
+            <Button onClick={submitRating} disabled={submitting}>
+              {myRating ? "Guardar cambios" : "Publicar evaluación"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
+export default RatingSystem;
