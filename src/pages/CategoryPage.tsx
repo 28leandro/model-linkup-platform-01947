@@ -13,6 +13,7 @@ import { getPublicCity } from "@/lib/utils";
 import { getCategoryById } from "@/lib/categories";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
+import ListingRatingBadge from "@/components/ListingRatingBadge";
 
 const CATEGORY_SEO: Record<string, { title: string; description: string }> = {
   "vehicles": {
