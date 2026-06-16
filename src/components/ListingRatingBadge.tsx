@@ -52,7 +52,7 @@ export const ListingRatingBadge = ({ listingId, category, className = "" }: Prop
 
   return (
     <span
-      className={`inline-flex items-center gap-0.5 text-[11px] sm:text-xs text-muted-foreground ${className}`}
+      className={`inline-flex items-center gap-0.5 text-[10px] leading-none text-muted-foreground shrink-0 ${className}`}
       aria-label={`${state.avg.toFixed(1)} de 5 · ${state.count} evaluaciones`}
     >
       <Star className="w-3 h-3 fill-foreground text-foreground" />
