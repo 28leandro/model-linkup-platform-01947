@@ -155,6 +155,19 @@ const PostAd = () => {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+    const invalidFile = files.find((file) => {
+      const name = file.name.toLowerCase();
+      return !file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && !/\.(jpe?g|png|webp)$/i.test(name);
+    });
+    if (invalidFile) {
+      toast({
+        title: "Formato de foto inválido",
+        description: "Use fotos JPG, PNG ou WEBP. Fotos HEIC/Live do iPhone devem ser convertidas para JPG.",
+        variant: "destructive",
+      });
+      e.target.value = "";
+      return;
+    }
     const total = files.length + previews.length;
     if (!photosUnlocked && total > FREE_PHOTOS) {
       toast({
@@ -203,6 +216,8 @@ const PostAd = () => {
       return;
     }
 
+    setSubmitError("");
+
     if (uploading) {
       toast({
         title: t('postAd.wait'),
@@ -213,7 +228,22 @@ const PostAd = () => {
 
     // Title length guard (real-time helper already shown)
     if (title.trim().length < 5) {
+      setSubmitError("El título debe tener al menos 5 caracteres.");
       toast({ title: "Título muy corto", description: "El título debe tener al menos 5 caracteres.", variant: "destructive" });
+      return;
+    }
+
+    if (!category) {
+      const msg = t('postAd.categoryError');
+      setSubmitError(msg);
+      toast({ title: t('postAd.validationError'), description: msg, variant: "destructive" });
+      return;
+    }
+
+    if (!attributes.city?.trim()) {
+      const msg = "Informe a cidade do anúncio.";
+      setSubmitError(msg);
+      toast({ title: t('postAd.validationError'), description: msg, variant: "destructive" });
       return;
     }
 
@@ -306,7 +336,6 @@ const PostAd = () => {
     }
 
     setIsSubmitting(true);
-    setSubmitError("");
 
     try {
     // Upload new images to Cloud storage
