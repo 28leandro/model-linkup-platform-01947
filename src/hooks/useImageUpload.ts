@@ -56,11 +56,11 @@ export const useImageUpload = () => {
         throw new Error('Você precisa estar logado para fazer upload de imagens.');
       }
 
-      // Validate file size (max 5MB)
-      if (file.size > 5 * 1024 * 1024) {
+      // Validate file size (max 25MB original; será comprimida a JPEG 80% / 1200px)
+      if (file.size > 25 * 1024 * 1024) {
         toast({
           title: "Arquivo muito grande",
-          description: `O arquivo excede o limite de 5MB`,
+          description: `O arquivo excede o limite de 25MB`,
           variant: "destructive",
         });
         return null;
