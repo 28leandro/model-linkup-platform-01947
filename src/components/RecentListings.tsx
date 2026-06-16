@@ -73,7 +73,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
           <h3 className="font-normal text-sm sm:text-base mb-0 line-clamp-1 text-foreground">{listing.title}</h3>
           <div className="flex items-center gap-1.5 min-h-[20px] flex-wrap">
             {listing.price && listing.price > 0 ? (
-              <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0 truncate`}>
+              <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0`}>
                 {formatPrice(listing.price, (listing as any).currency)}
               </p>
             ) : (

@@ -294,11 +294,14 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
     <div className="bg-muted/40 p-4 rounded-lg space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex items-center gap-2">
-          <span className="font-semibold text-lg">{average ? average.toFixed(1) : "—"}</span>
+          <span className="inline-flex items-center gap-1 font-semibold text-sm">
+            <Star className="w-3.5 h-3.5 fill-foreground text-foreground" />
+            {average ? average.toFixed(1) : "—"}
+          </span>
           <button
             type="button"
             onClick={() => setOpenList(true)}
-            className="text-sm text-muted-foreground underline hover:text-foreground"
+            className="text-xs text-muted-foreground underline hover:text-foreground"
           >
             {ratings.length === 0
               ? "Sin evaluaciones aún"
