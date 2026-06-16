@@ -1,5 +1,12 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+
+if (typeof window !== 'undefined') {
+  try {
+    window.localStorage.removeItem('listings-storage');
+  } catch {
+    // Ignore browsers that block localStorage access.
+  }
+}
 
 export type ListingType = 'vehicles' | 'real-estate' | 'services';
 export type RealEstateType = 'sale' | 'rent';
@@ -45,8 +52,7 @@ interface ListingsState {
 }
 
 export const useListingsStore = create<ListingsState>()(
-  persist(
-    (set) => ({
+  (set) => ({
   listings: [
     {
       id: "1",
@@ -196,9 +202,5 @@ export const useListingsStore = create<ListingsState>()(
     set((state) => ({
       listings: state.listings.filter((listing) => listing.id !== id)
     })),
-}),
-    {
-      name: 'listings-storage',
-    }
-  )
+})
 );
