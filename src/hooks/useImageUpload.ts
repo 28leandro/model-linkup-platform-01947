@@ -12,9 +12,8 @@ export const useImageUpload = () => {
     return user?.id || null;
   };
 
-  const compressImage = (file: File): Promise<Blob> => {
-    return new Promise(async (resolve, reject) => {
-      try {
+  const compressImage = async (file: File): Promise<Blob> => {
+    try {
         // Try modern createImageBitmap first (better mobile support, handles EXIF)
         let bitmap: ImageBitmap | HTMLImageElement | null = null;
         let width = 0;
@@ -76,6 +75,7 @@ export const useImageUpload = () => {
           (bitmap as ImageBitmap).close();
         }
 
+        return await new Promise<Blob>((resolve, reject) => {
         const tryQuality = (quality: number) => {
           canvas.toBlob((blob) => {
             if (!blob) {
@@ -90,10 +90,10 @@ export const useImageUpload = () => {
           }, 'image/jpeg', quality);
         };
         tryQuality(0.82);
-      } catch (err) {
-        reject(err instanceof Error ? err : new Error('Falha ao processar imagem.'));
-      }
-    });
+        });
+    } catch (err) {
+      throw err instanceof Error ? err : new Error('Falha ao processar imagem.');
+    }
   };
 
   const uploadImage = async (file: File): Promise<string | null> => {
