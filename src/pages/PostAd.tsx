@@ -537,6 +537,12 @@ const PostAd = () => {
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+              {submitError && (
+                <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
+                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+                  <p className="break-words">{submitError}</p>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="title">{t('postAd.adTitle')}</Label>
                 <Input
@@ -1059,8 +1065,9 @@ const PostAd = () => {
                 >
                   {t('postAd.cancel')}
                 </Button>
-                <Button type="submit" disabled={uploading} className="w-full sm:w-auto">
-                  {uploading ? t('postAd.uploading') : isEditing ? t('postAd.saveChanges') : t('postAd.publish')}
+                <Button type="submit" disabled={uploading || isSubmitting} className="w-full sm:w-auto">
+                  {(uploading || isSubmitting) && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {uploading || isSubmitting ? t('postAd.uploading') : isEditing ? t('postAd.saveChanges') : t('postAd.publish')}
                 </Button>
               </div>
             </form>
