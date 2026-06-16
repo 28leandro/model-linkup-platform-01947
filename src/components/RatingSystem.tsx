@@ -91,9 +91,9 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
     const { data } = await supabase.rpc("get_listing_ratings_with_profiles", {
       listing_uuid: listingId,
     });
-    const list = ((data as RatingRow[]) || []);
+    const list = (((data as RatingRow[]) || []).map((r) => ({ ...r, rating: Number(r.rating) })));
     setRatings(list);
-    setAverage(list.length ? list.reduce((s, r) => s + r.rating, 0) / list.length : 0);
+    setAverage(list.length ? list.reduce((s, r) => s + Number(r.rating), 0) / list.length : 0);
 
     if (user && !isOwner) {
       const { data: canData } = await supabase.rpc("can_rate_service", {
@@ -140,7 +140,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
       toast({ title: "Tu comentario debe tener al menos 20 caracteres", variant: "destructive" });
       return;
     }
-    const total = p + l + pr;
+    const total = Math.round(((p + l + pr) / 3) * 100) / 100;
     setSubmitting(true);
     try {
       if (myRating) {
@@ -248,7 +248,7 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
                       {new Date(r.created_at).toLocaleDateString("es", { year: "numeric", month: "long" })}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-foreground whitespace-nowrap">{r.rating}/15</span>
+                  <span className="text-sm font-semibold text-foreground whitespace-nowrap">{Number(r.rating).toFixed(2)} / 5</span>
                 </div>
                 <div className="grid grid-cols-3 gap-2 mb-2">
                   {CRITERIA.map((c) => (
