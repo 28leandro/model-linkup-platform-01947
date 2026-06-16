@@ -205,10 +205,10 @@ export const RatingSystem = ({ listingId, listingOwnerId, listingCategory, compa
           type="button"
           onClick={() => setOpenList(true)}
           className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-          aria-label={`${average.toFixed(2)} de 5 estrellas · ${ratings.length} evaluaciones`}
+          aria-label={`${average.toFixed(1)} puntos · ${ratings.length} evaluaciones`}
         >
           <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
-          <span className="font-medium text-foreground">{average.toFixed(2)}</span>
+          <span className="font-medium text-foreground">{average.toFixed(1)}</span>
           <span>· {ratings.length}</span>
         </button>
         {renderListDialog()}
