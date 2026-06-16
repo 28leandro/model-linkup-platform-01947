@@ -49,6 +49,7 @@ export const ListingRatingBadge = ({ listingId, category, className = "" }: Prop
   }, [listingId]);
 
   if (!state || state.count === 0) return null;
+  if (category === "real-estate") return null;
 
   return (
     <span
