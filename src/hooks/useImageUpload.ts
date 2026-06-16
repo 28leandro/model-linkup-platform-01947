@@ -131,11 +131,12 @@ export const useImageUpload = () => {
         .getPublicUrl(data.path);
 
       return publicUrl;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Image upload error:', error);
       
       let userMessage = "Falha ao processar imagem. Tente novamente.";
-      if (error.message?.includes('logged') || error.message?.includes('auth')) {
+      const message = error instanceof Error ? error.message : '';
+      if (message.includes('logged') || message.includes('auth')) {
         userMessage = "Você precisa estar logado para enviar imagens.";
       }
       
