@@ -32,14 +32,13 @@ interface Props {
   className?: string;
 }
 
-/** Tiny inline star + average for service listings. Renders nothing if no ratings. */
+/** Tiny inline star + average for any listing with ratings. Renders nothing if no ratings. */
 export const ListingRatingBadge = ({ listingId, category, className = "" }: Props) => {
   const [state, setState] = useState<CacheEntry | null>(
     cache.get(listingId) || null
   );
 
   useEffect(() => {
-    if (category !== "services") return;
     let alive = true;
     fetchRating(listingId).then((e) => {
       if (alive) setState(e);
@@ -47,9 +46,9 @@ export const ListingRatingBadge = ({ listingId, category, className = "" }: Prop
     return () => {
       alive = false;
     };
-  }, [listingId, category]);
+  }, [listingId]);
 
-  if (category !== "services" || !state || state.count === 0) return null;
+  if (!state || state.count === 0) return null;
 
   return (
     <span
