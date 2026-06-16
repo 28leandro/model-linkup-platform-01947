@@ -23,6 +23,8 @@ import { getVehicleBrands, getVehicleModels } from "@/lib/vehicleBrands";
 
 const FREE_PHOTOS = 3;
 const MAX_PHOTOS_UNLOCKED = 10;
+// Payment system temporarily disabled — all photo uploads up to MAX_PHOTOS_UNLOCKED are free.
+const PHOTOS_FREE_FOR_ALL = true;
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -55,9 +57,7 @@ const PostAd = () => {
     longitude: -57.5759 
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
-  const [photosUnlocked, setPhotosUnlocked] = useState(false);
-  const [testCode, setTestCode] = useState("");
-  const [redeemingCode, setRedeemingCode] = useState(false);
+  const [photosUnlocked, setPhotosUnlocked] = useState(PHOTOS_FREE_FOR_ALL);
 
   // Real-time validation helpers
   const titleError = title.length > 0 && title.trim().length < 5
