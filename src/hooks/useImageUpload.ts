@@ -13,50 +13,86 @@ export const useImageUpload = () => {
   };
 
   const compressImage = (file: File): Promise<Blob> => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1200;
-          const MAX_HEIGHT = 1200;
-          let width = img.width;
-          let height = img.height;
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Try modern createImageBitmap first (better mobile support, handles EXIF)
+        let bitmap: ImageBitmap | HTMLImageElement | null = null;
+        let width = 0;
+        let height = 0;
 
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height *= MAX_WIDTH / width;
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width *= MAX_HEIGHT / height;
-              height = MAX_HEIGHT;
-            }
+        if (typeof createImageBitmap === 'function') {
+          try {
+            bitmap = await createImageBitmap(file);
+            width = bitmap.width;
+            height = bitmap.height;
+          } catch {
+            bitmap = null;
           }
+        }
 
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          
-          const createBlob = (quality: number) => {
-            canvas.toBlob((blob) => {
-              if (!blob) return;
-              if (blob.size <= MAX_UPLOAD_SIZE || quality <= 0.45) {
-                resolve(blob);
-                return;
-              }
-              createBlob(quality - 0.1);
-            }, 'image/jpeg', quality);
-          };
+        if (!bitmap) {
+          // Fallback for older browsers / unsupported formats
+          const dataUrl: string = await new Promise((res, rej) => {
+            const reader = new FileReader();
+            reader.onload = (e) => res(e.target?.result as string);
+            reader.onerror = () => rej(new Error('FileReader failed'));
+            reader.readAsDataURL(file);
+          });
+          const img = await new Promise<HTMLImageElement>((res, rej) => {
+            const i = new Image();
+            i.onload = () => res(i);
+            i.onerror = () => rej(new Error('Imagem inválida ou formato não suportado (tente JPG ou PNG).'));
+            i.src = dataUrl;
+          });
+          bitmap = img;
+          width = img.naturalWidth || img.width;
+          height = img.naturalHeight || img.height;
+        }
 
-          createBlob(0.82);
+        if (!width || !height) {
+          reject(new Error('Não foi possível ler as dimensões da imagem.'));
+          return;
+        }
+
+        const MAX_DIM = 1200;
+        if (width > height && width > MAX_DIM) {
+          height = Math.round((height * MAX_DIM) / width);
+          width = MAX_DIM;
+        } else if (height >= width && height > MAX_DIM) {
+          width = Math.round((width * MAX_DIM) / height);
+          height = MAX_DIM;
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas indisponível no navegador.'));
+          return;
+        }
+        ctx.drawImage(bitmap as CanvasImageSource, 0, 0, width, height);
+        if ('close' in bitmap && typeof (bitmap as ImageBitmap).close === 'function') {
+          (bitmap as ImageBitmap).close();
+        }
+
+        const tryQuality = (quality: number) => {
+          canvas.toBlob((blob) => {
+            if (!blob) {
+              reject(new Error('Falha ao gerar imagem comprimida.'));
+              return;
+            }
+            if (blob.size <= MAX_UPLOAD_SIZE || quality <= 0.4) {
+              resolve(blob);
+              return;
+            }
+            tryQuality(Math.max(0.4, quality - 0.1));
+          }, 'image/jpeg', quality);
         };
-        img.src = e.target?.result as string;
-      };
-      reader.readAsDataURL(file);
+        tryQuality(0.82);
+      } catch (err) {
+        reject(err instanceof Error ? err : new Error('Falha ao processar imagem.'));
+      }
     });
   };
 
@@ -88,7 +124,18 @@ export const useImageUpload = () => {
       }
 
       setUploading(true);
-      const compressedBlob = await compressImage(file);
+      let compressedBlob: Blob;
+      try {
+        compressedBlob = await compressImage(file);
+      } catch (compressErr) {
+        const msg = compressErr instanceof Error ? compressErr.message : 'Falha ao processar imagem.';
+        toast({
+          title: 'Erro ao processar imagem',
+          description: msg + ' Tente outra foto em JPG ou PNG.',
+          variant: 'destructive',
+        });
+        return null;
+      }
       if (compressedBlob.size > MAX_UPLOAD_SIZE) {
         toast({
           title: "Imagem muito grande",
