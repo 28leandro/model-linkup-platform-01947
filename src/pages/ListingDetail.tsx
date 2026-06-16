@@ -326,17 +326,6 @@ const ListingDetail = () => {
                   </p>
                 )}
               </div>
-              {/* Compact rating badge below the description */}
-              {listing.user_id && (
-                <div className="mt-2">
-                  <RatingSystem
-                    listingId={listing.id}
-                    listingOwnerId={listing.user_id}
-                    listingCategory={listing.category}
-                    compactBadge
-                  />
-                </div>
-              )}
             </div>
             
             <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
