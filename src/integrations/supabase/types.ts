@@ -21,6 +21,9 @@ export type Database = {
           id: string
           listing_id: string
           rating: number
+          rating_location: number | null
+          rating_professionalism: number | null
+          rating_punctuality: number | null
           seller_response: string | null
           seller_response_at: string | null
           updated_at: string
@@ -32,6 +35,9 @@ export type Database = {
           id?: string
           listing_id: string
           rating: number
+          rating_location?: number | null
+          rating_professionalism?: number | null
+          rating_punctuality?: number | null
           seller_response?: string | null
           seller_response_at?: string | null
           updated_at?: string
@@ -43,6 +49,9 @@ export type Database = {
           id?: string
           listing_id?: string
           rating?: number
+          rating_location?: number | null
+          rating_professionalism?: number | null
+          rating_punctuality?: number | null
           seller_response?: string | null
           seller_response_at?: string | null
           updated_at?: string
@@ -473,6 +482,9 @@ export type Database = {
           created_at: string
           id: string
           rating: number
+          rating_location: number
+          rating_professionalism: number
+          rating_punctuality: number
           reviewer_avatar: string
           reviewer_name: string
           seller_response: string
