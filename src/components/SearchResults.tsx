@@ -61,8 +61,8 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
               />
             </div>
             <Link to={`/listing/${listing.id}`} className="block">
-              <div className="pt-0.5 px-0.5 leading-tight">
-                <div className="flex items-center gap-1.5 mb-0.5 min-h-[18px]">
+              <div className="pt-px px-0.5 leading-tight">
+                <div className="flex items-center gap-1.5 mb-0 min-h-[18px]">
                   {getCategoryIcon(listing.type) ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
                       {getCategoryIcon(listing.type)}
@@ -73,7 +73,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                   )}
                 </div>
                 <h3 className="font-normal text-sm sm:text-base mb-0 line-clamp-1 text-foreground">{listing.title}</h3>
-                <div className="min-h-[20px]">
+                <div className="flex items-center gap-1.5 min-h-[20px]">
                   {listing.price && listing.price > 0 ? (
                     <p className={`${priceClass(cheapestIds.has(listing.id))} font-semibold text-sm lg:text-base mb-0`}>
                       {formatPrice(listing.price, (listing as any).currency)}
@@ -81,8 +81,8 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                   ) : (
                     <p className="font-semibold text-sm lg:text-base mb-0 opacity-0">—</p>
                   )}
+                  <ListingRatingBadge listingId={listing.id} category={(listing as any).category ?? listing.type} />
                 </div>
-                <ListingRatingBadge listingId={listing.id} category={(listing as any).category ?? listing.type} className="mb-0.5" />
                 <div className="min-h-[20px]">
                   <VehicleInfo
                     year={(listing as any).year}
@@ -91,12 +91,12 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                   />
                 </div>
                 {listing.type === "real-estate" && AREA_SUBS.includes((listing as any).subcategory) && (listing as any).area > 0 && (
-                  <p className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground mt-0.5">
+                  <p className="inline-flex items-center gap-1 text-[11px] sm:text-xs text-muted-foreground mt-0">
                     <Ruler className="h-3 w-3" />
                     {Number((listing as any).area).toLocaleString("es-PY")} m²
                   </p>
                 )}
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">{getPublicCity(listing)}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0 line-clamp-1 font-light">{getPublicCity(listing)}</p>
               </div>
             </Link>
           </div>
