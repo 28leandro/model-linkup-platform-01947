@@ -157,12 +157,12 @@ const PostAd = () => {
     const files = Array.from(e.target.files || []);
     const invalidFile = files.find((file) => {
       const name = file.name.toLowerCase();
-      return !file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && !/\.(jpe?g|png|webp)$/i.test(name);
+      return !file.type.match(/^image\/(jpeg|jpg|png|webp|heic|heif)$/) && !/\.(jpe?g|png|webp|heic|heif)$/i.test(name);
     });
     if (invalidFile) {
       toast({
         title: "Formato de foto inválido",
-        description: "Use fotos JPG, PNG ou WEBP. Fotos HEIC/Live do iPhone devem ser convertidas para JPG.",
+        description: "Use fotos JPG, PNG, WEBP ou HEIC/HEIF do iPhone.",
         variant: "destructive",
       });
       e.target.value = "";
@@ -240,12 +240,7 @@ const PostAd = () => {
       return;
     }
 
-    if (!attributes.city?.trim()) {
-      const msg = "Informe a cidade do anúncio.";
-      setSubmitError(msg);
-      toast({ title: t('postAd.validationError'), description: msg, variant: "destructive" });
-      return;
-    }
+    const cityValue = attributes.city?.trim() || location.address?.split(',')?.[0]?.trim() || "Asunción";
 
     // Category-specific required fields
     if (category === "vehicles") {
@@ -415,7 +410,7 @@ const PostAd = () => {
       fuel_type: category === "vehicles" ? (fuelType || orig.fuel_type || null) : (isEditing ? orig.fuel_type ?? null : null),
       subcategory: subcategory || orig.subcategory || null,
       condition: condition || orig.condition || null,
-      attributes: attributes || {},
+      attributes: { ...(attributes || {}), city: cityValue },
       latitude: location.latitude ?? orig.latitude,
       longitude: location.longitude ?? orig.longitude,
       user_id: user.id,
@@ -536,7 +531,7 @@ const PostAd = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4 sm:space-y-6">
               {submitError && (
                 <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -559,7 +554,7 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="category">{t('postAd.category')} *</Label>
-                <Select value={category} onValueChange={setCategory} required>
+                <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="bg-card border-input h-11 sm:h-10">
                     <SelectValue placeholder={t('postAd.categoryPlaceholder')} />
                   </SelectTrigger>
@@ -1043,7 +1038,7 @@ const PostAd = () => {
                       <Input
                         id="image-upload"
                         type="file"
-                        accept="image/*"
+                        accept="image/*,.heic,.heif,image/heic,image/heif"
                         className="hidden"
                         onChange={handleImageChange}
                         multiple
