@@ -515,6 +515,7 @@ const PostAd = () => {
 
         addListing(inserted || fullData);
 
+        try { sessionStorage.removeItem(DRAFT_KEY); } catch {/* ignore */}
         toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
         navigate(inserted?.id ? `/listing/${inserted.id}` : "/my-listings");
         return;
