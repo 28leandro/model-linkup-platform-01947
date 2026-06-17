@@ -956,7 +956,7 @@ const PostAd = () => {
               {category && (
               <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="city">Ciudad *</Label>
+                  <Label htmlFor="city">Ciudad</Label>
                   <Input
                     id="city"
                     value={attributes.city || ""}
