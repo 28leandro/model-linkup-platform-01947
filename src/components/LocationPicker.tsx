@@ -141,30 +141,47 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
       throw new LocationError('NOT_SUPPORTED');
     }
 
+    // Bug #3 — Android geolocation timeout (even with permission granted):
+    //   On mobile networks, enableHighAccuracy=true + maximumAge=0 commonly
+    //   times out while the GPS chip is still acquiring a fix. We:
+    //     1. Try a SHORT high-accuracy attempt (8s) and allow a cached fix
+    //        up to 60s old to satisfy the request instantly when possible.
+    //     2. On any non-permission failure, fall back to low-accuracy
+    //        (network/wifi positioning) which almost always succeeds.
+    //     3. Last resort: watchPosition (some Android builds only emit a
+    //        first fix via watchPosition, not getCurrentPosition).
+    //   Every step is wrapped in try/catch with debug logging.
     try {
       const position = await getBrowserPosition({
         enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        timeout: 8000,
+        maximumAge: 60000,
       });
+      if (import.meta.env.DEV) console.debug('[geo] high-accuracy fix OK');
       return position.coords;
     } catch (error) {
       const geoError = error as GeolocationPositionError;
-      if (geoError.code === geoError.PERMISSION_DENIED) throw new LocationError('PERMISSION_DENIED');
+      if (geoError?.code === 1) throw new LocationError('PERMISSION_DENIED');
+      if (import.meta.env.DEV) console.debug('[geo] high-accuracy failed, falling back:', geoError?.code);
 
       try {
         const position = await getBrowserPosition({
           enableHighAccuracy: false,
-          timeout: 18000,
-          maximumAge: 120000,
-        });
-        return position.coords;
-      } catch {
-        const position = await getBrowserWatchPosition({
-          enableHighAccuracy: false,
-          timeout: 22000,
+          timeout: 15000,
           maximumAge: 300000,
         });
+        if (import.meta.env.DEV) console.debug('[geo] low-accuracy fix OK');
+        return position.coords;
+      } catch (err2) {
+        const e2 = err2 as GeolocationPositionError;
+        if (e2?.code === 1) throw new LocationError('PERMISSION_DENIED');
+        if (import.meta.env.DEV) console.debug('[geo] low-accuracy failed, trying watchPosition:', e2?.code);
+        const position = await getBrowserWatchPosition({
+          enableHighAccuracy: false,
+          timeout: 20000,
+          maximumAge: 600000,
+        });
+        if (import.meta.env.DEV) console.debug('[geo] watchPosition fix OK');
         return position.coords;
       }
     }

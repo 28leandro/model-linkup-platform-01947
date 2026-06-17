@@ -96,3 +96,17 @@
     }
   }
 }
+
+/* Bug #1 — Mobile Android: prevent horizontal overflow that breaks ad cards
+   layout on Chrome/Samsung Internet (long titles, wide images, embedded
+   iframes/ads). Keep media fluid by default. */
+@layer base {
+  html, body, #root {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+  img, video, iframe {
+    max-width: 100%;
+    height: auto;
+  }
+}

@@ -22,23 +22,69 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Set up auth state listener
+    let mounted = true;
+
+    // Bug #2 — Session drop fix:
+    // Only mutate state on meaningful auth events. TOKEN_REFRESHED and
+    // USER_UPDATED fire frequently on mobile (especially after the tab is
+    // backgrounded or the network reconnects). Toggling `loading` on every
+    // event caused the UI to remount and looked like an involuntary logout.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+      (event, newSession) => {
+        if (!mounted) return;
+        if (import.meta.env.DEV) console.debug('[auth] event:', event);
+
+        if (event === 'SIGNED_OUT') {
+          setSession(null);
+          setUser(null);
+          return;
+        }
+
+        // SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED / USER_UPDATED /
+        // PASSWORD_RECOVERY — keep state in sync but never flip loading
+        // back to true (initial load handles that once).
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
       }
     );
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Initial session hydration
+    supabase.auth.getSession()
+      .then(({ data: { session: initialSession } }) => {
+        if (!mounted) return;
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+      })
+      .catch((err) => {
+        console.error('[auth] getSession failed:', err);
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
 
-    return () => subscription.unsubscribe();
+    // Bug #2 — Reconnect handler: when the device comes back online or the
+    // tab becomes visible again after a network blip, force a session
+    // refresh so the user does not appear "logged out" until the next API
+    // call lazily refreshes the token.
+    const refresh = () => {
+      supabase.auth.getSession().then(({ data: { session: s } }) => {
+        if (!mounted) return;
+        setSession(s);
+        setUser(s?.user ?? null);
+      }).catch((err) => console.error('[auth] refresh failed:', err));
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    window.addEventListener('online', refresh);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+      window.removeEventListener('online', refresh);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   const signUp = async (email: string, password: string, name?: string) => {
