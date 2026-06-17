@@ -111,24 +111,12 @@ const Index = () => {
       }
     };
 
-    // Try browser geolocation first, fallback to IP
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setUserLocation({
-            lat: position.coords.latitude,
-            lon: position.coords.longitude,
-          });
-        },
-        () => {
-          // Browser geolocation denied/failed, try IP-based
-          getLocationByIP();
-        },
-        { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
-      );
-    } else {
-      getLocationByIP();
-    }
+    // Do NOT auto-prompt for browser geolocation on home load.
+    // On Android, if another app has an overlay (chat bubbles, screen filter)
+    // Chrome shows "Este sitio no puede solicitarte permiso" and blocks the page.
+    // Use IP-based location silently; the user can opt-in to precise location
+    // from screens that explicitly need it (MapView, LocationPicker, filters).
+    getLocationByIP();
 
     const fetchListings = async () => {
       const { data, error } = await supabase
