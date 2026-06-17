@@ -258,11 +258,19 @@ const PostAd = () => {
         toast({ title: "Falta tipo de vehículo", description: "Seleccioná el tipo de vehículo.", variant: "destructive" });
         return;
       }
-      if (!attributes.brand) {
+      const vehicleBrands = getVehicleBrands(subcategory);
+      const requiresVehicleDetails = ![
+        "repuestos-auto",
+        "repuestos-moto",
+        "repuestos-camion",
+        "accesorios-vehiculos",
+        "nauticos",
+      ].includes(subcategory);
+      if (vehicleBrands.length > 0 && !attributes.brand) {
         toast({ title: "Falta la marca", description: "Seleccioná la marca del vehículo.", variant: "destructive" });
         return;
       }
-      if (!year) {
+      if (requiresVehicleDetails && !year) {
         toast({ title: "Falta el año", description: "Indicá el año del vehículo.", variant: "destructive" });
         return;
       }
