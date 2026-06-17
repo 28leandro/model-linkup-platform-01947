@@ -152,10 +152,11 @@ export const useImageUpload = () => {
         });
         return null;
       }
-      if (compressedBlob.size > MAX_UPLOAD_SIZE) {
+      // Hard ceiling at 8MB (Supabase storage accepts up to 50MB; this is just a safety net).
+      if (compressedBlob.size > 8 * 1024 * 1024) {
         toast({
           title: "Imagem muito grande",
-          description: "A imagem não pôde ser reduzida abaixo de 5MB.",
+          description: "Não foi possível reduzir esta foto. Tente outra imagem.",
           variant: "destructive",
         });
         return null;
