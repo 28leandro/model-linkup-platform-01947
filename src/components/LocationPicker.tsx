@@ -287,7 +287,6 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
               onLocationSelect({ address: e.target.value, latitude: 0, longitude: 0 });
             }}
             placeholder={isGettingLocation ? t('location.gettingLocation') : ""}
-            required
             disabled={isGettingLocation}
             autoComplete="off"
             className="h-11 sm:h-10 pr-9"
