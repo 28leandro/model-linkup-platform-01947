@@ -25,6 +25,7 @@ const FREE_PHOTOS = 3;
 const MAX_PHOTOS_UNLOCKED = 10;
 // Payment system temporarily disabled — all photo uploads up to MAX_PHOTOS_UNLOCKED are free.
 const PHOTOS_FREE_FOR_ALL = true;
+const LISTING_SELECT_FIELDS = "id,title,rating,description,category,type,location,images,price,currency,area,year,brand,model,fuel_type,subcategory,condition,attributes,latitude,longitude,created_at,user_id,is_published,photos_unlocked";
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ const PostAd = () => {
     (async () => {
       const { data, error } = await supabase
         .from('listings')
-        .select('*')
+        .select(LISTING_SELECT_FIELDS)
         .eq('id', id)
         .maybeSingle();
       if (!cancelled && !error && data) {
@@ -455,7 +456,8 @@ const PostAd = () => {
         const { error } = await supabase
           .from('listings')
           .update(diff)
-          .eq('id', String(editingListing.id));
+          .eq('id', String(editingListing.id))
+          .eq('user_id', user.id);
         if (error) throw error;
 
         updateListing(editingListing.id, diff);
@@ -471,7 +473,7 @@ const PostAd = () => {
         const { data: inserted, error } = await supabase
           .from('listings')
           .insert([insertData])
-          .select()
+          .select(LISTING_SELECT_FIELDS)
           .single();
         
         if (error) throw error;
