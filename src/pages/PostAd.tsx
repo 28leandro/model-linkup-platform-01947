@@ -25,6 +25,7 @@ const FREE_PHOTOS = 3;
 const MAX_PHOTOS_UNLOCKED = 10;
 // Payment system temporarily disabled — all photo uploads up to MAX_PHOTOS_UNLOCKED are free.
 const PHOTOS_FREE_FOR_ALL = true;
+const LISTING_SELECT_FIELDS = "id,title,rating,description,category,type,location,images,price,currency,area,year,brand,model,fuel_type,subcategory,condition,attributes,latitude,longitude,created_at,user_id,is_published,photos_unlocked";
 
 const PostAd = () => {
   const navigate = useNavigate();
@@ -114,7 +115,7 @@ const PostAd = () => {
     (async () => {
       const { data, error } = await supabase
         .from('listings')
-        .select('*')
+        .select(LISTING_SELECT_FIELDS)
         .eq('id', id)
         .maybeSingle();
       if (!cancelled && !error && data) {
@@ -157,12 +158,12 @@ const PostAd = () => {
     const files = Array.from(e.target.files || []);
     const invalidFile = files.find((file) => {
       const name = file.name.toLowerCase();
-      return !file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && !/\.(jpe?g|png|webp)$/i.test(name);
+      return !file.type.match(/^image\/(jpeg|jpg|png|webp|heic|heif)$/) && !/\.(jpe?g|png|webp|heic|heif)$/i.test(name);
     });
     if (invalidFile) {
       toast({
         title: "Formato de foto inválido",
-        description: "Use fotos JPG, PNG ou WEBP. Fotos HEIC/Live do iPhone devem ser convertidas para JPG.",
+        description: "Use fotos JPG, PNG, WEBP ou HEIC/HEIF do iPhone.",
         variant: "destructive",
       });
       e.target.value = "";
@@ -200,8 +201,18 @@ const PostAd = () => {
   };
 
   const removeImage = (index: number) => {
+    const removedPreview = previews[index];
     setPreviews(prev => prev.filter((_, i) => i !== index));
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
+
+    if (removedPreview?.startsWith('blob:')) {
+      const newImageIndex = previews
+        .filter((preview) => preview.startsWith('blob:'))
+        .findIndex((preview) => preview === removedPreview);
+      if (newImageIndex >= 0) {
+        setImageFiles(prev => prev.filter((_, i) => i !== newImageIndex));
+      }
+      URL.revokeObjectURL(removedPreview);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -240,12 +251,7 @@ const PostAd = () => {
       return;
     }
 
-    if (!attributes.city?.trim()) {
-      const msg = "Informe a cidade do anúncio.";
-      setSubmitError(msg);
-      toast({ title: t('postAd.validationError'), description: msg, variant: "destructive" });
-      return;
-    }
+    const cityValue = attributes.city?.trim() || location.address?.split(',')?.[0]?.trim() || "Asunción";
 
     // Category-specific required fields
     if (category === "vehicles") {
@@ -253,11 +259,19 @@ const PostAd = () => {
         toast({ title: "Falta tipo de vehículo", description: "Seleccioná el tipo de vehículo.", variant: "destructive" });
         return;
       }
-      if (!attributes.brand) {
+      const vehicleBrands = getVehicleBrands(subcategory);
+      const requiresVehicleDetails = ![
+        "repuestos-auto",
+        "repuestos-moto",
+        "repuestos-camion",
+        "accesorios-vehiculos",
+        "nauticos",
+      ].includes(subcategory);
+      if (vehicleBrands.length > 0 && !attributes.brand) {
         toast({ title: "Falta la marca", description: "Seleccioná la marca del vehículo.", variant: "destructive" });
         return;
       }
-      if (!year) {
+      if (requiresVehicleDetails && !year) {
         toast({ title: "Falta el año", description: "Indicá el año del vehículo.", variant: "destructive" });
         return;
       }
@@ -289,26 +303,8 @@ const PostAd = () => {
       location: location.address.trim(),
     };
 
-    // When editing, only validate fields that actually changed
-    let toValidate: any = candidate;
-    if (isEditing && editingListing) {
-      const o: any = editingListing;
-      const changed: any = {};
-      if (candidate.title !== (o.title || "")) changed.title = candidate.title;
-      if (candidate.description !== (o.description || "")) changed.description = candidate.description;
-      if (candidate.phone !== (o.phone || "")) changed.phone = candidate.phone;
-      if (candidate.category !== (o.category || o.type || "")) changed.category = candidate.category;
-      if (Number(candidate.price) !== Number(o.price || 0)) changed.price = candidate.price;
-      if (Number(candidate.area) !== Number(o.area || 0)) changed.area = candidate.area;
-      if (candidate.location !== (o.location || "")) changed.location = candidate.location;
-      if (candidate.latitude !== (o.latitude || 0)) changed.latitude = candidate.latitude;
-      if (candidate.longitude !== (o.longitude || 0)) changed.longitude = candidate.longitude;
-      toValidate = changed;
-    }
-
     try {
-      const partial = listingSchema.partial();
-      partial.parse(toValidate);
+      listingSchema.parse(candidate);
     } catch (error: any) {
       // Provide more specific error messages (Zod v4 uses 'issues' instead of 'errors')
       const issues = error.issues || error.errors || [];
@@ -415,7 +411,7 @@ const PostAd = () => {
       fuel_type: category === "vehicles" ? (fuelType || orig.fuel_type || null) : (isEditing ? orig.fuel_type ?? null : null),
       subcategory: subcategory || orig.subcategory || null,
       condition: condition || orig.condition || null,
-      attributes: attributes || {},
+      attributes: { ...(attributes || {}), city: cityValue },
       latitude: location.latitude ?? orig.latitude,
       longitude: location.longitude ?? orig.longitude,
       user_id: user.id,
@@ -460,7 +456,8 @@ const PostAd = () => {
         const { error } = await supabase
           .from('listings')
           .update(diff)
-          .eq('id', String(editingListing.id));
+          .eq('id', String(editingListing.id))
+          .eq('user_id', user.id);
         if (error) throw error;
 
         updateListing(editingListing.id, diff);
@@ -476,7 +473,7 @@ const PostAd = () => {
         const { data: inserted, error } = await supabase
           .from('listings')
           .insert([insertData])
-          .select()
+          .select(LISTING_SELECT_FIELDS)
           .single();
         
         if (error) throw error;
@@ -536,7 +533,7 @@ const PostAd = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <form onSubmit={handleSubmit} noValidate className="space-y-4 sm:space-y-6">
               {submitError && (
                 <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
                   <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
@@ -559,7 +556,7 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="category">{t('postAd.category')} *</Label>
-                <Select value={category} onValueChange={setCategory} required>
+                <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="bg-card border-input h-11 sm:h-10">
                     <SelectValue placeholder={t('postAd.categoryPlaceholder')} />
                   </SelectTrigger>
@@ -961,7 +958,7 @@ const PostAd = () => {
               {category && (
               <div className="grid grid-cols-1 gap-3">
                 <div className="space-y-2">
-                  <Label htmlFor="city">Ciudad *</Label>
+                  <Label htmlFor="city">Ciudad</Label>
                   <Input
                     id="city"
                     value={attributes.city || ""}
@@ -1043,7 +1040,7 @@ const PostAd = () => {
                       <Input
                         id="image-upload"
                         type="file"
-                        accept="image/*"
+                        accept="image/*,.heic,.heif,image/heic,image/heif"
                         className="hidden"
                         onChange={handleImageChange}
                         multiple
