@@ -6,7 +6,20 @@ import { toast } from '@/components/ui/use-toast';
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
   const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
-  const MAX_UPLOAD_SIZE = 2 * 1024 * 1024;
+  const MAX_UPLOAD_SIZE = 2 * 1024 * 1024; // target after compression
+  const MAX_DIM = 1200; // max width/height in px (web-optimized)
+  const TARGET_QUALITY = 0.8; // ~80% perceptual quality
+
+  // Detect WebP encoding support in the current browser/canvas.
+  const supportsWebP = (() => {
+    try {
+      const c = document.createElement('canvas');
+      c.width = c.height = 1;
+      return c.toDataURL('image/webp').indexOf('data:image/webp') === 0;
+    } catch {
+      return false;
+    }
+  })();
 
   const isHeicImage = (file: File) => {
     const name = file.name.toLowerCase();
@@ -15,7 +28,10 @@ export const useImageUpload = () => {
 
   const isSupportedInputImage = (file: File) => {
     const name = file.name.toLowerCase();
-    return /^image\/(jpeg|jpg|png|webp|heic|heif)$/i.test(file.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(name);
+    return (
+      /^image\/(jpeg|jpg|png|webp|heic|heif)$/i.test(file.type) ||
+      /\.(jpe?g|png|webp|heic|heif)$/i.test(name)
+    );
   };
 
   const convertHeicToJpeg = async (file: File): Promise<Blob> => {
@@ -69,7 +85,6 @@ export const useImageUpload = () => {
           throw new Error('Não foi possível ler as dimensões da imagem.');
         }
 
-        const MAX_DIM = 1024;
         if (width > height && width > MAX_DIM) {
           height = Math.round((height * MAX_DIM) / width);
           width = MAX_DIM;
@@ -90,21 +105,23 @@ export const useImageUpload = () => {
           (bitmap as ImageBitmap).close();
         }
 
+        // Prefer WebP (smaller files); gracefully fall back to JPEG on Safari/old browsers.
+        const outputType = supportsWebP ? 'image/webp' : 'image/jpeg';
         return await new Promise<Blob>((resolve, reject) => {
-        const tryQuality = (quality: number) => {
-          canvas.toBlob((blob) => {
-            if (!blob) {
-              reject(new Error('Falha ao gerar imagem comprimida.'));
-              return;
-            }
-            if (blob.size <= MAX_UPLOAD_SIZE || quality <= 0.3) {
-              resolve(blob);
-              return;
-            }
-            tryQuality(Math.max(0.3, quality - 0.1));
-          }, 'image/jpeg', quality);
-        };
-        tryQuality(0.75);
+          const tryQuality = (quality: number) => {
+            canvas.toBlob((blob) => {
+              if (!blob) {
+                reject(new Error('Falha ao gerar imagem comprimida.'));
+                return;
+              }
+              if (blob.size <= MAX_UPLOAD_SIZE || quality <= 0.3) {
+                resolve(blob);
+                return;
+              }
+              tryQuality(Math.max(0.3, quality - 0.1));
+            }, outputType, quality);
+          };
+          tryQuality(TARGET_QUALITY);
         });
     } catch (err) {
       throw err instanceof Error ? err : new Error('Falha ao processar imagem.');
@@ -129,11 +146,11 @@ export const useImageUpload = () => {
       }
 
       const fileName = file.name.toLowerCase();
-      const looksLikeSupportedImage = /\.(jpe?g|png|webp)$/i.test(fileName);
+      const looksLikeSupportedImage = /\.(jpe?g|png|webp|heic|heif)$/i.test(fileName);
       if (!isSupportedInputImage(file) && !looksLikeSupportedImage) {
         toast({
           title: "Tipo de arquivo inválido",
-          description: "Use fotos JPG, PNG, WEBP ou HEIC/HEIF do iPhone",
+          description: "Aceitamos apenas JPG, PNG, WEBP ou HEIC/HEIF do iPhone.",
           variant: "destructive",
         });
         return null;
@@ -161,13 +178,19 @@ export const useImageUpload = () => {
         });
         return null;
       }
-      const storageFileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
+      // Unique filename — UUID when available, timestamp+random fallback.
+      const uuid =
+        typeof crypto !== 'undefined' && 'randomUUID' in crypto
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+      const ext = compressedBlob.type === 'image/webp' ? 'webp' : 'jpg';
+      const storageFileName = `${uuid}.${ext}`;
       const filePath = `${userId}/${storageFileName}`;
       
       const { data, error } = await supabase.storage
         .from('listing-images')
         .upload(filePath, compressedBlob, {
-          contentType: 'image/jpeg',
+          contentType: compressedBlob.type || 'image/jpeg',
           cacheControl: '3600',
           upsert: false
         });
