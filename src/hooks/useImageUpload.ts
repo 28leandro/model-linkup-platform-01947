@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import heic2any from 'heic2any';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
@@ -7,6 +8,21 @@ export const useImageUpload = () => {
   const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
   const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
 
+  const isHeicImage = (file: File) => {
+    const name = file.name.toLowerCase();
+    return /\.(heic|heif)$/i.test(name) || /image\/(heic|heif)/i.test(file.type);
+  };
+
+  const isSupportedInputImage = (file: File) => {
+    const name = file.name.toLowerCase();
+    return /^image\/(jpeg|jpg|png|webp|heic|heif)$/i.test(file.type) || /\.(jpe?g|png|webp|heic|heif)$/i.test(name);
+  };
+
+  const convertHeicToJpeg = async (file: File): Promise<Blob> => {
+    const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.82 });
+    return Array.isArray(converted) ? converted[0] : converted;
+  };
+
   const getUserId = async (): Promise<string | null> => {
     const { data: { user } } = await supabase.auth.getUser();
     return user?.id || null;
@@ -14,6 +30,7 @@ export const useImageUpload = () => {
 
   const compressImage = async (file: File): Promise<Blob> => {
     try {
+        const sourceBlob = isHeicImage(file) ? await convertHeicToJpeg(file) : file;
         // Try modern createImageBitmap first (better mobile support, handles EXIF)
         let bitmap: ImageBitmap | HTMLImageElement | null = null;
         let width = 0;
@@ -21,7 +38,7 @@ export const useImageUpload = () => {
 
         if (typeof createImageBitmap === 'function') {
           try {
-            bitmap = await createImageBitmap(file);
+            bitmap = await createImageBitmap(sourceBlob);
             width = bitmap.width;
             height = bitmap.height;
           } catch {
@@ -35,7 +52,7 @@ export const useImageUpload = () => {
             const reader = new FileReader();
             reader.onload = (e) => res(e.target?.result as string);
             reader.onerror = () => rej(new Error('FileReader failed'));
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(sourceBlob);
           });
           const img = await new Promise<HTMLImageElement>((res, rej) => {
             const i = new Image();
@@ -113,10 +130,10 @@ export const useImageUpload = () => {
 
       const fileName = file.name.toLowerCase();
       const looksLikeSupportedImage = /\.(jpe?g|png|webp)$/i.test(fileName);
-      if (!file.type.match(/^image\/(jpeg|jpg|png|webp)$/) && !looksLikeSupportedImage) {
+      if (!isSupportedInputImage(file) && !looksLikeSupportedImage) {
         toast({
           title: "Tipo de arquivo inválido",
-          description: "Apenas JPG, PNG e WEBP são permitidos",
+          description: "Use fotos JPG, PNG, WEBP ou HEIC/HEIF do iPhone",
           variant: "destructive",
         });
         return null;
