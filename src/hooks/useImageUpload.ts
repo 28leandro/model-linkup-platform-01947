@@ -6,7 +6,7 @@ import { toast } from '@/components/ui/use-toast';
 export const useImageUpload = () => {
   const [uploading, setUploading] = useState(false);
   const MAX_ORIGINAL_SIZE = 50 * 1024 * 1024;
-  const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
+  const MAX_UPLOAD_SIZE = 2 * 1024 * 1024;
 
   const isHeicImage = (file: File) => {
     const name = file.name.toLowerCase();
@@ -69,7 +69,7 @@ export const useImageUpload = () => {
           throw new Error('Não foi possível ler as dimensões da imagem.');
         }
 
-        const MAX_DIM = 1200;
+        const MAX_DIM = 1024;
         if (width > height && width > MAX_DIM) {
           height = Math.round((height * MAX_DIM) / width);
           width = MAX_DIM;
@@ -97,14 +97,14 @@ export const useImageUpload = () => {
               reject(new Error('Falha ao gerar imagem comprimida.'));
               return;
             }
-            if (blob.size <= MAX_UPLOAD_SIZE || quality <= 0.4) {
+            if (blob.size <= MAX_UPLOAD_SIZE || quality <= 0.3) {
               resolve(blob);
               return;
             }
-            tryQuality(Math.max(0.4, quality - 0.1));
+            tryQuality(Math.max(0.3, quality - 0.1));
           }, 'image/jpeg', quality);
         };
-        tryQuality(0.82);
+        tryQuality(0.75);
         });
     } catch (err) {
       throw err instanceof Error ? err : new Error('Falha ao processar imagem.');
@@ -152,10 +152,11 @@ export const useImageUpload = () => {
         });
         return null;
       }
-      if (compressedBlob.size > MAX_UPLOAD_SIZE) {
+      // Hard ceiling at 8MB (Supabase storage accepts up to 50MB; this is just a safety net).
+      if (compressedBlob.size > 8 * 1024 * 1024) {
         toast({
           title: "Imagem muito grande",
-          description: "A imagem não pôde ser reduzida abaixo de 5MB.",
+          description: "Não foi possível reduzir esta foto. Tente outra imagem.",
           variant: "destructive",
         });
         return null;

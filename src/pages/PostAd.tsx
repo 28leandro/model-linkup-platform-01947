@@ -107,6 +107,41 @@ const PostAd = () => {
     ? (originalListing || listings.find(l => l.id === id))
     : null;
 
+  // Form draft persistence (sessionStorage) — only for new ads, not edits.
+  const DRAFT_KEY = "postad:draft:v1";
+  useEffect(() => {
+    if (isEditing) return;
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (d.title) setTitle(d.title);
+      if (d.description) setDescription(d.description);
+      if (d.category) setCategory(d.category);
+      if (d.phone) setPhone(d.phone);
+      if (d.price !== undefined && d.price !== null) setPrice(d.price);
+      if (d.currency) setCurrency(d.currency);
+      if (d.area !== undefined && d.area !== null) setArea(d.area);
+      if (d.year !== undefined && d.year !== null) setYear(d.year);
+      if (d.fuelType) setFuelType(d.fuelType);
+      if (d.subcategory) setSubcategory(d.subcategory);
+      if (d.condition) setCondition(d.condition);
+      if (d.attributes) setAttributes(d.attributes);
+      if (d.location) setLocation(d.location);
+    } catch {/* ignore */}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (isEditing) return;
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+        title, description, category, phone, price, currency,
+        area, year, fuelType, subcategory, condition, attributes, location,
+      }));
+    } catch {/* ignore */}
+  }, [isEditing, title, description, category, phone, price, currency, area, year, fuelType, subcategory, condition, attributes, location]);
+
   // Fetch the original listing from the backend so edits start with fresh,
   // complete data (the local store may be stale or not yet hydrated).
   useEffect(() => {
@@ -480,6 +515,7 @@ const PostAd = () => {
 
         addListing(inserted || fullData);
 
+        try { sessionStorage.removeItem(DRAFT_KEY); } catch {/* ignore */}
         toast({ title: t('postAd.published'), description: t('postAd.publishedDesc') });
         navigate(inserted?.id ? `/listing/${inserted.id}` : "/my-listings");
         return;
