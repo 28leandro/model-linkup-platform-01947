@@ -284,26 +284,8 @@ const PostAd = () => {
       location: location.address.trim(),
     };
 
-    // When editing, only validate fields that actually changed
-    let toValidate: any = candidate;
-    if (isEditing && editingListing) {
-      const o: any = editingListing;
-      const changed: any = {};
-      if (candidate.title !== (o.title || "")) changed.title = candidate.title;
-      if (candidate.description !== (o.description || "")) changed.description = candidate.description;
-      if (candidate.phone !== (o.phone || "")) changed.phone = candidate.phone;
-      if (candidate.category !== (o.category || o.type || "")) changed.category = candidate.category;
-      if (Number(candidate.price) !== Number(o.price || 0)) changed.price = candidate.price;
-      if (Number(candidate.area) !== Number(o.area || 0)) changed.area = candidate.area;
-      if (candidate.location !== (o.location || "")) changed.location = candidate.location;
-      if (candidate.latitude !== (o.latitude || 0)) changed.latitude = candidate.latitude;
-      if (candidate.longitude !== (o.longitude || 0)) changed.longitude = candidate.longitude;
-      toValidate = changed;
-    }
-
     try {
-      const partial = listingSchema.partial();
-      partial.parse(toValidate);
+      listingSchema.parse(candidate);
     } catch (error: any) {
       // Provide more specific error messages (Zod v4 uses 'issues' instead of 'errors')
       const issues = error.issues || error.errors || [];
