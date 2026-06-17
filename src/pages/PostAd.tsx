@@ -200,8 +200,18 @@ const PostAd = () => {
   };
 
   const removeImage = (index: number) => {
+    const removedPreview = previews[index];
     setPreviews(prev => prev.filter((_, i) => i !== index));
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
+
+    if (removedPreview?.startsWith('blob:')) {
+      const newImageIndex = previews
+        .filter((preview) => preview.startsWith('blob:'))
+        .findIndex((preview) => preview === removedPreview);
+      if (newImageIndex >= 0) {
+        setImageFiles(prev => prev.filter((_, i) => i !== newImageIndex));
+      }
+      URL.revokeObjectURL(removedPreview);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
