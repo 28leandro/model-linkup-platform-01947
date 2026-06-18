@@ -247,14 +247,62 @@ const PostAd = () => {
       return;
     }
 
-    // Generate preview URLs for immediate display
-    const newPreviews = files.map(file => URL.createObjectURL(file));
-    setPreviews(prev => [...prev, ...newPreviews]);
-    setImageFiles(prev => [...prev, ...files]);
-    
+    // AI moderation (Sightengine via edge function). Reject any image flagged for
+    // nudity / weapons / offensive / gore content. Approved files continue normally.
+    const fileToBase64 = (file: File): Promise<string> =>
+      new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(',')[1] || '');
+        };
+        reader.onerror = () => reject(new Error('read_failed'));
+        reader.readAsDataURL(file);
+      });
+
+    const approvedFiles: File[] = [];
+    let rejectedCount = 0;
+    for (const file of files) {
+      try {
+        const imageBase64 = await fileToBase64(file);
+        const { data, error } = await supabase.functions.invoke('moderate-image', {
+          body: { imageBase64, contentType: file.type || 'image/jpeg' },
+        });
+        if (error) {
+          // Fail-open on transport error so legit users aren't blocked.
+          approvedFiles.push(file);
+          continue;
+        }
+        if (data?.approved === false) {
+          rejectedCount += 1;
+        } else {
+          approvedFiles.push(file);
+        }
+      } catch {
+        approvedFiles.push(file);
+      }
+    }
+
+    e.target.value = "";
+
+    if (rejectedCount > 0) {
+      toast({
+        title: "Imágenes removidas",
+        description:
+          "Una o más imágenes no cumplen con nuestras directrices de comunidad y fueron removidas. Por favor, use solo fotos de los productos.",
+        variant: "destructive",
+      });
+    }
+
+    if (approvedFiles.length === 0) return;
+
+    const newPreviews = approvedFiles.map((file) => URL.createObjectURL(file));
+    setPreviews((prev) => [...prev, ...newPreviews]);
+    setImageFiles((prev) => [...prev, ...approvedFiles]);
+
     toast({
       title: t('postAd.imagesAdded'),
-      description: `${files.length} ${t('postAd.imagesAddedDesc')}`,
+      description: `${approvedFiles.length} ${t('postAd.imagesAddedDesc')}`,
     });
   };
 
