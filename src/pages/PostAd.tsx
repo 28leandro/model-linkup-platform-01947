@@ -22,7 +22,7 @@ import { CATEGORIES, CONDITIONS, getCategoryById } from "@/lib/categories";
 import { getVehicleBrands, getVehicleModels } from "@/lib/vehicleBrands";
 
 const FREE_PHOTOS = 3;
-const MAX_PHOTOS_UNLOCKED = 5;
+const MAX_PHOTOS_UNLOCKED = 10;
 // Payment system temporarily disabled — all photo uploads up to MAX_PHOTOS_UNLOCKED are free.
 const PHOTOS_FREE_FOR_ALL = true;
 const LISTING_SELECT_FIELDS = "id,title,rating,description,category,type,location,images,price,currency,area,year,brand,model,fuel_type,subcategory,condition,attributes,latitude,longitude,created_at,user_id,is_published,photos_unlocked";
