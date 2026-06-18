@@ -191,6 +191,27 @@ const PostAd = () => {
 
   const maxPhotos = photosUnlocked ? MAX_PHOTOS_UNLOCKED : FREE_PHOTOS;
 
+  // Smart silent validation — used to disable the publish button when any
+  // required field is missing. No error toasts or texts are shown for missing
+  // fields; users see the red asterisk next to the field label instead.
+  const catMeta = getCategoryById(category);
+  const requiresSubcategory = !!catMeta?.subcategories?.length;
+  const isOtherSub =
+    (category === "sport" && subcategory === "otros-deportes") ||
+    (category === "fashion" && subcategory === "otros-fashion") ||
+    (category === "home-garden" && subcategory === "otros-hogar");
+  const otherDescOK = !isOtherSub || !!(attributes.otherDescription || attributes.sportOther || "").toString().trim();
+  const isFormValid =
+    title.trim().length >= 5 &&
+    !!category &&
+    (!requiresSubcategory || !!subcategory) &&
+    otherDescOK &&
+    description.trim().length > 0 &&
+    Number(price) > 0 &&
+    !!location.address.trim() &&
+    !!phone.trim() &&
+    previews.length >= 1;
+
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const invalidFile = files.find((file) => {
