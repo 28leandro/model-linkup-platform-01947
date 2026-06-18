@@ -861,7 +861,7 @@ const PostAd = () => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="mileage">Kilometraje (km)</Label>
-                        <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", clampNonNeg(e.target.value))} placeholder="Ej: 10000" className="h-11 sm:h-10" />
+                        <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", clampNonNeg(e.target.value))} placeholder="" className="h-11 sm:h-10" />
                       </div>
                     </>
                   ) : (
@@ -872,7 +872,7 @@ const PostAd = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="mileage">Kilometraje (km)</Label>
-                    <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", clampNonNeg(e.target.value))} placeholder="Ej: 50000" className="h-11 sm:h-10" />
+                    <Input id="mileage" type="number" min="0" value={attributes.mileage ?? ""} onChange={(e) => setAttr("mileage", clampNonNeg(e.target.value))} placeholder="" className="h-11 sm:h-10" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="fuelType">{t('postAd.fuelType')}</Label>
@@ -906,11 +906,11 @@ const PostAd = () => {
                 <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label htmlFor="schedule">Horario de atención</Label>
-                    <Input id="schedule" value={attributes.schedule || ""} onChange={(e) => setAttr("schedule", e.target.value)} placeholder="Ej: Lun-Vie 8-18h" className="h-11 sm:h-10" />
+                    <Input id="schedule" value={attributes.schedule || ""} onChange={(e) => setAttr("schedule", e.target.value)} placeholder="" className="h-11 sm:h-10" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="coverage">Región de cobertura</Label>
-                    <Input id="coverage" value={attributes.coverage || ""} onChange={(e) => setAttr("coverage", e.target.value)} placeholder="Ej: Asunción y Gran Asunción" className="h-11 sm:h-10" />
+                    <Input id="coverage" value={attributes.coverage || ""} onChange={(e) => setAttr("coverage", e.target.value)} placeholder="" className="h-11 sm:h-10" />
                   </div>
                 </div>
               )}
@@ -919,7 +919,7 @@ const PostAd = () => {
                 <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                   <div className="space-y-2">
                     <Label htmlFor="size">Talla</Label>
-                    <Input id="size" value={attributes.size || ""} onChange={(e) => setAttr("size", e.target.value)} placeholder="Ej: M, 42, 38" className="h-11 sm:h-10" />
+                    <Input id="size" value={attributes.size || ""} onChange={(e) => setAttr("size", e.target.value)} placeholder="" className="h-11 sm:h-10" />
                   </div>
                   <div className="space-y-2">
                     <Label>Género</Label>
@@ -939,18 +939,18 @@ const PostAd = () => {
               {category === "tech" && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300 space-y-2">
                   <Label htmlFor="modelFree">Modelo</Label>
-                  <Input id="modelFree" value={attributes.modelCustom || ""} onChange={(e) => setAttr("modelCustom", e.target.value)} placeholder="Ej: iPhone 14 Pro, Galaxy S23" className="h-11 sm:h-10" />
+                  <Input id="modelFree" value={attributes.modelCustom || ""} onChange={(e) => setAttr("modelCustom", e.target.value)} placeholder="" className="h-11 sm:h-10" />
                 </div>
               )}
 
               {category && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label htmlFor="description">{t('postAd.description')}</Label>
+                  <Label htmlFor="description">{t('postAd.description')}<Req /></Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder={t('postAd.descriptionPlaceholder')}
+                    placeholder=""
                     className="min-h-[120px]"
                   />
                 </div>
@@ -960,7 +960,7 @@ const PostAd = () => {
 
               {category && (
                 <div className="space-y-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <Label htmlFor="price">{t('postAd.price')}</Label>
+                  <Label htmlFor="price">{t('postAd.price')}<Req /></Label>
                   <div className="flex gap-2">
                     <Select value={currency} onValueChange={setCurrency}>
                       <SelectTrigger className="w-[100px] h-11 sm:h-10">
@@ -980,7 +980,7 @@ const PostAd = () => {
                         type="number"
                         value={price}
                         onChange={(e) => setPrice(clampNonNeg(e.target.value) as any)}
-                        placeholder={currency === "USD" ? "Ej: 1500" : "Ej: 50000000"}
+                        placeholder=""
                         min="0"
                         className="h-11 sm:h-10 pl-12"
                       />
@@ -1019,7 +1019,7 @@ const PostAd = () => {
                     id="city"
                     value={attributes.city || ""}
                     onChange={(e) => setAttr("city", e.target.value)}
-                    placeholder="Ej: Asunción"
+                    placeholder=""
                     className="h-11 sm:h-10"
                   />
                 </div>
@@ -1029,7 +1029,7 @@ const PostAd = () => {
                     id="state"
                     value={attributes.state || ""}
                     onChange={(e) => setAttr("state", e.target.value)}
-                    placeholder="Ej: Central"
+                    placeholder=""
                     className="h-11 sm:h-10"
                   />
                 </div>
@@ -1043,13 +1043,13 @@ const PostAd = () => {
 
               {category && (
               <div className="space-y-2">
-                <Label htmlFor="phone">{t('postAd.phone')}</Label>
+                <Label htmlFor="phone">{t('postAd.phone')}<Req /></Label>
                 <Input
                   id="phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  placeholder={t('postAd.phonePlaceholder')}
+                  placeholder=""
                   className="h-11 sm:h-10"
                 />
               </div>
@@ -1057,7 +1057,7 @@ const PostAd = () => {
 
               <div className="space-y-2">
                 <Label htmlFor="images">
-                  {t('postAd.photos')}
+                  {t('postAd.photos')}<Req />
                 </Label>
                 <p className="text-xs text-muted-foreground">
                   {`${previews.length}/${MAX_PHOTOS_UNLOCKED} fotos`}
@@ -1115,7 +1115,7 @@ const PostAd = () => {
                 >
                   {t('postAd.cancel')}
                 </Button>
-                <Button type="submit" disabled={uploading || isSubmitting} className="w-full sm:w-auto">
+                <Button type="submit" disabled={uploading || isSubmitting || !isFormValid} className="w-full sm:w-auto">
                   {(uploading || isSubmitting) && <Loader2 className="h-4 w-4 animate-spin" />}
                   {uploading || isSubmitting ? t('postAd.uploading') : isEditing ? t('postAd.saveChanges') : t('postAd.publish')}
                 </Button>
