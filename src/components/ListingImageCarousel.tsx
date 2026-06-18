@@ -43,6 +43,7 @@ const ListingImageCarousel = ({
             src={cover}
             alt={title}
             loading="lazy"
+            decoding="async"
             draggable={false}
             className="w-full h-full object-cover select-none transition-transform duration-500 ease-out group-hover:scale-110"
             onError={(e) => {

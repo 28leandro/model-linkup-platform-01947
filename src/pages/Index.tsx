@@ -9,6 +9,7 @@ import HeroCarousel from "@/components/HeroCarousel";
 import SearchResults from "@/components/SearchResults";
 import RecentListings from "@/components/RecentListings";
 import RecentlyViewedCarousel from "@/components/RecentlyViewedCarousel";
+import ListingCardSkeletonGrid from "@/components/ListingCardSkeleton";
 import Footer from "@/components/Footer";
 import StoreBadgesBar from "@/components/StoreBadgesBar";
 
@@ -28,6 +29,7 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [allListings, setAllListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
+  const [listingsLoading, setListingsLoading] = useState(true);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
@@ -119,6 +121,7 @@ const Index = () => {
     getLocationByIP();
 
     const fetchListings = async () => {
+      setListingsLoading(true);
       const { data, error } = await supabase
         .from('listings_public')
         .select('*')
@@ -152,6 +155,7 @@ const Index = () => {
         setAllListings(formattedListings);
         setFilteredListings(formattedListings);
       }
+      setListingsLoading(false);
     };
     
     fetchListings();
@@ -360,7 +364,9 @@ const Index = () => {
       </div>
 
       <div className="container mx-auto px-3 sm:px-4">
-        {hasSearched ? (
+        {listingsLoading ? (
+          <ListingCardSkeletonGrid count={10} />
+        ) : hasSearched ? (
           <SearchResults listings={sortedListings} />
         ) : (
           <RecentListings listings={sortedListings} />
