@@ -137,7 +137,7 @@ const translations = {
     'postAd.permissionError': 'Você não tem permissão para esta ação.',
     'postAd.loading': 'Carregando...',
     'postAd.year': 'Ano do Veículo',
-    'postAd.yearPlaceholder': 'Ex: 2020',
+    'postAd.yearPlaceholder': '',
     'postAd.fuelType': 'Tipo de Combustível',
     'postAd.fuelTypePlaceholder': 'Selecione o combustível',
     'postAd.fuelGasoline': 'Gasolina',
