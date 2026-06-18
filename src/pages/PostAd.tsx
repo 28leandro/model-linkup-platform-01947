@@ -593,12 +593,7 @@ const PostAd = () => {
           </CardHeader>
           <CardContent className="px-4 sm:px-6 pb-4 sm:pb-6">
             <form onSubmit={handleSubmit} noValidate className="space-y-4 sm:space-y-6">
-              {submitError && (
-                <div className="flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive" role="alert">
-                  <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                  <p className="break-words">{submitError}</p>
-                </div>
-              )}
+              {/* Inline error banners removed — save errors still surface via toast. */}
               <div className="space-y-2">
                 <Label htmlFor="title">{t('postAd.adTitle')}<Req /></Label>
                 <Input
