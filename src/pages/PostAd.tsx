@@ -579,7 +579,7 @@ const PostAd = () => {
                 </div>
               )}
               <div className="space-y-2">
-                <Label htmlFor="title">{t('postAd.adTitle')}</Label>
+                <Label htmlFor="title">{t('postAd.adTitle')}<Req /></Label>
                 <Input
                   id="title"
                   value={title}
@@ -587,13 +587,10 @@ const PostAd = () => {
                   placeholder=""
                   className="h-11 sm:h-10"
                 />
-                {titleError && (
-                  <p className="text-xs text-destructive">{titleError}</p>
-                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="category">{t('postAd.category')} *</Label>
+                <Label htmlFor="category">{t('postAd.category')}<Req /></Label>
                 <Select value={category} onValueChange={setCategory}>
                   <SelectTrigger className="bg-card border-input h-11 sm:h-10">
                     <SelectValue placeholder={t('postAd.categoryPlaceholder')} />
