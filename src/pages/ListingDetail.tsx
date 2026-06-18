@@ -136,8 +136,24 @@ const ListingDetail = () => {
       <>
         <Header onLoginClick={() => setShowLoginDialog(true)} />
         <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="min-h-screen bg-background">
+          <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+            <div className="lg:col-span-2 space-y-3">
+              <Skeleton className="w-full aspect-square rounded-xl" />
+              <div className="grid grid-cols-5 gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Skeleton key={i} className="aspect-square rounded-md" />
+                ))}
+              </div>
+            </div>
+            <div className="space-y-3">
+              <Skeleton className="h-7 w-3/4" />
+              <Skeleton className="h-9 w-1/2" />
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-24 w-full" />
+              <Skeleton className="h-12 w-full" />
+            </div>
+          </div>
         </div>
       </>
     );
