@@ -646,7 +646,7 @@ const PostAd = () => {
                 return (
                   <div className="grid grid-cols-1 gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="space-y-2">
-                      <Label>{subLabel}</Label>
+                      <Label>{subLabel}<Req /></Label>
                       <Select value={subcategory} onValueChange={(v) => { setSubcategory(v); setAttr("brand", ""); }}>
                         <SelectTrigger className="h-11 sm:h-10"><SelectValue placeholder={subPlaceholder} /></SelectTrigger>
                         <SelectContent position="popper" sideOffset={4} className="bg-popover border border-border shadow-xl">
@@ -658,14 +658,19 @@ const PostAd = () => {
                     </div>
                     {!isServices && !(category === "real-estate" && ["terreno","comercial","quinta","estancia","oficina","edificio"].includes(subcategory)) && (
                       <div className="space-y-2">
-                        {category === "sport" && subcategory === "otros-deportes" && (
+                        {((category === "sport" && subcategory === "otros-deportes") ||
+                          (category === "fashion" && subcategory === "otros-fashion") ||
+                          (category === "home-garden" && subcategory === "otros-hogar")) && (
                           <div className="space-y-2 mb-3">
-                            <Label htmlFor="sportOther">¿Qué artículo deportivo?</Label>
+                            <Label htmlFor="sportOther">¿Qué artículo?<Req /></Label>
                             <Input
                               id="sportOther"
-                              value={attributes.sportOther || ""}
-                              onChange={(e) => setAttr("sportOther", e.target.value)}
-                              placeholder="Describí el artículo deportivo"
+                              value={attributes.otherDescription || attributes.sportOther || ""}
+                              onChange={(e) => {
+                                setAttr("otherDescription", e.target.value);
+                                setAttr("sportOther", e.target.value);
+                              }}
+                              placeholder=""
                               className="h-11 sm:h-10"
                             />
                           </div>
