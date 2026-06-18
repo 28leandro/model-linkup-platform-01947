@@ -124,7 +124,7 @@ const PaymentSuccess = () => {
               </Button>
 
               <a
-                href="https://wa.me/595981000000?text=Hola,%20tengo%20un%20problema%20con%20mi%20pago"
+                href={`https://wa.me/595981000000?text=${encodeURIComponent("Hola, tengo un problema con mi pago")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"

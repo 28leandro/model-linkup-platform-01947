@@ -704,7 +704,7 @@ const PostAd = () => {
                         </SelectContent>
                       </Select>
                     </div>
-                    {!isServices && !(category === "real-estate" && ["terreno","comercial","quinta","estancia","oficina","edificio"].includes(subcategory)) && (
+                    {!isServices && category !== "real-estate" && (
                       <div className="space-y-2">
                         {((category === "sport" && subcategory === "otros-deportes") ||
                           (category === "fashion" && subcategory === "otros-fashion") ||
