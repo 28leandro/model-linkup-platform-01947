@@ -162,7 +162,7 @@ export const CATEGORIES: Category[] = [
     subcategories: [
       { id: "masculino",  label_es: "Roupas",           label_pt: "Roupas",           icon: Shirt },
       { id: "feminino",   label_es: "Calzados",         label_pt: "Calçados",         icon: Footprints },
-      { id: "infantil",   label_es: "Bolso Femenino",   label_pt: "Bolsa Feminina",   icon: Baby },
+      { id: "infantil",   label_es: "Bolsa Femenina",   label_pt: "Bolsa Feminina",   icon: Baby },
       { id: "relojes-joyas", label_es: "Relojes y Joyas", label_pt: "Relógios e Joias", icon: Gem },
       { id: "perfumes",   label_es: "Perfumes",         label_pt: "Perfumes",         icon: SprayCan },
       { id: "otros-fashion", label_es: "Otros",         label_pt: "Outros",           icon: Package },
