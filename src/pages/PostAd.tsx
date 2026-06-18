@@ -436,7 +436,7 @@ const PostAd = () => {
       description: description.trim() || orig.description,
       category: category || orig.category,
       type: (category || orig.type) as any,
-      location: location.address.trim() || orig.location || "Asunción, Paraguay",
+      location: location.address.trim() || orig.location || "",
       images: finalImages.length > 0 ? finalImages : (orig.images || []),
       phone: (phone.trim() || orig.phone) || null,
       price: (price === "" ? orig.price : price) ?? null,
