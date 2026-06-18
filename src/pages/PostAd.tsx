@@ -27,6 +27,9 @@ const MAX_PHOTOS_UNLOCKED = 10;
 const PHOTOS_FREE_FOR_ALL = true;
 const LISTING_SELECT_FIELDS = "id,title,rating,description,category,type,location,images,price,currency,area,year,brand,model,fuel_type,subcategory,condition,attributes,latitude,longitude,created_at,user_id,is_published,photos_unlocked";
 
+// Small red asterisk used to mark required fields without aggressive text/popups.
+const Req = () => <span className="text-destructive ml-0.5" aria-hidden="true">*</span>;
+
 const PostAd = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -53,9 +56,9 @@ const PostAd = () => {
   const [previews, setPreviews] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [location, setLocation] = useState({ 
-    address: 'Asunción, Paraguay', 
-    latitude: -25.2637, 
-    longitude: -57.5759 
+    address: '', 
+    latitude: 0, 
+    longitude: 0 
   });
   const [originalListing, setOriginalListing] = useState<any>(null);
   const [photosUnlocked, setPhotosUnlocked] = useState(PHOTOS_FREE_FOR_ALL);
@@ -63,9 +66,8 @@ const PostAd = () => {
   const [submitError, setSubmitError] = useState("");
 
   // Real-time validation helpers
-  const titleError = title.length > 0 && title.trim().length < 5
-    ? "Mínimo 5 caracteres"
-    : "";
+  // Silent validation — no inline error messages. The submit button stays disabled
+  // and missing fields are highlighted only via the red asterisk next to the label.
   const clampNonNeg = (v: string) => (v === "" ? "" : Math.max(0, Number(v)));
   const currentYear = new Date().getFullYear();
   const clampYear = (v: string) => {
