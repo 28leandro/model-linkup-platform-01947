@@ -1,6 +1,7 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { MapPin, ArrowLeft, ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
 import useEmblaCarousel from "embla-carousel-react";
 import VehicleInfo from "@/components/VehicleInfo";
