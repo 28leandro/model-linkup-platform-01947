@@ -123,11 +123,8 @@ const PaymentSuccess = () => {
                 <Link to="/post-ad">Crear mi primer anuncio</Link>
               </Button>
 
-              const supportMessage = encodeURIComponent("Hola, tengo un problema con mi pago");
-              const supportWhatsAppUrl = `https://wa.me/595981000000?text=${supportMessage}`;
-
               <a
-                href={supportWhatsAppUrl}
+                href={`https://wa.me/595981000000?text=${encodeURIComponent("Hola, tengo un problema con mi pago")}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary transition-colors"
