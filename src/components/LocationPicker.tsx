@@ -292,7 +292,10 @@ const LocationPicker = ({ onLocationSelect, initialAddress = '' }: LocationPicke
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="location">{t('postAd.location')}</Label>
+      <Label htmlFor="location">
+        {t('postAd.location')}
+        <span className="text-destructive ml-0.5" aria-hidden="true">*</span>
+      </Label>
       <div className="flex flex-col sm:flex-row gap-2">
         <div className="relative flex-1">
           <Input

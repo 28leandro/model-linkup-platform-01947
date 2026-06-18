@@ -162,9 +162,10 @@ export const CATEGORIES: Category[] = [
     subcategories: [
       { id: "masculino",  label_es: "Roupas",           label_pt: "Roupas",           icon: Shirt },
       { id: "feminino",   label_es: "Calzados",         label_pt: "Calçados",         icon: Footprints },
-      { id: "infantil",   label_es: "Infantil",         label_pt: "Infantil",         icon: Baby },
+      { id: "infantil",   label_es: "Bolso Femenino",   label_pt: "Bolsa Feminina",   icon: Baby },
       { id: "relojes-joyas", label_es: "Relojes y Joyas", label_pt: "Relógios e Joias", icon: Gem },
       { id: "perfumes",   label_es: "Perfumes",         label_pt: "Perfumes",         icon: SprayCan },
+      { id: "otros-fashion", label_es: "Otros",         label_pt: "Outros",           icon: Package },
     ],
   },
   {
@@ -181,6 +182,7 @@ export const CATEGORIES: Category[] = [
       { id: "electrodomesticos", label_es: "Electrodomésticos", label_pt: "Eletrodomésticos", icon: Refrigerator, examples: ["Heladeras","Lavarropas","Microondas"], brands: ["Samsung","LG","Electrolux","Whirlpool","Philco","Consul","Brastemp","Midea","Tokyo","Mtek","James","Enxuta","Panasonic"] },
       { id: "decoracion",       label_es: "Decoración",       label_pt: "Decoração",         icon: Lamp,         examples: ["Alfombras","Iluminación","Cuadros"], brands: ["Philips","Osram","Tramontina","Generico"] },
       { id: "jardin",           label_es: "Jardín y Bricolaje", label_pt: "Jardim e Bricolagem", icon: Trees,    examples: ["Herramientas","Plantas","Riego"], brands: ["Stihl","Husqvarna","Black & Decker","Bosch","Makita","Tramontina","DeWalt","Stanley"] },
+      { id: "otros-hogar",      label_es: "Otros",            label_pt: "Outros",            icon: Package },
     ],
   },
   {
