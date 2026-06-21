@@ -36,6 +36,7 @@ function App() {
             <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/trust" element={<Trust />} />
             <Route path="/photo-paywall" element={<PhotoPaywall />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
