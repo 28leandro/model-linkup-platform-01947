@@ -39,6 +39,7 @@ function App() {
             <Route path="/photo-paywall" element={<PhotoPaywall />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/pagopar-test" element={<PagoparTest />} />
             <Route path="/my-listings" element={<MyListings />} />
