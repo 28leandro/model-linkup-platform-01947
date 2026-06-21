@@ -10,6 +10,7 @@ import RefundPolicy from "./pages/RefundPolicy";
 import PhotoPaywall from "./pages/PhotoPaywall";
 import Inbox from "./pages/Inbox";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 import PagoparTest from "./pages/PagoparTest";
 import MyListings from "./pages/MyListings";
 import AccountSettings from "./pages/AccountSettings";
@@ -38,6 +39,7 @@ function App() {
             <Route path="/photo-paywall" element={<PhotoPaywall />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/pagopar-test" element={<PagoparTest />} />
             <Route path="/my-listings" element={<MyListings />} />
             <Route path="/account" element={<AccountSettings />} />
