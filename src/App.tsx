@@ -7,6 +7,7 @@ import FavoriteThings from "./pages/FavoriteThings";
 import MapView from "./pages/MapView";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import RefundPolicy from "./pages/RefundPolicy";
+import Trust from "./pages/Trust";
 import PhotoPaywall from "./pages/PhotoPaywall";
 import Inbox from "./pages/Inbox";
 import ResetPassword from "./pages/ResetPassword";
