@@ -7,6 +7,7 @@ import FavoriteThings from "./pages/FavoriteThings";
 import MapView from "./pages/MapView";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import RefundPolicy from "./pages/RefundPolicy";
+import Trust from "./pages/Trust";
 import PhotoPaywall from "./pages/PhotoPaywall";
 import Inbox from "./pages/Inbox";
 import ResetPassword from "./pages/ResetPassword";
@@ -36,6 +37,7 @@ function App() {
             <Route path="/payment/success" element={<PaymentSuccess />} />
             <Route path="/payment-success" element={<PaymentSuccess />} />
             <Route path="/refund-policy" element={<RefundPolicy />} />
+            <Route path="/trust" element={<Trust />} />
             <Route path="/photo-paywall" element={<PhotoPaywall />} />
             <Route path="/inbox" element={<Inbox />} />
             <Route path="/auth/reset-password" element={<ResetPassword />} />
