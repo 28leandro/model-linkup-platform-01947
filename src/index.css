@@ -61,8 +61,7 @@
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overscroll-behavior: none;
-    touch-action: manipulation;
+    overscroll-behavior-y: auto;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -103,7 +102,12 @@
 @layer base {
   html, body, #root {
     max-width: 100%;
-    overflow-x: hidden;
+    overflow-x: clip;
+  }
+  html, body {
+    min-height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   img, video, iframe {
     max-width: 100%;
