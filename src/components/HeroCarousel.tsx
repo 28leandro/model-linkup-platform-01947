@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import upapLogo from "@/assets/upap-logo.png";
 import smartfitLogo from "@/assets/smartfit-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
+import upapBanner from "@/assets/upap-banner.jpg";
+import smartfitBanner from "@/assets/smartfit-banner.png";
 
 interface Slide {
   id: string;
@@ -46,8 +48,7 @@ const SLIDES: Slide[] = [
     cta_pt: "Conheça a UPAP",
     href: "https://www.upap.edu.py",
     accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
-    logo: upapLogo,
-    confetti: true,
+    bgImage: upapBanner,
   },
   {
     id: "smartfit",
@@ -59,7 +60,7 @@ const SLIDES: Slide[] = [
     cta_pt: "Conheça a Smart Fit",
     href: "https://www.smartfit.com.py",
     accent: "from-[#1a1a1a] via-[#2b2b2b] to-[#000000]",
-    logo: smartfitLogo,
+    bgImage: smartfitBanner,
   },
   {
     id: "neura",
