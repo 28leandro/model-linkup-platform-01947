@@ -40,6 +40,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
+        // Password recovery: Supabase parses the recovery tokens from the URL
+        // hash and fires PASSWORD_RECOVERY. Make sure the user lands on the
+        // dedicated reset page even when the email link redirects to "/".
+        if (event === 'PASSWORD_RECOVERY') {
+          setSession(newSession);
+          setUser(newSession?.user ?? null);
+          if (window.location.pathname !== '/reset-password') {
+            window.history.replaceState({}, '', '/reset-password');
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }
+          return;
+        }
+
         // SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED / USER_UPDATED /
         // PASSWORD_RECOVERY — keep state in sync but never flip loading
         // back to true (initial load handles that once).
