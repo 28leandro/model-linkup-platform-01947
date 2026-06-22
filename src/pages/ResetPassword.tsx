@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Eye, EyeOff, KeyRound } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Mail, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 type Status = "verifying" | "ready" | "invalid";
+
+const RESET_EMAIL_KEY = "passwordResetEmail";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export default function ResetPassword() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<Status>("verifying");
+  const [resending, setResending] = useState(false);
 
   // Verify the recovery link on mount.
   // Supabase can deliver the token in three shapes:
