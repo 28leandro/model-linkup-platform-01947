@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { z } from "zod";
-import { Eye, EyeOff, KeyRound } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Mail, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
 type Status = "verifying" | "ready" | "invalid";
+
+const RESET_EMAIL_KEY = "passwordResetEmail";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ export default function ResetPassword() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [status, setStatus] = useState<Status>("verifying");
+  const [resending, setResending] = useState(false);
 
   // Verify the recovery link on mount.
   // Supabase can deliver the token in three shapes:
@@ -126,6 +129,41 @@ export default function ResetPassword() {
     navigate("/", { replace: true });
   };
 
+  const handleResend = async () => {
+    const email = (() => {
+      try {
+        return sessionStorage.getItem(RESET_EMAIL_KEY);
+      } catch {
+        return null;
+      }
+    })();
+
+    if (!email) {
+      navigate("/forgot-password", { replace: true });
+      return;
+    }
+
+    setResending(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setResending(false);
+
+    if (error) {
+      toast({
+        title: t('resetPassword.resendError') || t('resetPassword.errorTitle'),
+        description: error.message,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: t('resetPassword.resendSuccess') || t('forgotPassword.successTitle'),
+      description: t('resetPassword.resendDesc') || t('forgotPassword.successDesc'),
+    });
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
       <Card className="w-full max-w-md">
@@ -142,8 +180,21 @@ export default function ResetPassword() {
           ) : status === "invalid" ? (
             <div className="space-y-4 text-center">
               <p className="text-sm text-destructive">{t('resetPassword.invalidLink')}</p>
-              <Button variant="outline" onClick={() => navigate("/forgot-password")}>
-                {t('login.recoverySubmit')}
+              <Button
+                variant="outline"
+                onClick={handleResend}
+                disabled={resending}
+                className="w-full"
+              >
+                {resending ? (
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Mail className="mr-2 h-4 w-4" />
+                )}
+                {t('resetPassword.resendEmail') || t('login.recoverySubmit')}
+              </Button>
+              <Button variant="ghost" onClick={() => navigate("/forgot-password")} className="w-full">
+                {t('login.backToLogin')}
               </Button>
             </div>
           ) : (

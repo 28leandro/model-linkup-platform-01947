@@ -47,6 +47,13 @@ export default function ForgotPassword() {
       return;
     }
 
+    // Remember the email so /reset-password can offer a one-click resend.
+    try {
+      sessionStorage.setItem('passwordResetEmail', email);
+    } catch {
+      // ignore storage errors
+    }
+
     setSent(true);
     toast({
       title: t('forgotPassword.successTitle'),
