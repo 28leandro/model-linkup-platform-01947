@@ -233,7 +233,7 @@ const HeroCarousel = () => {
                   src={s.logo}
                   alt={`${s.id} logo`}
                   loading="lazy"
-                  className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 h-24 sm:h-36 md:h-44 w-auto drop-shadow-xl object-contain hidden sm:block"
+                  className="absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 h-20 sm:h-36 md:h-44 w-auto max-w-[40%] drop-shadow-xl object-contain"
                 />
               )}
               {s.fullImage ? (
