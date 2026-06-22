@@ -23,6 +23,7 @@ interface Slide {
   logo?: string;
   confetti?: boolean;
   bgImage?: string;
+  fullImage?: boolean;
 }
 
 const SLIDES: Slide[] = [
@@ -49,6 +50,7 @@ const SLIDES: Slide[] = [
     href: "https://www.upap.edu.py",
     accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
     bgImage: upapBanner,
+    fullImage: true,
   },
   {
     id: "smartfit",
@@ -61,6 +63,7 @@ const SLIDES: Slide[] = [
     href: "https://www.smartfit.com.py",
     accent: "from-[#1a1a1a] via-[#2b2b2b] to-[#000000]",
     bgImage: smartfitBanner,
+    fullImage: true,
   },
   {
     id: "neura",
