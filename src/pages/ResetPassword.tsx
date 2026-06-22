@@ -10,6 +10,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const PASSWORD_RECOVERY_FLAG = 'nemu_password_recovery_active';
+
+const hasRecoveryParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(
+    window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
+  );
+
+  return (
+    params.get('type') === 'recovery' ||
+    hashParams.get('type') === 'recovery' ||
+    params.has('code') ||
+    params.has('token_hash') ||
+    hashParams.has('access_token')
+  );
+};
+
 export default function ResetPassword() {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -23,16 +40,52 @@ export default function ResetPassword() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const cameFromRecoveryLink = hasRecoveryParams();
+    const isRecoveryFlow = () =>
+      cameFromRecoveryLink || window.sessionStorage.getItem(PASSWORD_RECOVERY_FLAG) === 'true';
+
+    if (cameFromRecoveryLink) {
+      window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
+      setHasRecoverySession(true);
+    }
+
     // Supabase recovery links arrive with tokens in the hash; the SDK auto-creates a session.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+      if (event === "PASSWORD_RECOVERY" || (session && isRecoveryFlow())) {
+        window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
         setHasRecoverySession(true);
         setChecking(false);
       }
     });
 
+    const finishChecking = () => setChecking(false);
+
+    const code = params.get('code');
+    const tokenHash = params.get('token_hash');
+
+    if (cameFromRecoveryLink && code) {
+      supabase.auth.exchangeCodeForSession(code)
+        .then(({ error }) => {
+          if (error) setHasRecoverySession(false);
+        })
+        .finally(finishChecking);
+      return () => subscription.unsubscribe();
+    }
+
+    if (cameFromRecoveryLink && tokenHash) {
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' })
+        .then(({ error }) => {
+          if (error) setHasRecoverySession(false);
+        })
+        .finally(finishChecking);
+      return () => subscription.unsubscribe();
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setHasRecoverySession(true);
+      if (session && isRecoveryFlow()) {
+        setHasRecoverySession(true);
+      }
       setChecking(false);
     });
 
@@ -77,6 +130,7 @@ export default function ResetPassword() {
       title: t('resetPassword.successTitle'),
       description: t('resetPassword.successDesc'),
     });
+    window.sessionStorage.removeItem(PASSWORD_RECOVERY_FLAG);
     await supabase.auth.signOut();
     navigate("/", { replace: true });
   };
@@ -85,7 +139,7 @@ export default function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
             <KeyRound className="h-6 w-6" />
           </div>
           <CardTitle>{t('resetPassword.title')}</CardTitle>
