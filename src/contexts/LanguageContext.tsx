@@ -236,6 +236,10 @@ const translations = {
     'resetPassword.successDesc': 'Faça login com sua nova senha.',
     'resetPassword.errorTitle': 'Erro ao redefinir senha',
     'resetPassword.invalidLink': 'Link inválido ou expirado. Solicite um novo email de recuperação.',
+    'resetPassword.resendEmail': 'Reenviar email',
+    'resetPassword.resendSuccess': 'Email reenviado!',
+    'resetPassword.resendDesc': 'Verifique sua caixa de entrada para redefinir sua senha.',
+    'resetPassword.resendError': 'Erro ao reenviar email',
     
     // ListingDetail
     'detail.description': 'Descrição',
@@ -530,6 +534,10 @@ const translations = {
     'resetPassword.successDesc': 'Inicia sesión con tu nueva contraseña.',
     'resetPassword.errorTitle': 'Error al restablecer la contraseña',
     'resetPassword.invalidLink': 'Enlace inválido o expirado. Solicita un nuevo email de recuperación.',
+    'resetPassword.resendEmail': 'Reenviar email',
+    'resetPassword.resendSuccess': '¡Email reenviado!',
+    'resetPassword.resendDesc': 'Revisa tu bandeja de entrada para restablecer tu contraseña.',
+    'resetPassword.resendError': 'Error al reenviar email',
     
     // ListingDetail
     'detail.description': 'Descripción',
