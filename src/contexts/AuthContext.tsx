@@ -24,6 +24,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
+    // If the user lands on any route with a recovery hash (Supabase appends
+    // #access_token=...&type=recovery), forward them to /reset-password
+    // BEFORE the SDK consumes the hash, so the dedicated page can pick up
+    // the PASSWORD_RECOVERY event.
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash || '';
+      const search = window.location.search || '';
+      const isRecovery =
+        hash.includes('type=recovery') || search.includes('type=recovery');
+      if (isRecovery && window.location.pathname !== '/reset-password') {
+        window.location.replace('/reset-password' + search + hash);
+      }
+    }
+
     // Bug #2 — Session drop fix:
     // Only mutate state on meaningful auth events. TOKEN_REFRESHED and
     // USER_UPDATED fire frequently on mobile (especially after the tab is
