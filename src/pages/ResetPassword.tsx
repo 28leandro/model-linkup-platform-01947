@@ -40,6 +40,7 @@ export default function ResetPassword() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
     const cameFromRecoveryLink = hasRecoveryParams();
     const isRecoveryFlow = () =>
       cameFromRecoveryLink || window.sessionStorage.getItem(PASSWORD_RECOVERY_FLAG) === 'true';
@@ -57,6 +58,29 @@ export default function ResetPassword() {
         setChecking(false);
       }
     });
+
+    const finishChecking = () => setChecking(false);
+
+    const code = params.get('code');
+    const tokenHash = params.get('token_hash');
+
+    if (cameFromRecoveryLink && code) {
+      supabase.auth.exchangeCodeForSession(code)
+        .then(({ error }) => {
+          if (error) setHasRecoverySession(false);
+        })
+        .finally(finishChecking);
+      return () => subscription.unsubscribe();
+    }
+
+    if (cameFromRecoveryLink && tokenHash) {
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' })
+        .then(({ error }) => {
+          if (error) setHasRecoverySession(false);
+        })
+        .finally(finishChecking);
+      return () => subscription.unsubscribe();
+    }
 
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session && isRecoveryFlow()) {
