@@ -16,6 +16,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const PASSWORD_RECOVERY_FLAG = 'nemu_password_recovery_active';
+
+const isPasswordRecoveryUrl = () => {
+  if (typeof window === 'undefined') return false;
+  const { pathname, search, hash } = window.location;
+  const params = new URLSearchParams(search);
+  const hashParams = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+
+  return (
+    params.get('type') === 'recovery' ||
+    hashParams.get('type') === 'recovery' ||
+    (pathname === '/reset-password' && params.has('code')) ||
+    (pathname === '/reset-password' && params.has('token_hash'))
+  );
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -31,9 +47,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash || '';
       const search = window.location.search || '';
-      const isRecovery =
-        hash.includes('type=recovery') || search.includes('type=recovery');
-      if (isRecovery && window.location.pathname !== '/reset-password') {
+      if (isPasswordRecoveryUrl()) {
+        window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
+      }
+      if (isPasswordRecoveryUrl() && window.location.pathname !== '/reset-password') {
         window.location.replace('/reset-password' + search + hash);
       }
     }
@@ -58,6 +75,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // hash and fires PASSWORD_RECOVERY. Make sure the user lands on the
         // dedicated reset page even when the email link redirects to "/".
         if (event === 'PASSWORD_RECOVERY') {
+          window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
           setSession(newSession);
           setUser(newSession?.user ?? null);
           if (window.location.pathname !== '/reset-password') {
