@@ -112,7 +112,7 @@ export default function ResetPassword() {
     <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9]">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
             <KeyRound className="h-6 w-6" />
           </div>
           <CardTitle>{t('resetPassword.title')}</CardTitle>
