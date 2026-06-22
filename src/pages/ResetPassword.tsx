@@ -41,6 +41,9 @@ export default function ResetPassword() {
 
   useEffect(() => {
     const cameFromRecoveryLink = hasRecoveryParams();
+    const isRecoveryFlow = () =>
+      cameFromRecoveryLink || window.sessionStorage.getItem(PASSWORD_RECOVERY_FLAG) === 'true';
+
     if (cameFromRecoveryLink) {
       window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
       setHasRecoverySession(true);
@@ -48,7 +51,7 @@ export default function ResetPassword() {
 
     // Supabase recovery links arrive with tokens in the hash; the SDK auto-creates a session.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+      if (event === "PASSWORD_RECOVERY" || (session && isRecoveryFlow())) {
         window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
         setHasRecoverySession(true);
         setChecking(false);
@@ -56,7 +59,7 @@ export default function ResetPassword() {
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session || cameFromRecoveryLink || window.sessionStorage.getItem(PASSWORD_RECOVERY_FLAG) === 'true') {
+      if (session && isRecoveryFlow()) {
         setHasRecoverySession(true);
       }
       setChecking(false);
