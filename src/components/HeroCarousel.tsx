@@ -191,7 +191,7 @@ const HeroCarousel = () => {
                   aria-hidden
                   className={cn(
                     "absolute inset-0 w-full h-full",
-                    s.fullImage ? "object-contain" : "object-cover"
+                    s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : "object-cover"
                   )}
                 />
               )}
