@@ -109,9 +109,8 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
         <div className="rounded-full bg-primary/15 p-3">
           <Plus className="h-5 w-5 text-primary" />
         </div>
-        <p className="text-sm sm:text-base font-medium text-foreground">{isPt ? "Ver tudo" : "Ver todo"}</p>
-        <p className="text-[11px] sm:text-xs text-muted-foreground inline-flex items-center gap-1">
-          +{remaining} <ArrowRight className="h-3 w-3" />
+        <p className="text-sm sm:text-base font-medium text-foreground inline-flex items-center gap-1">
+          {isPt ? "Ver tudo" : "Ver todo"} <ArrowRight className="h-3 w-3" />
         </p>
       </div>
     );
