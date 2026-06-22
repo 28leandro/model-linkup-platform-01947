@@ -10,22 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
-const PASSWORD_RECOVERY_FLAG = 'nemu_password_recovery_active';
-
-const hasRecoveryParams = () => {
-  const params = new URLSearchParams(window.location.search);
-  const hashParams = new URLSearchParams(
-    window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
-  );
-
-  return (
-    params.get('type') === 'recovery' ||
-    hashParams.get('type') === 'recovery' ||
-    params.has('code') ||
-    params.has('token_hash') ||
-    hashParams.has('access_token')
-  );
-};
+type Status = "verifying" | "ready" | "invalid";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -36,60 +21,67 @@ export default function ResetPassword() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [hasRecoverySession, setHasRecoverySession] = useState(false);
-  const [checking, setChecking] = useState(true);
+  const [status, setStatus] = useState<Status>("verifying");
 
+  // Verify the recovery link on mount.
+  // Supabase can deliver the token in three shapes:
+  //   1. PKCE:        /reset-password?code=xxxx
+  //   2. token_hash:  /reset-password?token_hash=xxxx&type=recovery
+  //   3. Implicit:    /reset-password#access_token=xxxx&type=recovery (SDK auto-handles)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const cameFromRecoveryLink = hasRecoveryParams();
-    const isRecoveryFlow = () =>
-      cameFromRecoveryLink || window.sessionStorage.getItem(PASSWORD_RECOVERY_FLAG) === 'true';
+    let cancelled = false;
 
-    if (cameFromRecoveryLink) {
-      window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
-      setHasRecoverySession(true);
-    }
+    const verify = async () => {
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get("code");
+      const tokenHash = url.searchParams.get("token_hash");
+      const hashParams = new URLSearchParams(
+        url.hash.startsWith("#") ? url.hash.slice(1) : url.hash
+      );
+      const hashType = hashParams.get("type");
+      const hasHashTokens = hashParams.has("access_token");
 
-    // Supabase recovery links arrive with tokens in the hash; the SDK auto-creates a session.
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (session && isRecoveryFlow())) {
-        window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
-        setHasRecoverySession(true);
-        setChecking(false);
+      try {
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (tokenHash) {
+          const { error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash,
+            type: "recovery",
+          });
+          if (error) throw error;
+        } else if (hasHashTokens && hashType === "recovery") {
+          // The SDK auto-parses the hash and fires PASSWORD_RECOVERY.
+          // Wait briefly for the session to materialize.
+          await new Promise((r) => setTimeout(r, 250));
+        }
+
+        const { data: { session } } = await supabase.auth.getSession();
+        if (cancelled) return;
+
+        // Clean the URL so the token isn't kept in history.
+        window.history.replaceState({}, "", "/reset-password");
+        setStatus(session ? "ready" : "invalid");
+      } catch (err) {
+        if (!cancelled) setStatus("invalid");
+      }
+    };
+
+    verify();
+
+    // Catch PASSWORD_RECOVERY events fired after mount (implicit flow).
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY" && !cancelled) {
+        window.history.replaceState({}, "", "/reset-password");
+        setStatus("ready");
       }
     });
 
-    const finishChecking = () => setChecking(false);
-
-    const code = params.get('code');
-    const tokenHash = params.get('token_hash');
-
-    if (cameFromRecoveryLink && code) {
-      supabase.auth.exchangeCodeForSession(code)
-        .then(({ error }) => {
-          if (error) setHasRecoverySession(false);
-        })
-        .finally(finishChecking);
-      return () => subscription.unsubscribe();
-    }
-
-    if (cameFromRecoveryLink && tokenHash) {
-      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' })
-        .then(({ error }) => {
-          if (error) setHasRecoverySession(false);
-        })
-        .finally(finishChecking);
-      return () => subscription.unsubscribe();
-    }
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && isRecoveryFlow()) {
-        setHasRecoverySession(true);
-      }
-      setChecking(false);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const schema = z.object({
@@ -130,7 +122,6 @@ export default function ResetPassword() {
       title: t('resetPassword.successTitle'),
       description: t('resetPassword.successDesc'),
     });
-    window.sessionStorage.removeItem(PASSWORD_RECOVERY_FLAG);
     await supabase.auth.signOut();
     navigate("/", { replace: true });
   };
@@ -146,12 +137,14 @@ export default function ResetPassword() {
           <CardDescription>{t('resetPassword.description')}</CardDescription>
         </CardHeader>
         <CardContent>
-          {checking ? (
+          {status === "verifying" ? (
             <p className="text-center text-sm text-muted-foreground">{t('postAd.loading')}</p>
-          ) : !hasRecoverySession ? (
+          ) : status === "invalid" ? (
             <div className="space-y-4 text-center">
               <p className="text-sm text-destructive">{t('resetPassword.invalidLink')}</p>
-              <Button variant="outline" onClick={() => navigate("/")}>{t('common.backToHome')}</Button>
+              <Button variant="outline" onClick={() => navigate("/forgot-password")}>
+                {t('login.recoverySubmit')}
+              </Button>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">

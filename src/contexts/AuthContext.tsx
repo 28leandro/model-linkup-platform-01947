@@ -16,22 +16,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const PASSWORD_RECOVERY_FLAG = 'nemu_password_recovery_active';
-
-const isPasswordRecoveryUrl = () => {
-  if (typeof window === 'undefined') return false;
-  const { pathname, search, hash } = window.location;
-  const params = new URLSearchParams(search);
-  const hashParams = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
-
-  return (
-    params.get('type') === 'recovery' ||
-    hashParams.get('type') === 'recovery' ||
-    (pathname === '/reset-password' && params.has('code')) ||
-    (pathname === '/reset-password' && params.has('token_hash'))
-  );
-};
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -40,18 +24,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    // If the user lands on any route with a recovery hash (Supabase appends
-    // #access_token=...&type=recovery), forward them to /reset-password
-    // BEFORE the SDK consumes the hash, so the dedicated page can pick up
-    // the PASSWORD_RECOVERY event.
-    if (typeof window !== 'undefined') {
-      const hash = window.location.hash || '';
-      const search = window.location.search || '';
-      if (isPasswordRecoveryUrl()) {
-        window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
-      }
-      if (isPasswordRecoveryUrl() && window.location.pathname !== '/reset-password') {
+    // Password recovery: Supabase email links can land on "/" with a hash
+    // like #access_token=...&type=recovery OR a search param like
+    // ?code=...&type=recovery. Forward to /reset-password BEFORE the SDK
+    // consumes the hash so the dedicated page handles the flow.
+    if (typeof window !== 'undefined' && window.location.pathname !== '/reset-password') {
+      const { search, hash } = window.location;
+      const sp = new URLSearchParams(search);
+      const hp = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+      const isRecovery =
+        sp.get('type') === 'recovery' ||
+        hp.get('type') === 'recovery' ||
+        (sp.has('code') && sp.get('type') === 'recovery');
+      if (isRecovery) {
         window.location.replace('/reset-password' + search + hash);
+        return;
       }
     }
 
@@ -71,23 +58,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
 
-        // Password recovery: Supabase parses the recovery tokens from the URL
-        // hash and fires PASSWORD_RECOVERY. Make sure the user lands on the
-        // dedicated reset page even when the email link redirects to "/".
+        // PASSWORD_RECOVERY: when the SDK detects a recovery token it fires
+        // this event. Redirect to /reset-password — the page handles the
+        // password update form.
         if (event === 'PASSWORD_RECOVERY') {
-          window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
-          setSession(newSession);
-          setUser(newSession?.user ?? null);
           if (window.location.pathname !== '/reset-password') {
-            window.history.replaceState({}, '', '/reset-password');
-            window.dispatchEvent(new PopStateEvent('popstate'));
+            window.location.replace('/reset-password');
           }
           return;
         }
 
-        // SIGNED_IN / INITIAL_SESSION / TOKEN_REFRESHED / USER_UPDATED /
-        // PASSWORD_RECOVERY — keep state in sync but never flip loading
-        // back to true (initial load handles that once).
         setSession(newSession);
         setUser(newSession?.user ?? null);
       }
