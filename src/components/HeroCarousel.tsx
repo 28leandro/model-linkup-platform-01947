@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import upapLogo from "@/assets/upap-logo.png";
 import smartfitLogo from "@/assets/smartfit-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
+import upapBanner from "@/assets/upap-banner.jpg";
+import smartfitBanner from "@/assets/smartfit-banner.png";
 
 interface Slide {
   id: string;
@@ -21,6 +23,7 @@ interface Slide {
   logo?: string;
   confetti?: boolean;
   bgImage?: string;
+  fullImage?: boolean;
 }
 
 const SLIDES: Slide[] = [
@@ -46,8 +49,8 @@ const SLIDES: Slide[] = [
     cta_pt: "Conheça a UPAP",
     href: "https://www.upap.edu.py",
     accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
-    logo: upapLogo,
-    confetti: true,
+    bgImage: upapBanner,
+    fullImage: true,
   },
   {
     id: "smartfit",
@@ -59,7 +62,8 @@ const SLIDES: Slide[] = [
     cta_pt: "Conheça a Smart Fit",
     href: "https://www.smartfit.com.py",
     accent: "from-[#1a1a1a] via-[#2b2b2b] to-[#000000]",
-    logo: smartfitLogo,
+    bgImage: smartfitBanner,
+    fullImage: true,
   },
   {
     id: "neura",
@@ -185,10 +189,15 @@ const HeroCarousel = () => {
                   src={s.bgImage}
                   alt=""
                   aria-hidden
-                  className="absolute inset-0 w-full h-full object-cover"
+                  className={cn(
+                    "absolute inset-0 w-full h-full",
+                    s.fullImage ? "object-contain" : "object-cover"
+                  )}
                 />
               )}
-              <div className={cn("absolute inset-0", s.bgImage ? "bg-black/40" : "bg-black/10")} aria-hidden />
+              {!s.fullImage && (
+                <div className={cn("absolute inset-0", s.bgImage ? "bg-black/40" : "bg-black/10")} aria-hidden />
+              )}
               {s.confetti && (
                 <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
                   {Array.from({ length: 28 }).map((_, i) => {
@@ -220,7 +229,7 @@ const HeroCarousel = () => {
                   })}
                 </div>
               )}
-              {s.logo && (
+              {s.logo && !s.fullImage && (
                 <img
                   src={s.logo}
                   alt={`${s.id} logo`}
@@ -228,7 +237,15 @@ const HeroCarousel = () => {
                   className="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 h-24 sm:h-36 md:h-44 w-auto drop-shadow-xl object-contain hidden sm:block"
                 />
               )}
-              {s.id === "clinica-la" ? (
+              {s.fullImage ? (
+                <a
+                  href={s.href}
+                  target={s.href.startsWith("http") ? "_blank" : undefined}
+                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  aria-label={isPt ? s.title_pt : s.title_es}
+                  className="absolute inset-0"
+                />
+              ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
                   <h2 className="absolute top-1 sm:top-4 left-4 sm:left-10 right-4 sm:right-10 text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm max-w-md">
                     {isPt ? s.title_pt : s.title_es}
