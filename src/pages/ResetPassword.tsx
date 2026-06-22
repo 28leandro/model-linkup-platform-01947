@@ -10,6 +10,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
 
+const PASSWORD_RECOVERY_FLAG = 'nemu_password_recovery_active';
+
+const hasRecoveryParams = () => {
+  const params = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(
+    window.location.hash.startsWith('#') ? window.location.hash.slice(1) : window.location.hash
+  );
+
+  return (
+    params.get('type') === 'recovery' ||
+    hashParams.get('type') === 'recovery' ||
+    params.has('code') ||
+    params.has('token_hash') ||
+    hashParams.has('access_token')
+  );
+};
+
 export default function ResetPassword() {
   const navigate = useNavigate();
   const { t } = useLanguage();
@@ -23,16 +40,25 @@ export default function ResetPassword() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
+    const cameFromRecoveryLink = hasRecoveryParams();
+    if (cameFromRecoveryLink) {
+      window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
+      setHasRecoverySession(true);
+    }
+
     // Supabase recovery links arrive with tokens in the hash; the SDK auto-creates a session.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
+        window.sessionStorage.setItem(PASSWORD_RECOVERY_FLAG, 'true');
         setHasRecoverySession(true);
         setChecking(false);
       }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) setHasRecoverySession(true);
+      if (session || cameFromRecoveryLink || window.sessionStorage.getItem(PASSWORD_RECOVERY_FLAG) === 'true') {
+        setHasRecoverySession(true);
+      }
       setChecking(false);
     });
 
@@ -77,6 +103,7 @@ export default function ResetPassword() {
       title: t('resetPassword.successTitle'),
       description: t('resetPassword.successDesc'),
     });
+    window.sessionStorage.removeItem(PASSWORD_RECOVERY_FLAG);
     await supabase.auth.signOut();
     navigate("/", { replace: true });
   };
