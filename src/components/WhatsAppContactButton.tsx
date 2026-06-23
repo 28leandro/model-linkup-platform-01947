@@ -40,12 +40,13 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
   const buyerMeta = (user?.user_metadata || {}) as Record<string, string>;
   const buyerName = cleanText(buyerMeta.name || user?.email?.split("@")[0] || "");
   const buyerPhone = cleanPhone(buyerMeta.phone || "");
-  const isReady = !!user && !!buyerPhone;
+  // Visible to everyone, but only logged-in users can actually send the message.
+  const isReady = !!user;
 
   const message = [
     `¡Hola! Soy ${buyerName} y vi tu anuncio de '${cleanText(listingTitle)}' en el sitio:`,
     "https://nemu.com.py",
-    `¡Me interesa! WhatsApp de contacto es: ${buyerPhone}`,
+    buyerPhone ? `¡Me interesa! WhatsApp de contacto es: ${buyerPhone}` : "¡Me interesa!",
   ].join("\n\n");
 
   const url = `https://wa.me/${sanitized}?text=${encodeURIComponent(message)}`;
@@ -60,20 +61,13 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
 
   const handleBlocked = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!user) {
-      toast({
-        title: "Inicia sesión para continuar",
-        description: "Necesitas estar logueado para contactar al vendedor por WhatsApp.",
-        variant: "destructive",
-      });
-      return;
-    }
+    e.stopPropagation();
     toast({
-      title: "Teléfono no registrado",
-      description: "Actualiza tu perfil con un teléfono válido antes de enviar el mensaje.",
+      title: "Inicia sesión para continuar",
+      description: "Necesitas estar logueado para contactar al vendedor por WhatsApp.",
       variant: "destructive",
     });
-    navigate("/account-settings");
+    navigate("/?auth=login");
   };
 
   if (variant === "inline") {
