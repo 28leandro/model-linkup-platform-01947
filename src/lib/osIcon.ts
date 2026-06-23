@@ -5,10 +5,10 @@
  * Both PNGs have a fully transparent background.
  */
 export function getOSIcon(): string {
-  if (typeof navigator === "undefined") return "/icon-android.png?v=11";
+  if (typeof navigator === "undefined") return "/icon-android.png?v=12";
   const ua = navigator.userAgent || "";
   const isIOS =
     /iPad|iPhone|iPod/.test(ua) ||
     (ua.includes("Macintosh") && "ontouchend" in document);
-  return isIOS ? "/icon-ios.png?v=11" : "/icon-android.png?v=11";
+  return isIOS ? "/icon-ios.png?v=12" : "/icon-android.png?v=12";
 }
