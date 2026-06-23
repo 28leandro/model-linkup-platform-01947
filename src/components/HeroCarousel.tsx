@@ -175,7 +175,7 @@ const HeroCarousel = () => {
             cursor: isDragging ? "grabbing" : "grab",
           }}
         >
-          {SLIDES.map((s) => (
+          {SLIDES.map((s, slideIdx) => (
             <div
               key={s.id}
               className={cn(
@@ -188,6 +188,12 @@ const HeroCarousel = () => {
                   src={s.bgImage}
                   alt=""
                   aria-hidden
+                  width={1200}
+                  height={500}
+                  loading={slideIdx === 0 ? "eager" : "lazy"}
+                  decoding={slideIdx === 0 ? "sync" : "async"}
+                  // @ts-ignore - fetchpriority is a valid HTML attribute
+                  fetchpriority={slideIdx === 0 ? "high" : "low"}
                   className={cn(
                     "absolute inset-0 w-full h-full",
                     s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : "object-cover"
@@ -233,6 +239,9 @@ const HeroCarousel = () => {
                   src={s.logo}
                   alt={`${s.id} logo`}
                   loading="lazy"
+                  decoding="async"
+                  width={400}
+                  height={400}
                   className="absolute right-3 sm:right-8 top-1/2 -translate-y-1/2 h-20 sm:h-36 md:h-44 w-auto max-w-[40%] drop-shadow-xl object-contain"
                 />
               )}
