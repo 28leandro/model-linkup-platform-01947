@@ -19,6 +19,12 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
 
   useEffect(() => {
     let active = true;
+    if (!user) {
+      setPhone(null);
+      return () => {
+        active = false;
+      };
+    }
     (async () => {
       const { data } = await supabase.rpc("get_listing_contact_phone", {
         listing_uuid: listingId,
@@ -28,20 +34,17 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
     return () => {
       active = false;
     };
-  }, [listingId]);
+  }, [listingId, user]);
 
-  if (!phone) return null;
-
-  const sanitized = phone.replace(/\D/g, "");
-  if (!sanitized) return null;
+  const sanitized = (phone || "").replace(/\D/g, "");
 
   const cleanText = (value: string) => value.replace(/\s+/g, " ").trim();
   const cleanPhone = (value: string) => value.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
   const buyerMeta = (user?.user_metadata || {}) as Record<string, string>;
   const buyerName = cleanText(buyerMeta.name || user?.email?.split("@")[0] || "");
   const buyerPhone = cleanPhone(buyerMeta.phone || "");
-  // Visible to everyone, but only logged-in users can actually send the message.
-  const isReady = !!user;
+  // Visible to everyone, but only logged-in users with a resolved phone can actually send.
+  const isReady = !!user && !!sanitized;
 
   const message = [
     `¡Hola! Soy ${buyerName} y vi tu anuncio de '${cleanText(listingTitle)}' en el sitio:`,
