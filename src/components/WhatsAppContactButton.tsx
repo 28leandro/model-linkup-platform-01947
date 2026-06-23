@@ -77,7 +77,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
     return (
       <Button
         asChild
-        className={`rounded-full w-14 h-14 ${isReady ? "bg-green-500 hover:bg-green-600" : "bg-muted hover:bg-muted"} shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0`}
+        className={`rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0`}
       >
         <a
           href={isReady ? url : "#"}
@@ -98,7 +98,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
       <Button
         asChild
         size="icon"
-        className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full ${isReady ? "bg-green-500 hover:bg-green-600" : "bg-muted hover:bg-muted"} p-0`}
+        className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-green-500 hover:bg-green-600 p-0`}
         title="Contactar por WhatsApp"
       >
         <a
@@ -117,7 +117,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
   return (
     <Button
       asChild
-        className={`fixed bottom-24 right-4 sm:bottom-6 sm:right-6 rounded-full w-14 h-14 ${isReady ? "bg-green-500 hover:bg-green-600" : "bg-muted hover:bg-muted"} shadow-lg flex items-center justify-center z-50 transition-transform hover:scale-110 p-0`}
+        className={`fixed bottom-24 right-4 sm:bottom-6 sm:right-6 rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center z-50 transition-transform hover:scale-110 p-0`}
     >
       <a
         href={isReady ? url : "#"}
