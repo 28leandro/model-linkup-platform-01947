@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { getOSIcon } from "@/lib/osIcon";
 
 const SplashScreen = () => {
   const [visible, setVisible] = useState(true);
@@ -29,7 +28,7 @@ const SplashScreen = () => {
     >
       <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in-95 duration-700">
         <img
-          src={getOSIcon()}
+          src="/icon-ios.png?v=8"
           alt="NEMU"
           width={112}
           height={112}
