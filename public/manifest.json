@@ -6,28 +6,28 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#7c3aed",
+  "background_color": "#ffffff",
   "theme_color": "#7c3aed",
   "lang": "es-PY",
   "categories": ["shopping", "business", "lifestyle"],
   "icons": [
     {
-      "src": "/icon-android.png?v=11",
-      "sizes": "1024x1024",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-android.png?v=11",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icon-android.png?v=11",
+      "src": "/icon-192.png?v=12",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png?v=12",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-android.png?v=12",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
     }
   ]
 }
