@@ -5,10 +5,10 @@
  * Both PNGs have a fully transparent background.
  */
 export function getOSIcon(): string {
-  if (typeof navigator === "undefined") return "/logo-principal-v2-android-512.png?v=1";
+  if (typeof navigator === "undefined") return "/logo-nemu-v3-512.png?v=3";
   const ua = navigator.userAgent || "";
   const isIOS =
     /iPad|iPhone|iPod/.test(ua) ||
     (ua.includes("Macintosh") && "ontouchend" in document);
-  return isIOS ? "/logo-principal-v2-512.png?v=1" : "/logo-principal-v2-android-512.png?v=1";
+  return isIOS ? "/logo-nemu-v3-512.png?v=3" : "/logo-nemu-v3-512.png?v=3";
 }
