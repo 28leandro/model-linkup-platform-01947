@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 const SITE_URL = "https://nemu.com.py";
-const DEFAULT_OG_IMAGE = `${SITE_URL}/favicon-v5-512.png?v=6`;
+const DEFAULT_OG_IMAGE = `${SITE_URL}/favicon-v5-512.png?v=7`;
 
 export interface SEOProps {
   title: string;
