@@ -28,7 +28,7 @@ const SplashScreen = () => {
     >
       <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in-95 duration-700">
         <img
-          src="/favicon-v4-512.png?v=5"
+          src="/favicon-v5-512.png?v=6"
           alt="NEMU"
           width={112}
           height={112}
