@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 // Sightengine image moderation. Receives base64 image, returns { approved, reason }.
 // Models: nudity-2.1, weapon, offensive, gore. Threshold: 0.8.
@@ -10,6 +11,28 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Require authenticated caller to prevent anonymous abuse of paid Sightengine quota.
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    const userClient = createClient(
+      Deno.env.get('SUPABASE_URL')!,
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const token = authHeader.replace('Bearer ', '');
+    const { data: claimsData, error: claimsErr } = await userClient.auth.getClaims(token);
+    if (claimsErr || !claimsData?.claims?.sub) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const apiUser = Deno.env.get('SIGHTENGINE_API_USER');
     const apiSecret = Deno.env.get('SIGHTENGINE_API_SECRET');
     if (!apiUser || !apiSecret) {
@@ -23,6 +46,14 @@ Deno.serve(async (req) => {
     if (!imageBase64 || typeof imageBase64 !== 'string') {
       return new Response(JSON.stringify({ error: 'imageBase64 required' }), {
         status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Cap payload at ~10MB base64 (~7.5MB binary) to limit abuse cost.
+    if (imageBase64.length > 10 * 1024 * 1024) {
+      return new Response(JSON.stringify({ error: 'Image too large' }), {
+        status: 413,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
