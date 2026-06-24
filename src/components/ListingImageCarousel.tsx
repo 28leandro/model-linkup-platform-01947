@@ -10,6 +10,7 @@ interface ListingImageCarouselProps {
   href: string;
   aspectClassName?: string;
   noImageLabel: string;
+  priority?: boolean;
 }
 
 const FALLBACK =
@@ -22,6 +23,7 @@ const ListingImageCarousel = ({
   href,
   aspectClassName = "aspect-square lg:aspect-[3/4]",
   noImageLabel,
+  priority = false,
 }: ListingImageCarouselProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(listingId);
@@ -42,8 +44,10 @@ const ListingImageCarousel = ({
           <img
             src={cover}
             alt={title}
-            loading="lazy"
+            loading={priority ? "eager" : "lazy"}
             decoding="async"
+            // @ts-ignore - fetchpriority is a valid HTML attribute
+            fetchpriority={priority ? "high" : "auto"}
             width={600}
             height={600}
             draggable={false}
