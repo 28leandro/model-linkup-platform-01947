@@ -37,11 +37,11 @@ const BottomNav = () => {
   return (
     <>
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-50 h-16 bg-background border-t shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)]"
+        className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-background border-t shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)]"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
         aria-label="Bottom navigation"
       >
-        <div className="flex items-stretch justify-around h-full px-2">
+        <div className="flex items-stretch justify-around h-16 px-2">
           <Link to="/" className={itemClass(isActive("/"))} aria-label={t("header.home") || "Início"}>
             <Home className="h-6 w-6" />
             <span>{t("nav.home")}</span>
