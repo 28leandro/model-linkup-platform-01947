@@ -27,6 +27,13 @@ const SplashScreen = () => {
       aria-hidden="true"
     >
       <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in-95 duration-700">
+        <img
+          src="/favicon-v4-512.png?v=5"
+          alt="NEMU"
+          width={112}
+          height={112}
+          className="w-28 h-28 drop-shadow-2xl"
+        />
         <div className="flex gap-1.5">
           <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" style={{ animationDelay: "0ms" }} />
           <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" style={{ animationDelay: "150ms" }} />
