@@ -191,7 +191,8 @@ export const useImageUpload = () => {
         .from('listing-images')
         .upload(filePath, compressedBlob, {
           contentType: compressedBlob.type || 'image/jpeg',
-          cacheControl: '3600',
+          // Long-lived cache (1 year). Filenames are UUIDs, so URLs are immutable.
+          cacheControl: '31536000',
           upsert: false
         });
 
