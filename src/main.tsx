@@ -5,8 +5,11 @@ import App from './App.tsx'
 import './index.css'
 import { LanguageProvider } from './contexts/LanguageContext'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { initPwaUpdate } from './lib/pwaUpdate'
 
 const queryClient = new QueryClient()
+
+initPwaUpdate()
 
 createRoot(document.getElementById("root")!).render(
   <HelmetProvider>
