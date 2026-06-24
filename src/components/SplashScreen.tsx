@@ -34,11 +34,6 @@ const SplashScreen = () => {
           height={112}
           className="w-28 h-28 drop-shadow-2xl"
         />
-        <div className="flex gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" style={{ animationDelay: "0ms" }} />
-          <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" style={{ animationDelay: "150ms" }} />
-          <span className="w-2 h-2 rounded-full bg-white/70 animate-pulse" style={{ animationDelay: "300ms" }} />
-        </div>
       </div>
     </div>
   );
