@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import upapLogo from "@/assets/upap-logo.png";
-import smartfitLogo from "@/assets/smartfit-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
 import upapBanner from "@/assets/upap-banner.jpg";
-import smartfitBanner from "@/assets/smartfit-banner.png";
 
 interface Slide {
   id: string;
@@ -51,18 +49,6 @@ const SLIDES: Slide[] = [
     accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
     logo: upapLogo,
     confetti: true,
-  },
-  {
-    id: "smartfit",
-    title_es: "Smart Fit — Entrená sin límites",
-    title_pt: "Smart Fit — Treine sem limites",
-    subtitle_es: "La cadena de gimnasios más grande de Latinoamérica.",
-    subtitle_pt: "A maior rede de academias da América Latina.",
-    cta_es: "Conocé Smart Fit",
-    cta_pt: "Conheça a Smart Fit",
-    href: "https://www.smartfit.com.py",
-    accent: "from-[#1a1a1a] via-[#2b2b2b] to-[#000000]",
-    logo: smartfitLogo,
   },
   {
     id: "neura",
