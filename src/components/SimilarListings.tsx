@@ -7,6 +7,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
 import ListingRatingBadge from "@/components/ListingRatingBadge";
 import { getCheapestIds, priceClass } from "@/lib/cheapest";
+import { CATEGORIES } from "@/lib/categories";
 
 interface SimilarListingsProps {
   currentId: string;
@@ -62,6 +63,60 @@ const normalizeValue = (value?: string | null) =>
     .trim();
 
 const normalizeBrand = (value?: string | null) => normalizeValue(value).replace(/\s+/g, " ");
+
+const canonicalCategory = (value?: string | null) => {
+  const normalized = normalizeValue(value);
+  const category = CATEGORIES.find((c) => {
+    const aliases = [c.id, c.type, c.label_es, c.label_pt].map(normalizeValue);
+    return aliases.includes(normalized);
+  });
+  return category?.id || value || null;
+};
+
+const canonicalSubcategory = (categoryValue?: string | null, subcategoryValue?: string | null) => {
+  const normalized = normalizeValue(subcategoryValue);
+  if (!normalized) return null;
+
+  const categoryId = canonicalCategory(categoryValue);
+  const categories = categoryId
+    ? CATEGORIES.filter((c) => c.id === categoryId || c.type === categoryId)
+    : CATEGORIES;
+
+  for (const categoryItem of categories.length ? categories : CATEGORIES) {
+    const subcategory = categoryItem.subcategories?.find((s) => {
+      const aliases = [s.id, s.label_es, s.label_pt].map(normalizeValue);
+      return aliases.includes(normalized);
+    });
+    if (subcategory) return subcategory.id;
+  }
+
+  return normalized.replace(/\s+/g, "-");
+};
+
+const serviceAffinity = (row: {
+  title?: string | null;
+  category?: string | null;
+  subcategory?: string | null;
+  type?: string | null;
+}) => {
+  const text = normalizeValue(
+    [row.category, row.type, row.subcategory, row.title].filter(Boolean).join(" ")
+  );
+
+  if (
+    /\b(belleza|beleza|bienestar|bem\s*estar|estetica|esteticista|spa|masaje|massagem|peluquer|cabelo|cabello|barber|barbero|manicur|manicure|pedicure|unas|unhas|cejas|sobrancelhas|depilacion|depilacao|maquillaje|maquiagem|gel)\b/.test(text)
+  ) {
+    return "beauty";
+  }
+
+  if (
+    /\b(reformas?|construccion|construcao|construçao|obra|obras|albanil|albañil|muralha|muralla|muro|porton|portao|portón|herreria|serralheria|cemento|ladrillo|tijolo|techo|telhado|plomer|fontaner|electric|pintura|pintor)\b/.test(text)
+  ) {
+    return "construction";
+  }
+
+  return canonicalSubcategory("services", row.subcategory);
+};
 
 const normalizeModel = (value?: string | null) =>
   normalizeValue(value)
@@ -166,6 +221,8 @@ const SimilarListings = ({
       try {
         const currentBrand = brand || null;
         const currentModel = model || null;
+        const currentCategory = canonicalCategory(category || type);
+        const currentSubcategory = canonicalSubcategory(currentCategory, subcategory);
         const normalizedBrand = normalizeBrand(currentBrand);
         const normalizedModel = normalizeModel(currentModel);
         const currentYear = year && year > 0 ? year : extractYear(title);
@@ -234,18 +291,33 @@ const SimilarListings = ({
           });
           // If nothing matched the brand filter, fall back to same subcategory only.
           if (rows.length === 0) rows = candidates;
+        } else if (currentCategory === "services") {
+          const currentServiceAffinity = serviceAffinity({ category, type, subcategory, title });
+          const serviceRows = await runQuery(
+            (q) => q.or("category.eq.services,type.eq.services"),
+            120
+          );
+
+          rows = serviceRows.filter((r) => {
+            const candidateSubcategory = canonicalSubcategory("services", r.subcategory);
+            const candidateAffinity = serviceAffinity(r);
+
+            if (currentServiceAffinity) return candidateAffinity === currentServiceAffinity;
+            if (currentSubcategory) return candidateSubcategory === currentSubcategory;
+            return false;
+          });
         } else {
           // Simple rule for every other category (belleza, inmuebles/casas,
           // tecnología/computadores, celulares, etc.): match by subcategory.
           // Never mix subcategories. Only fall back to category when the
           // current listing has no subcategory at all.
-          if (subcategory && category) {
+          if (currentSubcategory && currentCategory) {
             rows = await runQuery(
-              (q) => q.eq("category", category).eq("subcategory", subcategory),
+              (q) => q.eq("category", currentCategory).eq("subcategory", currentSubcategory),
               60
             );
-          } else if (category) {
-            rows = await runQuery((q) => q.eq("category", category), 60);
+          } else if (currentCategory) {
+            rows = await runQuery((q) => q.eq("category", currentCategory), 60);
           }
         }
 
@@ -258,8 +330,8 @@ const SimilarListings = ({
 
         const scored = rows.map((r) => {
           let score = 0;
-          if (r.category && category && r.category === category) score += 30;
-          if (subcategory && r.subcategory === subcategory) score += 50;
+          if (canonicalCategory(r.category || r.type) === currentCategory) score += 30;
+          if (currentSubcategory && canonicalSubcategory(currentCategory, r.subcategory) === currentSubcategory) score += 50;
           if (isVehicle) {
             const rowBrand = vehicleField(r, "brand");
             const rowModel = vehicleField(r, "model");
