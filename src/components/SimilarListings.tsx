@@ -206,40 +206,46 @@ const SimilarListings = ({
         };
 
         if (isVehicle) {
-          const vehicleRows = await runQuery((q) =>
-            q.or("category.eq.vehicles,type.eq.vehicles"),
-            500
+          // Vehicles: same subcategory (carros, motos, etc.) + same brand.
+          // Then filter by year (±5) and price (±35%) when available.
+          const vehicleRows = await runQuery(
+            (q) => {
+              let qq = q.or("category.eq.vehicles,type.eq.vehicles");
+              if (subcategory) qq = qq.eq("subcategory", subcategory);
+              return qq;
+            },
+            200
           );
-
-          const sameModelStrict = (r: SimilarItem) =>
-            !!normalizedModel && normalizeModel(vehicleField(r, "model")) === normalizedModel;
-
-          const vehicleCandidates = vehicleRows.filter(sameVehicleCategory);
-
-          // OLX-style strict: same model + same city. No fallback.
-          rows = vehicleCandidates.filter(
-            (r) => sameModelStrict(r) && sameCity(location, r.location)
-          );
+          const candidates = vehicleRows.filter(sameVehicleCategory);
+          rows = candidates.filter((r) => {
+            if (normalizedBrand) {
+              const rb = normalizeBrand(vehicleField(r, "brand"));
+              if (rb && rb !== normalizedBrand) return false;
+            }
+            if (currentYear) {
+              const ry = vehicleYear(r);
+              if (ry && Math.abs(ry - currentYear) > 5) return false;
+            }
+            if (price && price > 0 && r.price && r.price > 0) {
+              const delta = Math.abs(r.price - price) / price;
+              if (delta > 0.35) return false;
+            }
+            return true;
+          });
+          // If nothing matched the brand filter, fall back to same subcategory only.
+          if (rows.length === 0) rows = candidates;
         } else {
-          // Strict: only same subcategory. Never mix unrelated subcategories,
-          // even within the same parent category (e.g. "belleza" vs "reformas"
-          // both live under "services" but are unrelated).
+          // Simple rule for every other category (belleza, inmuebles/casas,
+          // tecnología/computadores, celulares, etc.): match by subcategory.
+          // Never mix subcategories. Only fall back to category when the
+          // current listing has no subcategory at all.
           if (subcategory && category) {
             rows = await runQuery(
               (q) => q.eq("category", category).eq("subcategory", subcategory),
               60
             );
           } else if (category) {
-            // Current listing has no subcategory: fall back to same category,
-            // but require at least one meaningful title-token overlap to avoid
-            // mixing unrelated items.
-            const catRows = await runQuery((q) => q.eq("category", category), 60);
-            const currentTokens = new Set(tokenize(title));
-            rows = currentTokens.size
-              ? catRows.filter((r) =>
-                  tokenize(r.title).some((w) => currentTokens.has(w))
-                )
-              : catRows;
+            rows = await runQuery((q) => q.eq("category", category), 60);
           }
         }
 
