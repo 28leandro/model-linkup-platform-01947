@@ -36,7 +36,31 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
     };
   }, [listingId, user]);
 
-  const sanitized = (phone || "").replace(/\D/g, "");
+  // Normalize phone for wa.me — must be full international number, digits only.
+  // Paraguay default: numbers stored locally (e.g. "0982 123-456" / "982123456")
+  // are converted to "595982123456". Numbers already including a country code
+  // (with or without "+") are preserved.
+  const normalizeWhatsApp = (raw: string | null): string => {
+    if (!raw) return "";
+    const trimmed = raw.trim();
+    const hadPlus = trimmed.startsWith("+");
+    let digits = trimmed.replace(/\D/g, "");
+    if (!digits) return "";
+    if (hadPlus) return digits;
+    // Strip leading zeros (local trunk prefix)
+    digits = digits.replace(/^0+/, "");
+    // If it already starts with a known country code length (>=11 digits), keep as-is
+    if (digits.length >= 11) return digits;
+    // Default Paraguay country code
+    return `595${digits}`;
+  };
+
+  const sanitized = normalizeWhatsApp(phone);
+
+  if (import.meta.env.DEV && phone) {
+    // eslint-disable-next-line no-console
+    console.debug("[WhatsApp] raw:", phone, "→ normalized:", sanitized);
+  }
 
   const cleanText = (value: string) => value.replace(/\s+/g, " ").trim();
   const cleanPhone = (value: string) => value.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
