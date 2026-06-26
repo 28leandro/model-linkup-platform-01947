@@ -302,6 +302,9 @@ const SimilarListings = ({
             const candidateSubcategory = canonicalSubcategory("services", r.subcategory);
             const candidateAffinity = serviceAffinity(r);
 
+            if (currentSubcategory && candidateSubcategory && candidateSubcategory !== currentSubcategory) {
+              return false;
+            }
             if (currentServiceAffinity) return candidateAffinity === currentServiceAffinity;
             if (currentSubcategory) return candidateSubcategory === currentSubcategory;
             return false;
