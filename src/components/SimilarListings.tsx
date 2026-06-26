@@ -221,16 +221,17 @@ const SimilarListings = ({
             (r) => sameModelStrict(r) && sameCity(location, r.location)
           );
         } else {
-          rows = await runQuery((q) => {
-            if (category) q = q.eq("category", category);
-            if (currency) q = q.eq("currency", currency);
-            if (price && price > 0)
-              q = q.gte("price", price * 0.8).lte("price", price * 1.2);
-            return q;
-          }, 60);
+          // Strict: same subcategory first, then fall back to same category.
+          // Never mix unrelated categories.
+          if (subcategory) {
+            rows = await runQuery(
+              (q) => q.eq("category", category!).eq("subcategory", subcategory),
+              60
+            );
+          }
           if (rows.length < 4 && category) {
-            const relaxed = await runQuery((q) => q.eq("category", category));
-            rows = mergeUnique(rows, relaxed);
+            const catRows = await runQuery((q) => q.eq("category", category), 60);
+            rows = mergeUnique(rows, catRows);
           }
         }
 
@@ -244,6 +245,7 @@ const SimilarListings = ({
         const scored = rows.map((r) => {
           let score = 0;
           if (r.category && category && r.category === category) score += 30;
+          if (subcategory && r.subcategory === subcategory) score += 50;
           if (isVehicle) {
             const rowBrand = vehicleField(r, "brand");
             const rowModel = vehicleField(r, "model");
