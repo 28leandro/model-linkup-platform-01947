@@ -221,17 +221,25 @@ const SimilarListings = ({
             (r) => sameModelStrict(r) && sameCity(location, r.location)
           );
         } else {
-          // Strict: same subcategory first, then fall back to same category.
-          // Never mix unrelated categories.
-          if (subcategory) {
+          // Strict: only same subcategory. Never mix unrelated subcategories,
+          // even within the same parent category (e.g. "belleza" vs "reformas"
+          // both live under "services" but are unrelated).
+          if (subcategory && category) {
             rows = await runQuery(
-              (q) => q.eq("category", category!).eq("subcategory", subcategory),
+              (q) => q.eq("category", category).eq("subcategory", subcategory),
               60
             );
-          }
-          if (rows.length < 4 && category) {
+          } else if (category) {
+            // Current listing has no subcategory: fall back to same category,
+            // but require at least one meaningful title-token overlap to avoid
+            // mixing unrelated items.
             const catRows = await runQuery((q) => q.eq("category", category), 60);
-            rows = mergeUnique(rows, catRows);
+            const currentTokens = new Set(tokenize(title));
+            rows = currentTokens.size
+              ? catRows.filter((r) =>
+                  tokenize(r.title).some((w) => currentTokens.has(w))
+                )
+              : catRows;
           }
         }
 
