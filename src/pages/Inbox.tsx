@@ -189,14 +189,17 @@ const Inbox = () => {
       const other = m.sender_id === user.id ? m.receiver_id : m.sender_id;
       const key = `${m.ad_id}::${other}`;
       const existing = map.get(key);
+      const isUnreadForMe = m.receiver_id === user.id && !m.read_at;
       if (!existing || new Date(m.created_at) > new Date(existing.last_message.created_at)) {
         map.set(key, {
           ad_id: m.ad_id,
           other_user_id: other,
           ad_title: adTitleMap.get(m.ad_id) || "Anúncio",
           last_message: m,
-          unread: existing?.unread || 0,
+          unread: (existing?.unread || 0) + (isUnreadForMe ? 1 : 0),
         });
+      } else if (isUnreadForMe) {
+        existing.unread += 1;
       }
     }
     return Array.from(map.values()).sort(
