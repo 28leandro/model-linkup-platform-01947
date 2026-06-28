@@ -6,6 +6,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { formatPrice } from "@/lib/formatPrice";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
 import DesktopListingCarousel from "@/components/DesktopListingCarousel";
+import { getCityFromLocation } from "@/lib/utils";
 
 const RecentlyViewedCarousel = () => {
   const { items, clear } = useRecentlyViewed();
@@ -58,8 +59,8 @@ const RecentlyViewedCarousel = () => {
                 ) : (
                   <p className="font-semibold text-sm lg:text-base mb-0.5 opacity-0">—</p>
                 )}
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light">
-                  {item.location || "\u00a0"}
+                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-bold">
+                  {getCityFromLocation(item.location) || "\u00a0"}
                 </p>
               </div>
             </Link>
