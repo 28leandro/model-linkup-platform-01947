@@ -96,7 +96,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                     {Number((listing as any).area).toLocaleString("es-PY")} m²
                   </p>
                 )}
-                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0 line-clamp-1 font-light">{getPublicCity(listing)}</p>
+                <p className="text-[11px] sm:text-xs text-muted-foreground mt-0 line-clamp-1 font-bold">{getPublicCity(listing)}</p>
               </div>
             </Link>
           </div>
