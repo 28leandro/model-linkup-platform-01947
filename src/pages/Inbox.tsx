@@ -300,6 +300,38 @@ const Inbox = () => {
     toast.success("Mensaje eliminado");
   };
 
+  const handleDeleteThread = async (adId: string, otherId: string) => {
+    if (!user) return;
+    if (!confirm("¿Eliminar toda la conversación? Esta acción no se puede deshacer.")) return;
+    // Optimistic
+    qc.setQueryData<Message[]>(["inbox", user.id], (prev = []) =>
+      prev.filter(
+        (m) =>
+          !(
+            m.ad_id === adId &&
+            ((m.sender_id === user.id && m.receiver_id === otherId) ||
+              (m.sender_id === otherId && m.receiver_id === user.id))
+          )
+      )
+    );
+    if (activeThread?.adId === adId && activeThread?.otherId === otherId) {
+      setActiveThread(null);
+    }
+    const { error } = await supabase
+      .from("messages")
+      .delete()
+      .eq("ad_id", adId)
+      .or(
+        `and(sender_id.eq.${user.id},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${user.id})`
+      );
+    if (error) {
+      toast.error("No se pudo eliminar la conversación");
+      qc.invalidateQueries({ queryKey: ["inbox", user.id] });
+      return;
+    }
+    toast.success("Conversación eliminada");
+  };
+
   return (
     <>
       <Header onLoginClick={() => setShowLogin(true)} />
@@ -329,24 +361,33 @@ const Inbox = () => {
                     {threads.map((t) => {
                       const isActive =
                         activeThread?.adId === t.ad_id && activeThread?.otherId === t.other_user_id;
+                      const lastIsMine = t.last_message.sender_id === user.id;
+                      const lastRead = !!(t.last_message as any).read_at;
+                      // Allow swipe/delete once the conversation has been opened (no unread + last incoming is read, or last is mine)
+                      const canDelete = t.unread === 0 && (lastIsMine || lastRead);
                       return (
                         <li key={`${t.ad_id}-${t.other_user_id}`}>
-                          <button
-                            className={`w-full text-left p-3 hover:bg-muted/50 transition-colors rounded-md ${
-                              isActive ? "bg-muted" : ""
-                            }`}
-                            onClick={() =>
-                              setActiveThread({ adId: t.ad_id, otherId: t.other_user_id })
-                            }
+                          <SwipeableThreadRow
+                            canDelete={canDelete}
+                            onDelete={() => handleDeleteThread(t.ad_id, t.other_user_id)}
                           >
-                            <p className="font-medium text-sm truncate">{t.ad_title}</p>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {t.last_message.content}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground mt-1">
-                              {new Date(t.last_message.created_at).toLocaleString()}
-                            </p>
-                          </button>
+                            <button
+                              className={`w-full text-left p-3 hover:bg-muted/50 transition-colors rounded-md ${
+                                isActive ? "bg-muted" : ""
+                              }`}
+                              onClick={() =>
+                                setActiveThread({ adId: t.ad_id, otherId: t.other_user_id })
+                              }
+                            >
+                              <p className="font-medium text-sm truncate">{t.ad_title}</p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {t.last_message.content}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground mt-1">
+                                {new Date(t.last_message.created_at).toLocaleString()}
+                              </p>
+                            </button>
+                          </SwipeableThreadRow>
                         </li>
                       );
                     })}
@@ -426,11 +467,7 @@ const Inbox = () => {
                             );
                           }
                           return (
-                            <SwipeableMessageRow
-                              key={m.id}
-                              mine={mine}
-                              onDelete={() => handleDelete(m.id)}
-                            >
+                            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                               <div
                                 className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                                   mine
@@ -443,7 +480,7 @@ const Inbox = () => {
                                   {new Date(m.created_at).toLocaleString()}
                                 </p>
                               </div>
-                            </SwipeableMessageRow>
+                            </div>
                           );
                         })}
                       </div>
