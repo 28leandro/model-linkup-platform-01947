@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { LoginDialog } from "@/components/LoginDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, MessageSquare, Star, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowLeft, Send, MessageSquare, Star, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Message {
@@ -18,6 +18,7 @@ interface Message {
   ad_id: string;
   content: string;
   created_at: string;
+  read_at?: string | null;
 }
 
 type ParsedSystem =
@@ -41,6 +42,102 @@ const parseSystem = (content: string): ParsedSystem => {
     }
   }
   return null;
+};
+
+interface SwipeableMessageRowProps {
+  mine: boolean;
+  onDelete: () => void;
+  children: React.ReactNode;
+}
+
+const SwipeableMessageRow = ({ mine, onDelete, children }: SwipeableMessageRowProps) => {
+  const [offset, setOffset] = useState(0);
+  const [revealed, setRevealed] = useState(false);
+  const startX = useRef<number | null>(null);
+  const moved = useRef(false);
+
+  const REVEAL_WIDTH = 64;
+  const THRESHOLD = 40;
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+    moved.current = false;
+  };
+  const onTouchMove = (e: React.TouchEvent) => {
+    if (startX.current == null) return;
+    const dx = e.touches[0].clientX - startX.current;
+    // Swipe right-to-left → negative dx
+    if (dx < 0) {
+      moved.current = true;
+      setOffset(Math.max(dx, -REVEAL_WIDTH));
+    } else if (revealed && dx > 0) {
+      moved.current = true;
+      setOffset(Math.min(-REVEAL_WIDTH + dx, 0));
+    }
+  };
+  const onTouchEnd = () => {
+    if (offset <= -THRESHOLD) {
+      setOffset(-REVEAL_WIDTH);
+      setRevealed(true);
+    } else {
+      setOffset(0);
+      setRevealed(false);
+    }
+    startX.current = null;
+  };
+
+  const handleDeleteClick = () => {
+    setOffset(0);
+    setRevealed(false);
+    onDelete();
+  };
+
+  return (
+    <div className="relative group">
+      {/* Mobile reveal background */}
+      <div className="absolute inset-y-0 right-0 flex items-center md:hidden">
+        <button
+          type="button"
+          aria-label="Eliminar mensaje"
+          onClick={handleDeleteClick}
+          className="h-full w-16 flex items-center justify-center bg-destructive text-destructive-foreground rounded-r-md"
+        >
+          <Trash2 className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div
+        className={`flex items-center gap-1 ${mine ? "justify-end" : "justify-start"} transition-transform`}
+        style={{ transform: `translateX(${offset}px)` }}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+      >
+        {/* Desktop trash (left of mine messages, right of theirs) */}
+        {mine && (
+          <button
+            type="button"
+            aria-label="Eliminar mensaje"
+            onClick={onDelete}
+            className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+        {children}
+        {!mine && (
+          <button
+            type="button"
+            aria-label="Eliminar mensaje"
+            onClick={onDelete}
+            className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
 };
 
 interface ThreadInfo {
@@ -201,6 +298,21 @@ const Inbox = () => {
     qc.invalidateQueries({ queryKey: ["inbox", user!.id] });
   };
 
+  const handleDelete = async (messageId: string) => {
+    if (!user) return;
+    // Optimistic update
+    qc.setQueryData<Message[]>(["inbox", user.id], (prev = []) =>
+      prev.filter((m) => m.id !== messageId)
+    );
+    const { error } = await supabase.from("messages").delete().eq("id", messageId);
+    if (error) {
+      toast.error("No se pudo eliminar el mensaje");
+      qc.invalidateQueries({ queryKey: ["inbox", user.id] });
+      return;
+    }
+    toast.success("Mensaje eliminado");
+  };
+
   return (
     <>
       <Header onLoginClick={() => setShowLogin(true)} />
@@ -327,7 +439,11 @@ const Inbox = () => {
                             );
                           }
                           return (
-                            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                            <SwipeableMessageRow
+                              key={m.id}
+                              mine={mine}
+                              onDelete={() => handleDelete(m.id)}
+                            >
                               <div
                                 className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                                   mine
@@ -340,7 +456,7 @@ const Inbox = () => {
                                   {new Date(m.created_at).toLocaleString()}
                                 </p>
                               </div>
-                            </div>
+                            </SwipeableMessageRow>
                           );
                         })}
                       </div>
