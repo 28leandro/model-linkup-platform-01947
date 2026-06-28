@@ -8,6 +8,23 @@ import ListingImageCarousel from "@/components/ListingImageCarousel";
 import DesktopListingCarousel from "@/components/DesktopListingCarousel";
 import { getCityFromLocation } from "@/lib/utils";
 
+// Robust city extractor: prefer last segment that doesn't look like a street,
+// fallback to the heuristic in getCityFromLocation.
+const cityOnly = (loc?: string) => {
+  if (!loc) return "";
+  const parts = loc.split(",").map((p) => p.trim()).filter(Boolean);
+  if (parts.length === 0) return "";
+  if (parts.length === 1) return parts[0];
+  // Drop street-looking first segment, drop trailing region/state if present
+  const looksLikeStreet = (s: string) =>
+    /\d/.test(s) ||
+    /\b(av|avda|avenida|calle|rua|r\.|ruta|km|n[ºo°]|esq|esquina)\b/i.test(s);
+  const filtered = parts.filter((p) => !looksLikeStreet(p));
+  // Heuristic: city is usually the second-to-last (last is department/region)
+  if (filtered.length >= 2) return filtered[filtered.length - 2];
+  return filtered[0] || getCityFromLocation(loc);
+};
+
 const RecentlyViewedCarousel = () => {
   const { items, clear } = useRecentlyViewed();
   const { t } = useLanguage();
@@ -60,7 +77,7 @@ const RecentlyViewedCarousel = () => {
                   <p className="font-semibold text-sm lg:text-base mb-0.5 opacity-0">—</p>
                 )}
                 <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-bold">
-                  {getCityFromLocation(item.location) || "\u00a0"}
+                  {cityOnly(item.location) || "\u00a0"}
                 </p>
               </div>
             </Link>

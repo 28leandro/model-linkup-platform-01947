@@ -77,13 +77,17 @@ const ListingDetail = () => {
         setListing(data as Listing);
         try {
           const l: any = data;
+          const explicitCity =
+            typeof l?.attributes?.city === "string" && l.attributes.city.trim()
+              ? l.attributes.city.trim()
+              : undefined;
           trackRecentlyViewed({
             id: l.id,
             title: l.title,
             image: Array.isArray(l.images) ? l.images[0] : undefined,
             price: l.price,
             currency: l.currency,
-            location: l.location,
+            location: explicitCity || l.location,
             type: l.type,
           });
         } catch {
