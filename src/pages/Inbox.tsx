@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,7 +8,7 @@ import { LoginDialog } from "@/components/LoginDialog";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, Send, MessageSquare, Star, CheckCircle2, XCircle } from "lucide-react";
+import { ArrowLeft, Send, MessageSquare, Star, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Message {
@@ -18,6 +18,7 @@ interface Message {
   ad_id: string;
   content: string;
   created_at: string;
+  read_at?: string | null;
 }
 
 type ParsedSystem =
@@ -199,6 +200,21 @@ const Inbox = () => {
     }
     toast.success(answer === "yes" ? "Marcado como atendido" : "Marcado como no atendido");
     qc.invalidateQueries({ queryKey: ["inbox", user!.id] });
+  };
+
+  const handleDelete = async (messageId: string) => {
+    if (!user) return;
+    // Optimistic update
+    qc.setQueryData<Message[]>(["inbox", user.id], (prev = []) =>
+      prev.filter((m) => m.id !== messageId)
+    );
+    const { error } = await supabase.from("messages").delete().eq("id", messageId);
+    if (error) {
+      toast.error("No se pudo eliminar el mensaje");
+      qc.invalidateQueries({ queryKey: ["inbox", user.id] });
+      return;
+    }
+    toast.success("Mensaje eliminado");
   };
 
   return (
