@@ -22,17 +22,22 @@ import MobileSearchDialog from "@/components/MobileSearchDialog";
 import { CATEGORIES } from "@/lib/categories";
 import { trackSearch } from "@/lib/cheapest";
 import SEO from "@/components/SEO";
+import { useCachedListings } from "@/hooks/useCachedListings";
 
 const Index = () => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const [allListings, setAllListings] = useState<any[]>([]);
   const [filteredListings, setFilteredListings] = useState<any[]>([]);
-  const [listingsLoading, setListingsLoading] = useState(true);
   const [loginDialogOpen, setLoginDialogOpen] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+  const { listings: allListings, loading: listingsLoading } = useCachedListings("feed:home");
+
+  // Keep filtered results in sync with fresh data when not actively searching.
+  useEffect(() => {
+    if (!hasSearched) setFilteredListings(allListings);
+  }, [allListings, hasSearched]);
   const [sortOption, setSortOption] = useState<SortOption>('recent');
   const [filters, setFilters] = useState<FilterOptions>({
     sortOption: 'recent',
@@ -119,46 +124,6 @@ const Index = () => {
     // Use IP-based location silently; the user can opt-in to precise location
     // from screens that explicitly need it (MapView, LocationPicker, filters).
     getLocationByIP();
-
-    const fetchListings = async () => {
-      setListingsLoading(true);
-      const { data, error } = await supabase
-        .from('listings_public')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching listings:', error);
-      } else if (data) {
-        // Convert backend data to match the Listing interface
-        const formattedListings = data.map((item: any) => ({
-          id: item.id,
-          title: item.title,
-          description: item.description,
-          type: item.type,
-          category: item.category || item.type,
-          rating: item.rating || 0,
-          location: item.location,
-          phone: item.phone,
-          images: item.images || [],
-          latitude: item.latitude,
-          longitude: item.longitude,
-          price: item.price,
-          currency: item.currency,
-          year: item.year,
-          fuelType: item.fuel_type,
-          fuel_type: item.fuel_type,
-          mileage: item.attributes?.mileage,
-          attributes: item.attributes,
-          created_at: item.created_at,
-        }));
-        setAllListings(formattedListings);
-        setFilteredListings(formattedListings);
-      }
-      setListingsLoading(false);
-    };
-    
-    fetchListings();
   }, []);
 
   // Calculate distance between two coordinates in km

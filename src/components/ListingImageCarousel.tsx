@@ -2,6 +2,7 @@ import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
+import AdaptiveImage from "@/components/AdaptiveImage";
 
 interface ListingImageCarouselProps {
   listingId: string;
@@ -41,13 +42,10 @@ const ListingImageCarousel = ({
     <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
         <Link to={href} className="absolute inset-0 block" draggable={false}>
-          <img
+          <AdaptiveImage
             src={cover}
             alt={title}
-            loading={priority ? "eager" : "lazy"}
-            decoding="async"
-            // @ts-ignore - fetchpriority is a valid HTML attribute
-            fetchpriority={priority ? "high" : "auto"}
+            priority={priority}
             width={600}
             height={600}
             draggable={false}
