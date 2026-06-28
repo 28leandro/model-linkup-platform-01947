@@ -1,10 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard, Search, User, Settings } from "lucide-react";
+import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard, Search, User, Settings, MessageSquare } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUnreadMessages } from "@/hooks/useUnreadMessages";
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -22,6 +23,7 @@ interface HeaderProps {
 const Header = ({ onLoginClick }: HeaderProps) => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
+  const unreadCount = useUnreadMessages();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -144,14 +146,31 @@ const Header = ({ onLoginClick }: HeaderProps) => {
           {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Menú de usuario" className="border-0">
+                <Button variant="ghost" size="icon" aria-label="Menú de usuario" className="border-0 relative">
                   <User className="w-4 h-4" />
+                  {unreadCount > 0 && (
+                    <span
+                      aria-label={`${unreadCount} mensajes sin leer`}
+                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center leading-none"
+                    >
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56 bg-popover z-50">
                 <DropdownMenuItem onClick={() => navigate("/my-listings")}>
                   <LayoutDashboard className="w-4 h-4 mr-2" />
                   Mis Anuncios
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/inbox")}>
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  <span className="flex-1">Mensajes</span>
+                  {unreadCount > 0 && (
+                    <span className="ml-2 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[10px] font-bold flex items-center justify-center leading-none">
+                      {unreadCount > 99 ? "99+" : unreadCount}
+                    </span>
+                  )}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={() => navigate("/account")}>
                   <Settings className="w-4 h-4 mr-2" />

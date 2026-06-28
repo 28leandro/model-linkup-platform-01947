@@ -44,38 +44,35 @@ const parseSystem = (content: string): ParsedSystem => {
   return null;
 };
 
-interface SwipeableMessageRowProps {
-  mine: boolean;
+interface SwipeableThreadRowProps {
+  canDelete: boolean;
   onDelete: () => void;
   children: React.ReactNode;
 }
 
-const SwipeableMessageRow = ({ mine, onDelete, children }: SwipeableMessageRowProps) => {
+const SwipeableThreadRow = ({ canDelete, onDelete, children }: SwipeableThreadRowProps) => {
   const [offset, setOffset] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const startX = useRef<number | null>(null);
-  const moved = useRef(false);
 
-  const REVEAL_WIDTH = 64;
+  const REVEAL_WIDTH = 72;
   const THRESHOLD = 40;
 
   const onTouchStart = (e: React.TouchEvent) => {
+    if (!canDelete) return;
     startX.current = e.touches[0].clientX;
-    moved.current = false;
   };
   const onTouchMove = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
+    if (!canDelete || startX.current == null) return;
     const dx = e.touches[0].clientX - startX.current;
-    // Swipe right-to-left → negative dx
     if (dx < 0) {
-      moved.current = true;
       setOffset(Math.max(dx, -REVEAL_WIDTH));
     } else if (revealed && dx > 0) {
-      moved.current = true;
       setOffset(Math.min(-REVEAL_WIDTH + dx, 0));
     }
   };
   const onTouchEnd = () => {
+    if (!canDelete) return;
     if (offset <= -THRESHOLD) {
       setOffset(-REVEAL_WIDTH);
       setRevealed(true);
@@ -86,56 +83,46 @@ const SwipeableMessageRow = ({ mine, onDelete, children }: SwipeableMessageRowPr
     startX.current = null;
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setOffset(0);
     setRevealed(false);
     onDelete();
   };
 
   return (
-    <div className="relative group">
-      {/* Mobile reveal background */}
-      <div className="absolute inset-y-0 right-0 flex items-center md:hidden">
-        <button
-          type="button"
-          aria-label="Eliminar mensaje"
-          onClick={handleDeleteClick}
-          className="h-full w-16 flex items-center justify-center bg-destructive text-destructive-foreground rounded-r-md"
-        >
-          <Trash2 className="w-5 h-5" />
-        </button>
-      </div>
-
+    <div className="relative overflow-hidden group">
+      {canDelete && (
+        <div className="absolute inset-y-0 right-0 flex items-center">
+          <button
+            type="button"
+            aria-label="Eliminar conversación"
+            onClick={handleDeleteClick}
+            className="h-full w-[72px] flex items-center justify-center bg-destructive text-destructive-foreground md:hidden"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+        </div>
+      )}
       <div
-        className={`flex items-center gap-1 ${mine ? "justify-end" : "justify-start"} transition-transform`}
+        className="transition-transform bg-card"
         style={{ transform: `translateX(${offset}px)` }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Desktop trash (left of mine messages, right of theirs) */}
-        {mine && (
-          <button
-            type="button"
-            aria-label="Eliminar mensaje"
-            onClick={onDelete}
-            className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
         {children}
-        {!mine && (
-          <button
-            type="button"
-            aria-label="Eliminar mensaje"
-            onClick={onDelete}
-            className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
       </div>
+      {canDelete && (
+        <button
+          type="button"
+          aria-label="Eliminar conversación"
+          onClick={handleDeleteClick}
+          className="hidden md:flex absolute top-1/2 -translate-y-1/2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1.5 rounded-md hover:bg-destructive/10"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 };
@@ -202,14 +189,17 @@ const Inbox = () => {
       const other = m.sender_id === user.id ? m.receiver_id : m.sender_id;
       const key = `${m.ad_id}::${other}`;
       const existing = map.get(key);
+      const isUnreadForMe = m.receiver_id === user.id && !m.read_at;
       if (!existing || new Date(m.created_at) > new Date(existing.last_message.created_at)) {
         map.set(key, {
           ad_id: m.ad_id,
           other_user_id: other,
           ad_title: adTitleMap.get(m.ad_id) || "Anúncio",
           last_message: m,
-          unread: existing?.unread || 0,
+          unread: (existing?.unread || 0) + (isUnreadForMe ? 1 : 0),
         });
+      } else if (isUnreadForMe) {
+        existing.unread += 1;
       }
     }
     return Array.from(map.values()).sort(
@@ -313,6 +303,38 @@ const Inbox = () => {
     toast.success("Mensaje eliminado");
   };
 
+  const handleDeleteThread = async (adId: string, otherId: string) => {
+    if (!user) return;
+    if (!confirm("¿Eliminar toda la conversación? Esta acción no se puede deshacer.")) return;
+    // Optimistic
+    qc.setQueryData<Message[]>(["inbox", user.id], (prev = []) =>
+      prev.filter(
+        (m) =>
+          !(
+            m.ad_id === adId &&
+            ((m.sender_id === user.id && m.receiver_id === otherId) ||
+              (m.sender_id === otherId && m.receiver_id === user.id))
+          )
+      )
+    );
+    if (activeThread?.adId === adId && activeThread?.otherId === otherId) {
+      setActiveThread(null);
+    }
+    const { error } = await supabase
+      .from("messages")
+      .delete()
+      .eq("ad_id", adId)
+      .or(
+        `and(sender_id.eq.${user.id},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${user.id})`
+      );
+    if (error) {
+      toast.error("No se pudo eliminar la conversación");
+      qc.invalidateQueries({ queryKey: ["inbox", user.id] });
+      return;
+    }
+    toast.success("Conversación eliminada");
+  };
+
   return (
     <>
       <Header onLoginClick={() => setShowLogin(true)} />
@@ -342,24 +364,33 @@ const Inbox = () => {
                     {threads.map((t) => {
                       const isActive =
                         activeThread?.adId === t.ad_id && activeThread?.otherId === t.other_user_id;
+                      const lastIsMine = t.last_message.sender_id === user.id;
+                      const lastRead = !!(t.last_message as any).read_at;
+                      // Allow swipe/delete once the conversation has been opened (no unread + last incoming is read, or last is mine)
+                      const canDelete = t.unread === 0 && (lastIsMine || lastRead);
                       return (
                         <li key={`${t.ad_id}-${t.other_user_id}`}>
-                          <button
-                            className={`w-full text-left p-3 hover:bg-muted/50 transition-colors rounded-md ${
-                              isActive ? "bg-muted" : ""
-                            }`}
-                            onClick={() =>
-                              setActiveThread({ adId: t.ad_id, otherId: t.other_user_id })
-                            }
+                          <SwipeableThreadRow
+                            canDelete={canDelete}
+                            onDelete={() => handleDeleteThread(t.ad_id, t.other_user_id)}
                           >
-                            <p className="font-medium text-sm truncate">{t.ad_title}</p>
-                            <p className="text-xs text-muted-foreground truncate">
-                              {t.last_message.content}
-                            </p>
-                            <p className="text-[10px] text-muted-foreground mt-1">
-                              {new Date(t.last_message.created_at).toLocaleString()}
-                            </p>
-                          </button>
+                            <button
+                              className={`w-full text-left p-3 hover:bg-muted/50 transition-colors rounded-md ${
+                                isActive ? "bg-muted" : ""
+                              }`}
+                              onClick={() =>
+                                setActiveThread({ adId: t.ad_id, otherId: t.other_user_id })
+                              }
+                            >
+                              <p className="font-medium text-sm truncate">{t.ad_title}</p>
+                              <p className="text-xs text-muted-foreground truncate">
+                                {t.last_message.content}
+                              </p>
+                              <p className="text-[10px] text-muted-foreground mt-1">
+                                {new Date(t.last_message.created_at).toLocaleString()}
+                              </p>
+                            </button>
+                          </SwipeableThreadRow>
                         </li>
                       );
                     })}
@@ -439,11 +470,7 @@ const Inbox = () => {
                             );
                           }
                           return (
-                            <SwipeableMessageRow
-                              key={m.id}
-                              mine={mine}
-                              onDelete={() => handleDelete(m.id)}
-                            >
+                            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                               <div
                                 className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                                   mine
@@ -456,7 +483,7 @@ const Inbox = () => {
                                   {new Date(m.created_at).toLocaleString()}
                                 </p>
                               </div>
-                            </SwipeableMessageRow>
+                            </div>
                           );
                         })}
                       </div>
