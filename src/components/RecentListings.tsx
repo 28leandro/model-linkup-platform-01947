@@ -46,7 +46,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
     return listings.filter((l) => !l.type || !known.has(l.type));
   }, [listings]);
 
-  const renderCard = (listing: Listing) => (
+  const renderCard = (listing: Listing, priority = false) => (
     <div key={listing.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink">
       <div className="rounded-xl overflow-hidden">
         <ListingImageCarousel
@@ -55,6 +55,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
           title={listing.title}
           href={`/listing/${listing.id}`}
           noImageLabel={t('listings.noImage')}
+          priority={priority}
         />
       </div>
       <Link to={`/listing/${listing.id}`} className="block">
@@ -140,14 +141,14 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
           {items.map((listing, idx) => {
             const hide = needsLimit && idx >= initialLimit;
             if (hide) return null;
-            return renderCard(listing);
+            return renderCard(listing, idx === 0);
           })}
           {needsLimit && renderSeeAllCard(catId, remaining)}
         </div>
         {/* Desktop: embla carousel with arrows + progress bars */}
         <div className="hidden lg:block">
           <DesktopListingCarousel>
-            {items.map((listing) => renderCard(listing))}
+            {items.map((listing, idx) => renderCard(listing, idx === 0))}
           </DesktopListingCarousel>
         </div>
       </>

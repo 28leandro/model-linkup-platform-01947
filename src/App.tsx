@@ -20,6 +20,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import BottomNav from "@/components/BottomNav";
+import NetworkBanner from "@/components/NetworkBanner";
 
 function App() {
   return (
@@ -50,6 +51,7 @@ function App() {
           </Routes>
         </div>
         <BottomNav />
+        <NetworkBanner />
         <Toaster />
       </AuthProvider>
     </ErrorBoundary>
