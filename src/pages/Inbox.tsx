@@ -44,38 +44,35 @@ const parseSystem = (content: string): ParsedSystem => {
   return null;
 };
 
-interface SwipeableMessageRowProps {
-  mine: boolean;
+interface SwipeableThreadRowProps {
+  canDelete: boolean;
   onDelete: () => void;
   children: React.ReactNode;
 }
 
-const SwipeableMessageRow = ({ mine, onDelete, children }: SwipeableMessageRowProps) => {
+const SwipeableThreadRow = ({ canDelete, onDelete, children }: SwipeableThreadRowProps) => {
   const [offset, setOffset] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const startX = useRef<number | null>(null);
-  const moved = useRef(false);
 
-  const REVEAL_WIDTH = 64;
+  const REVEAL_WIDTH = 72;
   const THRESHOLD = 40;
 
   const onTouchStart = (e: React.TouchEvent) => {
+    if (!canDelete) return;
     startX.current = e.touches[0].clientX;
-    moved.current = false;
   };
   const onTouchMove = (e: React.TouchEvent) => {
-    if (startX.current == null) return;
+    if (!canDelete || startX.current == null) return;
     const dx = e.touches[0].clientX - startX.current;
-    // Swipe right-to-left → negative dx
     if (dx < 0) {
-      moved.current = true;
       setOffset(Math.max(dx, -REVEAL_WIDTH));
     } else if (revealed && dx > 0) {
-      moved.current = true;
       setOffset(Math.min(-REVEAL_WIDTH + dx, 0));
     }
   };
   const onTouchEnd = () => {
+    if (!canDelete) return;
     if (offset <= -THRESHOLD) {
       setOffset(-REVEAL_WIDTH);
       setRevealed(true);
@@ -86,56 +83,46 @@ const SwipeableMessageRow = ({ mine, onDelete, children }: SwipeableMessageRowPr
     startX.current = null;
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setOffset(0);
     setRevealed(false);
     onDelete();
   };
 
   return (
-    <div className="relative group">
-      {/* Mobile reveal background */}
-      <div className="absolute inset-y-0 right-0 flex items-center md:hidden">
-        <button
-          type="button"
-          aria-label="Eliminar mensaje"
-          onClick={handleDeleteClick}
-          className="h-full w-16 flex items-center justify-center bg-destructive text-destructive-foreground rounded-r-md"
-        >
-          <Trash2 className="w-5 h-5" />
-        </button>
-      </div>
-
+    <div className="relative overflow-hidden group">
+      {canDelete && (
+        <div className="absolute inset-y-0 right-0 flex items-center">
+          <button
+            type="button"
+            aria-label="Eliminar conversación"
+            onClick={handleDeleteClick}
+            className="h-full w-[72px] flex items-center justify-center bg-destructive text-destructive-foreground md:hidden"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+        </div>
+      )}
       <div
-        className={`flex items-center gap-1 ${mine ? "justify-end" : "justify-start"} transition-transform`}
+        className="transition-transform bg-card"
         style={{ transform: `translateX(${offset}px)` }}
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
       >
-        {/* Desktop trash (left of mine messages, right of theirs) */}
-        {mine && (
-          <button
-            type="button"
-            aria-label="Eliminar mensaje"
-            onClick={onDelete}
-            className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
         {children}
-        {!mine && (
-          <button
-            type="button"
-            aria-label="Eliminar mensaje"
-            onClick={onDelete}
-            className="hidden md:inline-flex opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </button>
-        )}
       </div>
+      {canDelete && (
+        <button
+          type="button"
+          aria-label="Eliminar conversación"
+          onClick={handleDeleteClick}
+          className="hidden md:flex absolute top-1/2 -translate-y-1/2 right-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hover:text-destructive p-1.5 rounded-md hover:bg-destructive/10"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 };
