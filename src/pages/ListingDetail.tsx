@@ -347,7 +347,7 @@ const ListingDetail = () => {
             
             <div className="flex items-center gap-2 text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">
               <MapPin className="w-4 h-4 flex-shrink-0" />
-              <span className="line-clamp-1">{getPublicCity(listing)}</span>
+              <span className="line-clamp-1 font-bold">{getPublicCity(listing)}</span>
             </div>
 
             {/* Detalhes do Produto */}
