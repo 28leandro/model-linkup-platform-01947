@@ -343,7 +343,11 @@ const Inbox = () => {
                             );
                           }
                           return (
-                            <div key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                            <SwipeableMessageRow
+                              key={m.id}
+                              mine={mine}
+                              onDelete={() => handleDelete(m.id)}
+                            >
                               <div
                                 className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${
                                   mine
@@ -356,7 +360,7 @@ const Inbox = () => {
                                   {new Date(m.created_at).toLocaleString()}
                                 </p>
                               </div>
-                            </div>
+                            </SwipeableMessageRow>
                           );
                         })}
                       </div>
