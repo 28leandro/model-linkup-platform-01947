@@ -61,15 +61,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
       <Link to={`/listing/${listing.id}`} className="block">
         <div className="pt-px px-0.5 leading-tight">
           <div className="flex items-center gap-1 mb-0 flex-wrap min-h-[18px]">
-            {(() => {
-              const cond = getConditionMeta((listing as any).condition);
-              if (!cond) return <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium opacity-0">—</span>;
-              return (
-                <span className={cn("inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium", cond.color)}>
-                  {isPt ? cond.label_pt : cond.label_es}
-                </span>
-              );
-            })()}
+            <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium opacity-0">—</span>
           </div>
           <h3 className="font-normal text-sm sm:text-base mb-0 line-clamp-1 text-foreground">{listing.title}</h3>
           <div className="flex items-center gap-1.5 min-h-[20px] flex-wrap">
