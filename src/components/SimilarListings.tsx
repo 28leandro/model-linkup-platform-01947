@@ -299,13 +299,14 @@ const SimilarListings = ({
           );
 
           rows = serviceRows.filter((r) => {
-            const candidateSubcategory = canonicalSubcategory("services", r.subcategory);
             const candidateAffinity = serviceAffinity(r);
-
-            if (currentSubcategory && candidateSubcategory && candidateSubcategory !== currentSubcategory) {
-              return false;
+            // Group all beauty & wellness services together (unhas, peluqueria,
+            // estética, massagem, etc.). Same for construction. Other services
+            // fall back to strict subcategory match.
+            if (currentServiceAffinity === "beauty" || currentServiceAffinity === "construction") {
+              return candidateAffinity === currentServiceAffinity;
             }
-            if (currentServiceAffinity) return candidateAffinity === currentServiceAffinity;
+            const candidateSubcategory = canonicalSubcategory("services", r.subcategory);
             if (currentSubcategory) return candidateSubcategory === currentSubcategory;
             return false;
           });
