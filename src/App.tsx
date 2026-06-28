@@ -1,21 +1,24 @@
 import { Routes, Route } from "react-router-dom";
+import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
-import PostAd from "./pages/PostAd";
-import ListingDetail from "./pages/ListingDetail";
-import CategoryPage from "./pages/CategoryPage";
-import FavoriteThings from "./pages/FavoriteThings";
-import MapView from "./pages/MapView";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import RefundPolicy from "./pages/RefundPolicy";
-import Trust from "./pages/Trust";
-import PhotoPaywall from "./pages/PhotoPaywall";
-import Inbox from "./pages/Inbox";
-import ResetPassword from "./pages/ResetPassword";
-import ForgotPassword from "./pages/ForgotPassword";
-import PagoparTest from "./pages/PagoparTest";
-import MyListings from "./pages/MyListings";
-import AccountSettings from "./pages/AccountSettings";
-import NotFound from "./pages/NotFound";
+// Route-level code splitting: only the home route is eager.
+// All other pages are loaded on demand to shrink the initial JS bundle.
+const PostAd = lazy(() => import("./pages/PostAd"));
+const ListingDetail = lazy(() => import("./pages/ListingDetail"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const FavoriteThings = lazy(() => import("./pages/FavoriteThings"));
+const MapView = lazy(() => import("./pages/MapView"));
+const PaymentSuccess = lazy(() => import("./pages/PaymentSuccess"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const Trust = lazy(() => import("./pages/Trust"));
+const PhotoPaywall = lazy(() => import("./pages/PhotoPaywall"));
+const Inbox = lazy(() => import("./pages/Inbox"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const PagoparTest = lazy(() => import("./pages/PagoparTest"));
+const MyListings = lazy(() => import("./pages/MyListings"));
+const AccountSettings = lazy(() => import("./pages/AccountSettings"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -27,6 +30,7 @@ function App() {
     <ErrorBoundary>
       <AuthProvider>
         <div className="pb-16 md:pb-0">
+          <Suspense fallback={<div className="min-h-screen" aria-hidden />}>
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/post-ad" element={<PostAd />} />
@@ -49,6 +53,7 @@ function App() {
             <Route path="/account" element={<AccountSettings />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </div>
         <BottomNav />
         <NetworkBanner />
