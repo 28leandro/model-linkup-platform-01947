@@ -111,6 +111,21 @@ const HeroCarousel = () => {
     return () => clearInterval(t);
   }, []);
 
+  // Preload the hero banner image (LCP candidate) so it starts downloading
+  // before React paints the carousel.
+  useEffect(() => {
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = clinicaLaBanner;
+    // @ts-ignore - valid HTML attr
+    link.fetchPriority = "high";
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
   const go = (dir: number) =>
     setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
 
