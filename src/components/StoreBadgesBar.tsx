@@ -6,7 +6,7 @@ const ANDROID_LINK = "#"; // TODO: substituir pelo link real da Google Play
 
 const StoreBadgesBar = () => {
   return (
-    <div className="w-full backdrop-blur-md bg-background/85 border-t border-border">
+    <div className="w-full bg-background/95 border-t border-border">
       <div className="container mx-auto px-4 py-3 flex items-center justify-center gap-3 sm:gap-4">
         <a
           href={IOS_LINK}
