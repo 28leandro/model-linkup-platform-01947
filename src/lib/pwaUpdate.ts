@@ -9,8 +9,8 @@
  * the PWA skill rules.
  */
 
-const SW_PATH = "/sw.js";
 const VERSION_KEY = "nemu-app-version";
+const SW_CLEANED_KEY = "nemu-sw-cleaned";
 
 function isBlockedEnvironment(): boolean {
   if (typeof window === "undefined") return true;
@@ -94,15 +94,33 @@ export function initPwaUpdate(): void {
     }
   }
 
-  // 2. Register the kill-switch SW so any returning visitor that has an
-  //    old service worker / Workbox precache gets it wiped.
+  // 2. One-time cleanup of any legacy service worker (old Workbox precache,
+  //    or the previous kill-switch SW). We intentionally do NOT register a
+  //    new worker: re-registering the kill-switch SW on every page load made
+  //    it activate -> reload the page -> register again -> activate -> reload,
+  //    a loop that left the site "loading" for ~10-15s before it settled.
+  //    Unregistering from the page is enough; assets come straight from the
+  //    network / HTTP cache (hashed files are immutable per .htaccess).
   if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register(SW_PATH, { scope: "/" })
-        .catch(() => {
-          /* registration failed — non-fatal */
-        });
-    });
+    void (async () => {
+      try {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        if (regs.length === 0) return;
+        await Promise.allSettled(regs.map((r) => r.unregister()));
+        await clearAllCaches();
+        // If a legacy worker was actually controlling this page, a single
+        // reload escapes its cached shell. Guard with sessionStorage so this
+        // can never loop.
+        if (
+          navigator.serviceWorker.controller &&
+          !sessionStorage.getItem(SW_CLEANED_KEY)
+        ) {
+          sessionStorage.setItem(SW_CLEANED_KEY, "1");
+          window.location.reload();
+        }
+      } catch {
+        /* cleanup failed — non-fatal */
+      }
+    })();
   }
 }

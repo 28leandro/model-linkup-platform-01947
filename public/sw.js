@@ -17,11 +17,11 @@ self.addEventListener("activate", (event) =>
           /(^|-)precache-v\d+-|(^|-)runtime-|(^|-)googleAnalytics-|^nemu-/.test(n)
         );
         await Promise.allSettled(ours.map((n) => caches.delete(n)));
-
-        await self.clients.claim();
-        const wins = await self.clients.matchAll({ type: "window" });
-        await Promise.allSettled(wins.map((c) => c.navigate(c.url)));
       } finally {
+        // Unregister silently. DO NOT navigate/reload clients from here:
+        // combined with the page re-registering this worker on every load,
+        // c.navigate() created an activate -> reload -> register -> activate
+        // loop that left the site "loading" for ~10-15s before settling.
         await self.registration.unregister();
       }
     })()
