@@ -14,6 +14,22 @@ const SW_CLEANED_KEY = "nemu-sw-cleaned";
 
 function isBlockedEnvironment(): boolean {
   if (typeof window === "undefined") return true;
+  // Never clear caches/reload while an auth recovery link is being opened.
+  // iOS Safari/PWA can drop or consume one-time URL tokens during forced reloads.
+  const params = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(
+    window.location.hash.startsWith("#") ? window.location.hash.slice(1) : window.location.hash
+  );
+  if (
+    params.get("type") === "recovery" ||
+    hashParams.get("type") === "recovery" ||
+    params.has("code") ||
+    params.has("token_hash") ||
+    hashParams.has("access_token") ||
+    hashParams.has("refresh_token")
+  ) {
+    return true;
+  }
   if (!import.meta.env.PROD) return true;
   try {
     if (window.self !== window.top) return true;
