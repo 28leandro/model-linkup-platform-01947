@@ -45,7 +45,7 @@ export default function ResetPassword() {
 
     const verify = async () => {
       const { code, tokenHash, type, hasHashTokens, hasAuthParams, error } = getRecoveryUrlState();
-      const recoveryLink = shouldTreatUrlAsPasswordRecovery();
+      const recoveryLink = shouldTreatUrlAsPasswordRecovery() || Boolean(code || tokenHash || hasHashTokens);
 
       if (recoveryLink) markPasswordRecoveryActive();
 
