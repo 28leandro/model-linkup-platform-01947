@@ -31,6 +31,23 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Admin-only: verify role using service role client to bypass RLS safely.
+  const userId = claims.claims.sub as string;
+  const adminClient = createClient(
+    Deno.env.get("SUPABASE_URL")!,
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+  );
+  const { data: isAdmin, error: roleErr } = await adminClient.rpc("has_role", {
+    _user_id: userId,
+    _role: "admin",
+  });
+  if (roleErr || !isAdmin) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+
   const hasPublicKey = !!Deno.env.get("PAGOPAR_PUBLIC_KEY");
   const hasPrivateKey = !!Deno.env.get("PAGOPAR_PRIVATE_KEY");
 
