@@ -20,6 +20,7 @@ const PagoparTest = () => {
   const scriptStatus = usePagoparScript();
   const [config, setConfig] = useState<ConfigState>(null);
   const [checking, setChecking] = useState(true);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   const refresh = async () => {
     setChecking(true);
@@ -41,11 +42,22 @@ const PagoparTest = () => {
   };
 
   useEffect(() => {
-    if (user) refresh();
+    if (!user) return;
+    (async () => {
+      const { data, error } = await supabase.rpc("has_role", {
+        _user_id: user.id,
+        _role: "admin",
+      });
+      const admin = !error && !!data;
+      setIsAdmin(admin);
+      if (admin) refresh();
+      else setChecking(false);
+    })();
   }, [user]);
 
   if (loading) return null;
   if (!user) return <Navigate to="/" replace />;
+  if (isAdmin === false) return <Navigate to="/" replace />;
 
   const handleTestPayment = () => {
     if (!config?.configured) {
