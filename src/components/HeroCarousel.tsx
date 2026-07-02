@@ -1,4 +1,4 @@
-Pronto: a imagem da UPAP foi regenerada — os estudantes agora usam jaleco branco, pijama preta e estetoscopio.
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
