@@ -266,11 +266,27 @@ const HeroCarousel = () => {
                     rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
                     aria-label={isPt ? s.title_pt : s.title_es}
                     className="absolute inset-0 z-10"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (s.href.startsWith("http")) {
+                        e.preventDefault();
+                        window.open(s.href, "_blank", "noopener,noreferrer");
+                      }
+                    }}
                   />
                   <div className="absolute bottom-3 sm:bottom-5 left-4 sm:left-8 z-20">
                     <Button asChild variant="secondary" size="sm" className="bg-white text-[#7a0a1f] hover:bg-white/90 font-semibold text-xs sm:text-sm h-8 sm:h-9 shadow-lg">
                       {s.href.startsWith("http") ? (
-                        <a href={s.href} target="_blank" rel="noopener noreferrer">
+                        <a
+                          href={s.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            window.open(s.href, "_blank", "noopener,noreferrer");
+                          }}
+                        >
                           {isPt ? s.cta_pt : s.cta_es}
                         </a>
                       ) : (
