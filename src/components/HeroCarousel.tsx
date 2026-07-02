@@ -5,12 +5,8 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapMedicinaBannerAsset from "@/assets/upap-medicina-banner.png.asset.json";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
 import unaeBanner from "@/assets/unae-banner.jpg";
-
-// Cache-buster suffix forces Safari/iOS to re-download the banner after
-// the CDN asset was replaced. Bump the version when the image changes.
-const upapMedicinaBanner = { url: `${upapMedicinaBannerAsset.url}?v=2026-07-02-3` };
 
 interface Slide {
   id: string;
