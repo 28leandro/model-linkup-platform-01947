@@ -53,16 +53,15 @@ const SLIDES: Slide[] = [
   },
   {
     id: "upap",
-    title_es: "UPAP",
-    title_pt: "UPAP",
-    subtitle_es: "Inscripciones abiertas. Formá tu futuro con nosotros.",
-    subtitle_pt: "Inscrições abertas. Construa seu futuro conosco.",
+    title_es: "REACTIVÁ TU CARRERA",
+    title_pt: "REATIVE SUA CARREIRA",
+    subtitle_es: "Inscripciones abiertas · Formá tu futuro con nosotros",
+    subtitle_pt: "Inscrições abertas · Construa seu futuro conosco",
     cta_es: "Conocé UPAP",
     cta_pt: "Conheça a UPAP",
     href: "https://www.upap.edu.py",
-    accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
+    accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
     logo: upapLogo,
-    confetti: true,
   },
   {
     id: "neura",
@@ -171,7 +170,7 @@ const HeroCarousel = () => {
       <div
         ref={containerRef}
         className="relative overflow-hidden rounded-2xl border shadow-sm select-none touch-pan-y"
-        style={{ maxHeight: 250 }}
+        style={{ maxHeight: 300 }}
         onMouseDown={(e) => handleDragStart(e.clientX)}
         onMouseMove={(e) => handleDragMove(e.clientX)}
         onMouseUp={handleDragEnd}
@@ -194,7 +193,7 @@ const HeroCarousel = () => {
             <div
               key={s.id}
               className={cn(
-                "min-w-full h-[180px] sm:h-[220px] md:h-[250px] relative bg-gradient-to-br text-white",
+                "min-w-full h-[210px] sm:h-[260px] md:h-[300px] relative bg-gradient-to-br text-white",
                 s.accent
               )}
             >
@@ -261,13 +260,62 @@ const HeroCarousel = () => {
                 />
               )}
               {s.fullImage ? (
-                <a
-                  href={s.href}
-                  target={s.href.startsWith("http") ? "_blank" : undefined}
-                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  aria-label={isPt ? s.title_pt : s.title_es}
-                  className="absolute inset-0"
-                />
+                <>
+                  <a
+                    href={s.href}
+                    target={s.href.startsWith("http") ? "_blank" : undefined}
+                    rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                    aria-label={isPt ? s.title_pt : s.title_es}
+                    className="absolute inset-0 z-10"
+                  />
+                  <div className="absolute bottom-3 sm:bottom-5 left-4 sm:left-8 z-20">
+                    <Button asChild variant="secondary" size="sm" className="bg-white text-[#7a0a1f] hover:bg-white/90 font-semibold text-xs sm:text-sm h-8 sm:h-9 shadow-lg">
+                      {s.href.startsWith("http") ? (
+                        <a href={s.href} target="_blank" rel="noopener noreferrer">
+                          {isPt ? s.cta_pt : s.cta_es}
+                        </a>
+                      ) : (
+                        <Link to={s.href}>{isPt ? s.cta_pt : s.cta_es}</Link>
+                      )}
+                    </Button>
+                  </div>
+                </>
+              ) : s.id === "upap" ? (
+                <div className="relative h-full w-full px-4 sm:px-10 flex items-center gap-4 sm:gap-8">
+                  <div className="shrink-0 bg-white rounded-xl p-2 sm:p-3 shadow-lg">
+                    <img
+                      src={s.logo}
+                      alt="UPAP"
+                      loading="lazy"
+                      decoding="async"
+                      width={200}
+                      height={200}
+                      className="h-14 sm:h-20 md:h-24 w-auto object-contain"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="inline-block mb-1 sm:mb-2 px-2 py-0.5 rounded-full bg-[#f5c542] text-[#5a061f] text-[10px] sm:text-xs font-bold uppercase tracking-wider">
+                      {isPt ? "Inscrições abertas" : "Inscripciones abiertas"}
+                    </div>
+                    <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold leading-tight drop-shadow-sm">
+                      {isPt ? s.title_pt : s.title_es}
+                    </h2>
+                    <p className="hidden sm:block mt-1 text-xs sm:text-sm text-white/90 max-w-md">
+                      {isPt ? "Universidad Politécnica y Artística del Paraguay" : "Universidad Politécnica y Artística del Paraguay"}
+                    </p>
+                    <div className="mt-2 sm:mt-3">
+                      <a
+                        href={s.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 rounded-full bg-[#f5c542] text-[#5a061f] px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold hover:gap-3 hover:bg-[#ffd35a] transition-all shadow-md"
+                      >
+                        {isPt ? s.cta_pt : s.cta_es}
+                        <ArrowRight className="h-4 w-4" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
                   <h2 className="absolute top-1 sm:top-4 left-4 sm:left-10 right-4 sm:right-10 text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm max-w-md">
