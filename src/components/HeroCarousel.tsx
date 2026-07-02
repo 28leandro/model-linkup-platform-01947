@@ -53,16 +53,15 @@ const SLIDES: Slide[] = [
   },
   {
     id: "upap",
-    title_es: "UPAP",
-    title_pt: "UPAP",
-    subtitle_es: "Inscripciones abiertas. Formá tu futuro con nosotros.",
-    subtitle_pt: "Inscrições abertas. Construa seu futuro conosco.",
+    title_es: "REACTIVÁ TU CARRERA",
+    title_pt: "REATIVE SUA CARREIRA",
+    subtitle_es: "Inscripciones abiertas · Formá tu futuro con nosotros",
+    subtitle_pt: "Inscrições abertas · Construa seu futuro conosco",
     cta_es: "Conocé UPAP",
     cta_pt: "Conheça a UPAP",
     href: "https://www.upap.edu.py",
-    accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
+    accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
     logo: upapLogo,
-    confetti: true,
   },
   {
     id: "neura",
@@ -171,7 +170,7 @@ const HeroCarousel = () => {
       <div
         ref={containerRef}
         className="relative overflow-hidden rounded-2xl border shadow-sm select-none touch-pan-y"
-        style={{ maxHeight: 250 }}
+        style={{ maxHeight: 300 }}
         onMouseDown={(e) => handleDragStart(e.clientX)}
         onMouseMove={(e) => handleDragMove(e.clientX)}
         onMouseUp={handleDragEnd}
@@ -194,7 +193,7 @@ const HeroCarousel = () => {
             <div
               key={s.id}
               className={cn(
-                "min-w-full h-[180px] sm:h-[220px] md:h-[250px] relative bg-gradient-to-br text-white",
+                "min-w-full h-[210px] sm:h-[260px] md:h-[300px] relative bg-gradient-to-br text-white",
                 s.accent
               )}
             >
