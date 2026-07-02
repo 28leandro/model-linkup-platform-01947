@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import upapLogo from "@/assets/upap-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
 import upapBanner from "@/assets/upap-banner.jpg";
+import unaeBanner from "@/assets/unae-banner.jpg";
 
 interface Slide {
   id: string;
@@ -36,6 +37,19 @@ const SLIDES: Slide[] = [
     href: "/category/services",
     accent: "from-[#0b1430] via-[#101a3d] to-[#070d22]",
     bgImage: clinicaLaBanner,
+  },
+  {
+    id: "unae",
+    title_es: "UNAE",
+    title_pt: "UNAE",
+    subtitle_es: "Universidad Autónoma de Encarnación",
+    subtitle_pt: "Universidade Autônoma de Encarnación",
+    cta_es: "Conocé la UNAE",
+    cta_pt: "Conheça a UNAE",
+    href: "/unae",
+    accent: "from-[#7a0a1f] via-[#5a061f] to-[#3d0414]",
+    bgImage: unaeBanner,
+    fullImage: true,
   },
   {
     id: "upap",
