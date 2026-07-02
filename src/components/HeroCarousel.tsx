@@ -301,7 +301,7 @@ const HeroCarousel = () => {
                     className="absolute inset-0"
                     aria-hidden
                     style={{
-                      background: "linear-gradient(to right, rgba(90,6,31,0.88) 0%, rgba(90,6,31,0.35) 42%, transparent 58%)",
+                      background: "linear-gradient(to right, rgba(90,6,31,0.92) 0%, rgba(90,6,31,0.65) 28%, rgba(90,6,31,0.2) 40%, transparent 50%)",
                     }}
                   />
                   <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
@@ -328,6 +328,7 @@ const HeroCarousel = () => {
                     </div>
                   </div>
                 </div>
+
 
 
               ) : s.id === "clinica-la" ? (
