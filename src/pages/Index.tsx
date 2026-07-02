@@ -16,6 +16,7 @@ import StoreBadgesBar from "@/components/StoreBadgesBar";
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
 import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter";
 import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
+import { getPublicCity } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import MobileSearchDialog from "@/components/MobileSearchDialog";
@@ -241,13 +242,23 @@ const Index = () => {
     let listings = hasSearched ? filteredListings : allListings;
     
     // Apply location/radius filter
-    if (locationFilter.lat !== undefined && locationFilter.lon !== undefined && locationFilter.radiusKm > 0) {
+    // - If a radius is set: show listings within that radius of the chosen point.
+    // - Else if a city is selected: show ONLY listings published in that city.
+    if (locationFilter.radiusKm > 0 && locationFilter.lat !== undefined && locationFilter.lon !== undefined) {
       listings = listings.filter((l) => {
         if (!l.latitude || !l.longitude) return false;
         return (
           distanceKm(locationFilter.lat!, locationFilter.lon!, l.latitude, l.longitude) <=
           locationFilter.radiusKm
         );
+      });
+    } else if (locationFilter.city) {
+      const target = locationFilter.city.trim().toLowerCase();
+      listings = listings.filter((l) => {
+        const city = getPublicCity(l).toLowerCase();
+        if (city && city === target) return true;
+        // Fallback: substring match against the full location string.
+        return (l.location || "").toLowerCase().includes(target);
       });
     }
 
