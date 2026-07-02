@@ -305,15 +305,15 @@ const HeroCarousel = () => {
                       background: "linear-gradient(to right, rgba(90,6,31,0.82) 0%, rgba(90,6,31,0.55) 18%, rgba(90,6,31,0.2) 28%, transparent 38%)",
                     }}
                   />
-                  <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
-                    <div className="inline-flex items-center gap-1.5 self-start mb-1.5 sm:mb-2 px-2.5 py-1 rounded-full bg-[#f5c542] text-[#5a061f] text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow">
+                  <div className="relative h-full w-full px-3 sm:px-10 flex flex-col justify-center max-w-[55%] sm:max-w-[60%]">
+                    <div className="inline-flex items-center gap-1.5 self-start mb-1.5 sm:mb-2 px-2 sm:px-2.5 py-1 rounded-full bg-[#f5c542] text-[#5a061f] text-[9px] sm:text-xs font-bold uppercase tracking-wider shadow">
                       <Stethoscope className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                       {isPt ? "Faculdade de Medicina" : "Facultad de Medicina"}
                     </div>
-                    <h2 className="text-lg sm:text-2xl md:text-4xl font-extrabold leading-tight drop-shadow-md">
+                    <h2 className="text-base sm:text-2xl md:text-4xl font-extrabold leading-tight drop-shadow-md">
                       {isPt ? s.title_pt : s.title_es}
                     </h2>
-                    <p className="mt-1 text-[11px] sm:text-sm text-white/95 max-w-md">
+                    <p className="mt-1 text-[10px] sm:text-sm text-white/95 max-w-md">
                       {isPt ? s.subtitle_pt : s.subtitle_es}
                     </p>
                     <div className="mt-2 sm:mt-3">
@@ -321,10 +321,10 @@ const HeroCarousel = () => {
                         href={s.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#f5c542] text-[#5a061f] px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold hover:gap-3 hover:bg-[#ffd35a] transition-all shadow-md"
+                        className="inline-flex items-center gap-2 rounded-full bg-[#f5c542] text-[#5a061f] px-3 sm:px-4 py-1.5 sm:py-2 text-[10px] sm:text-sm font-bold hover:gap-3 hover:bg-[#ffd35a] transition-all shadow-md"
                       >
                         {isPt ? s.cta_pt : s.cta_es}
-                        <ArrowRight className="h-4 w-4" />
+                        <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                       </a>
                     </div>
                   </div>
