@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapMedicinaBanner from "@/assets/upap-medicina-banner.jpg";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
 import unaeBanner from "@/assets/unae-banner.jpg";
 
 interface Slide {
@@ -301,7 +301,7 @@ const HeroCarousel = () => {
                     className="absolute inset-0"
                     aria-hidden
                     style={{
-                      background: "linear-gradient(to right, rgba(90,6,31,0.92) 0%, rgba(90,6,31,0.65) 28%, rgba(90,6,31,0.2) 40%, transparent 50%)",
+                      background: "linear-gradient(to right, rgba(90,6,31,0.82) 0%, rgba(90,6,31,0.55) 18%, rgba(90,6,31,0.2) 28%, transparent 38%)",
                     }}
                   />
                   <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
