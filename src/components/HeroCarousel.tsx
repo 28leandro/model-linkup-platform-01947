@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapMedicinaBanner from "@/assets/upap-medicina-banner.jpg";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
 import unaeBanner from "@/assets/unae-banner.jpg";
 
 interface Slide {
@@ -35,7 +35,7 @@ const SLIDES: Slide[] = [
     cta_pt: "Quero ser médico",
     href: "https://www.upap.edu.py",
     accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
-    bgImage: upapMedicinaBanner,
+    bgImage: upapMedicinaBanner.url,
   },
   {
     id: "clinica-la",
@@ -129,7 +129,7 @@ const HeroCarousel = () => {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
-    link.href = upapMedicinaBanner;
+    link.href = upapMedicinaBanner.url;
     // @ts-ignore - valid HTML attr
     link.fetchPriority = "high";
     document.head.appendChild(link);
@@ -207,10 +207,11 @@ const HeroCarousel = () => {
                   decoding={slideIdx === 0 ? "sync" : "async"}
                   // @ts-ignore - fetchpriority is a valid HTML attribute
                   fetchpriority={slideIdx === 0 ? "high" : "low"}
-                  className={cn(
-                    "absolute inset-0 w-full h-full",
-                    s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : "object-cover"
-                  )}
+                    className={cn(
+                      "absolute inset-0 w-full h-full",
+                      s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : 
+                        s.id === "upap" ? "object-cover object-right sm:object-center" : "object-cover"
+                    )}
                 />
               )}
               {!s.fullImage && s.id !== "upap" && (
@@ -301,7 +302,7 @@ const HeroCarousel = () => {
                     className="absolute inset-0"
                     aria-hidden
                     style={{
-                      background: "linear-gradient(to right, rgba(90,6,31,0.92) 0%, rgba(90,6,31,0.65) 28%, rgba(90,6,31,0.2) 40%, transparent 50%)",
+                      background: "linear-gradient(to right, rgba(90,6,31,0.82) 0%, rgba(90,6,31,0.55) 18%, rgba(90,6,31,0.2) 28%, transparent 38%)",
                     }}
                   />
                   <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
