@@ -280,27 +280,18 @@ const HeroCarousel = () => {
                   </div>
                 </>
               ) : s.id === "upap" ? (
-                <div className="relative h-full w-full px-4 sm:px-10 flex items-center gap-4 sm:gap-8">
-                  <div className="shrink-0 bg-white rounded-xl p-2 sm:p-3 shadow-lg">
-                    <img
-                      src={s.logo}
-                      alt="UPAP"
-                      loading="lazy"
-                      decoding="async"
-                      width={200}
-                      height={200}
-                      className="h-14 sm:h-20 md:h-24 w-auto object-contain"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="inline-block mb-1 sm:mb-2 px-2 py-0.5 rounded-full bg-[#f5c542] text-[#5a061f] text-[10px] sm:text-xs font-bold uppercase tracking-wider">
-                      {isPt ? "Inscrições abertas" : "Inscripciones abiertas"}
+                <div className="relative h-full w-full">
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#5a061f] via-[#5a061f]/85 to-transparent" aria-hidden />
+                  <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
+                    <div className="inline-flex items-center gap-1.5 self-start mb-1.5 sm:mb-2 px-2.5 py-1 rounded-full bg-[#f5c542] text-[#5a061f] text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow">
+                      <Stethoscope className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                      {isPt ? "Faculdade de Medicina" : "Facultad de Medicina"}
                     </div>
-                    <h2 className="text-lg sm:text-2xl md:text-3xl font-extrabold leading-tight drop-shadow-sm">
+                    <h2 className="text-lg sm:text-2xl md:text-4xl font-extrabold leading-tight drop-shadow-md">
                       {isPt ? s.title_pt : s.title_es}
                     </h2>
-                    <p className="hidden sm:block mt-1 text-xs sm:text-sm text-white/90 max-w-md">
-                      {isPt ? "Universidad Politécnica y Artística del Paraguay" : "Universidad Politécnica y Artística del Paraguay"}
+                    <p className="mt-1 text-[11px] sm:text-sm text-white/95 max-w-md">
+                      {isPt ? s.subtitle_pt : s.subtitle_es}
                     </p>
                     <div className="mt-2 sm:mt-3">
                       <a
