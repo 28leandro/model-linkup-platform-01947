@@ -26,6 +26,18 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
+    id: "upap",
+    title_es: "Estudiá Medicina en la UPAP",
+    title_pt: "Estude Medicina na UPAP",
+    subtitle_es: "Formamos los médicos del futuro · Inscripciones abiertas",
+    subtitle_pt: "Formamos os médicos do futuro · Inscrições abertas",
+    cta_es: "Quiero ser médico",
+    cta_pt: "Quero ser médico",
+    href: "https://www.upap.edu.py",
+    accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
+    bgImage: upapMedicinaBanner,
+  },
+  {
     id: "clinica-la",
     title_es: "Lipoplastia mínimamente invasiva",
     title_pt: "Lipoplastia minimamente invasiva",
@@ -49,18 +61,6 @@ const SLIDES: Slide[] = [
     accent: "from-[#7a0a1f] via-[#5a061f] to-[#3d0414]",
     bgImage: unaeBanner,
     fullImage: true,
-  },
-  {
-    id: "upap",
-    title_es: "Estudiá Medicina en la UPAP",
-    title_pt: "Estude Medicina na UPAP",
-    subtitle_es: "Formamos los médicos del futuro · Inscripciones abiertas",
-    subtitle_pt: "Formamos os médicos do futuro · Inscrições abertas",
-    cta_es: "Quiero ser médico",
-    cta_pt: "Quero ser médico",
-    href: "https://www.upap.edu.py",
-    accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
-    bgImage: upapMedicinaBanner,
   },
   {
     id: "neura",
