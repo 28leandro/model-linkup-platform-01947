@@ -202,7 +202,7 @@ const HeroCarousel = () => {
                   alt=""
                   aria-hidden
                   width={1200}
-                  height={500}
+                  height={576}
                   loading={slideIdx === 0 ? "eager" : "lazy"}
                   decoding={slideIdx === 0 ? "sync" : "async"}
                   // @ts-ignore - fetchpriority is a valid HTML attribute
