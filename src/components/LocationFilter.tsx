@@ -62,7 +62,7 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
       city,
       lat: coords?.lat,
       lon: coords?.lon,
-      radiusKm: value.radiusKm || 20,
+      radiusKm: value.radiusKm || 0,
     });
     setQuery(city);
     setOpen(false);

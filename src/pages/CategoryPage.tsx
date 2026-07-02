@@ -10,8 +10,9 @@ import type { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ListingFilter, { SortOption, FilterOptions } from "@/components/ListingFilter";
 import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter";
-import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
+import { CITY_COORDS } from "@/lib/cityCoords";
 import { getPublicCity } from "@/lib/utils";
+import { listingMatchesLocationFilter } from "@/lib/locationFilters";
 import { getCategoryById } from "@/lib/categories";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
@@ -137,19 +138,8 @@ const CategoryPage = () => {
   const sortedListings = useMemo(() => {
     let filtered = [...categoryListings];
 
-    // Location filter: radius wins over city
-    if (locationFilter.radiusKm > 0 && locationFilter.lat !== undefined && locationFilter.lon !== undefined) {
-      filtered = filtered.filter((l: any) => {
-        if (!l.latitude || !l.longitude) return false;
-        return distanceKm(locationFilter.lat!, locationFilter.lon!, l.latitude, l.longitude) <= locationFilter.radiusKm;
-      });
-    } else if (locationFilter.city) {
-      const target = locationFilter.city.trim().toLowerCase();
-      filtered = filtered.filter((l: any) => {
-        const city = getPublicCity(l).toLowerCase();
-        if (city && city === target) return true;
-        return (l.location || "").toLowerCase().includes(target);
-      });
+    if (locationFilter.city || locationFilter.radiusKm > 0) {
+      filtered = filtered.filter((l: any) => listingMatchesLocationFilter(l, locationFilter));
     }
 
     if (meta?.subcategories && subFilter !== "all") {
