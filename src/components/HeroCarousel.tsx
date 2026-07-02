@@ -302,7 +302,7 @@ const HeroCarousel = () => {
                     className="absolute inset-0"
                     aria-hidden
                     style={{
-                      background: "linear-gradient(to right, rgba(45,3,15,0.95) 0%, rgba(45,3,15,0.75) 18%, rgba(45,3,15,0.35) 28%, transparent 42%)",
+                      background: "linear-gradient(to right, rgba(122,10,31,0.95) 0%, rgba(90,6,31,0.75) 18%, rgba(61,4,20,0.35) 28%, transparent 42%)",
                     }}
                   />
                   <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
