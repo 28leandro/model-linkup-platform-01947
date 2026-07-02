@@ -45,7 +45,7 @@ const SLIDES: Slide[] = [
     subtitle_pt: "Universidade Autônoma de Encarnación",
     cta_es: "Conocé la UNAE",
     cta_pt: "Conheça a UNAE",
-    href: "https://www.facebook.com/unaeenc/?locale=sz_PL",
+    href: "/unae",
     accent: "from-[#7a0a1f] via-[#5a061f] to-[#3d0414]",
     bgImage: unaeBanner,
     fullImage: true,
