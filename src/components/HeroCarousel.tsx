@@ -129,7 +129,7 @@ const HeroCarousel = () => {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
-    link.href = clinicaLaBanner;
+    link.href = upapMedicinaBanner;
     // @ts-ignore - valid HTML attr
     link.fetchPriority = "high";
     document.head.appendChild(link);
