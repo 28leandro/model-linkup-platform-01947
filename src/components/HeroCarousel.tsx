@@ -297,7 +297,7 @@ const HeroCarousel = () => {
                 </>
               ) : s.id === "upap" ? (
                 <div className="relative h-full w-full">
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#5a061f] via-[#5a061f]/55 to-transparent" aria-hidden />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#5a061f]/85 via-[#5a061f]/25 to-transparent" aria-hidden />
                   <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
                     <div className="inline-flex items-center gap-1.5 self-start mb-1.5 sm:mb-2 px-2.5 py-1 rounded-full bg-[#f5c542] text-[#5a061f] text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow">
                       <Stethoscope className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -322,6 +322,7 @@ const HeroCarousel = () => {
                     </div>
                   </div>
                 </div>
+
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
                   <h2 className="absolute top-1 sm:top-4 left-4 sm:left-10 right-4 sm:right-10 text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm max-w-md">
