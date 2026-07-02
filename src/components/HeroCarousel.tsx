@@ -207,10 +207,11 @@ const HeroCarousel = () => {
                   decoding={slideIdx === 0 ? "sync" : "async"}
                   // @ts-ignore - fetchpriority is a valid HTML attribute
                   fetchpriority={slideIdx === 0 ? "high" : "low"}
-                  className={cn(
-                    "absolute inset-0 w-full h-full",
-                    s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : "object-cover"
-                  )}
+                    className={cn(
+                      "absolute inset-0 w-full h-full",
+                      s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : 
+                        s.id === "upap" ? "object-cover object-right sm:object-center" : "object-cover"
+                    )}
                 />
               )}
               {!s.fullImage && s.id !== "upap" && (
