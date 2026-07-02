@@ -201,7 +201,7 @@ const HeroCarousel = () => {
                   src={s.bgImage}
                   alt=""
                   aria-hidden
-                  width={1200}
+                  width={1344}
                   height={576}
                   loading={slideIdx === 0 ? "eager" : "lazy"}
                   decoding={slideIdx === 0 ? "sync" : "async"}
