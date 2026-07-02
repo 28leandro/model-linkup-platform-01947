@@ -213,7 +213,7 @@ const HeroCarousel = () => {
                   )}
                 />
               )}
-              {!s.fullImage && (
+              {!s.fullImage && s.id !== "upap" && (
                 <div className={cn("absolute inset-0", s.bgImage ? "bg-black/40" : "bg-black/10")} aria-hidden />
               )}
               {s.confetti && (
