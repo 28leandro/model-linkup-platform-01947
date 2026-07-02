@@ -35,7 +35,7 @@ const SLIDES: Slide[] = [
     cta_pt: "Quero ser médico",
     href: "https://www.upap.edu.py",
     accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
-    bgImage: upapMedicinaBanner,
+    bgImage: upapMedicinaBanner.url,
   },
   {
     id: "clinica-la",
