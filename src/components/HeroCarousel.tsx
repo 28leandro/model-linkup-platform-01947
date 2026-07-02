@@ -210,7 +210,7 @@ const HeroCarousel = () => {
                     className={cn(
                       "absolute inset-0 w-full h-full",
                       s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : 
-                        s.id === "upap" ? "object-cover object-right" : "object-cover"
+                        s.id === "upap" ? "object-cover object-right sm:object-center" : "object-cover"
                     )}
                 />
               )}
