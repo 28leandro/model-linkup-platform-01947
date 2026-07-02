@@ -5,12 +5,12 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapMedicinaBannerAsset from "@/assets/upap-medicina-banner.jpg.asset.json";
+import upapMedicinaBannerAsset from "@/assets/upap-medicina-banner.png.asset.json";
 import unaeBanner from "@/assets/unae-banner.jpg";
 
 // Cache-buster suffix forces Safari/iOS to re-download the banner after
 // the CDN asset was replaced. Bump the version when the image changes.
-const upapMedicinaBanner = { url: `${upapMedicinaBannerAsset.url}?v=2026-07-02-4` };
+const upapMedicinaBanner = { url: `${upapMedicinaBannerAsset.url}?v=2026-07-02-3` };
 
 interface Slide {
   id: string;
@@ -40,7 +40,6 @@ const SLIDES: Slide[] = [
     href: "https://www.upap.edu.py",
     accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
     bgImage: upapMedicinaBanner.url,
-    fullImage: true,
   },
   {
     id: "clinica-la",
@@ -214,11 +213,8 @@ const HeroCarousel = () => {
                   fetchpriority={slideIdx === 0 ? "high" : "low"}
                     className={cn(
                       "absolute inset-0 w-full h-full",
-                      s.id === "upap"
-                        ? "object-contain object-center bg-[#5a061f]"
-                        : s.fullImage
-                          ? "object-contain sm:object-cover object-center sm:object-top"
-                          : "object-cover"
+                      s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : 
+                        s.id === "upap" ? "object-cover object-right" : "object-cover"
                     )}
                 />
               )}
