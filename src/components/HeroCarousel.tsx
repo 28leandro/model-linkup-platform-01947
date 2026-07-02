@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
-import upapLogo from "@/assets/upap-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapBanner from "@/assets/upap-banner.jpg";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.jpg";
 import unaeBanner from "@/assets/unae-banner.jpg";
 
 interface Slide {
@@ -46,22 +45,22 @@ const SLIDES: Slide[] = [
     subtitle_pt: "Universidade Autônoma de Encarnación",
     cta_es: "Conocé la UNAE",
     cta_pt: "Conheça a UNAE",
-    href: "/unae",
+    href: "https://www.unae.edu.py",
     accent: "from-[#7a0a1f] via-[#5a061f] to-[#3d0414]",
     bgImage: unaeBanner,
     fullImage: true,
   },
   {
     id: "upap",
-    title_es: "REACTIVÁ TU CARRERA",
-    title_pt: "REATIVE SUA CARREIRA",
-    subtitle_es: "Inscripciones abiertas · Formá tu futuro con nosotros",
-    subtitle_pt: "Inscrições abertas · Construa seu futuro conosco",
-    cta_es: "Conocé UPAP",
-    cta_pt: "Conheça a UPAP",
+    title_es: "Estudiá Medicina en la UPAP",
+    title_pt: "Estude Medicina na UPAP",
+    subtitle_es: "Formamos los médicos del futuro · Inscripciones abiertas",
+    subtitle_pt: "Formamos os médicos do futuro · Inscrições abertas",
+    cta_es: "Quiero ser médico",
+    cta_pt: "Quero ser médico",
     href: "https://www.upap.edu.py",
     accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
-    logo: upapLogo,
+    bgImage: upapMedicinaBanner,
   },
   {
     id: "neura",
