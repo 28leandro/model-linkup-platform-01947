@@ -10,7 +10,6 @@ interface AdaptiveImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, "
   priority?: boolean;
   fallbackColor?: string;
   containerClassName?: string;
-  sizes?: string;
 }
 
 function pickQuality(effectiveType: string, saveData: boolean, isSlow: boolean): Quality {
@@ -35,20 +34,6 @@ function transformSupabaseUrl(src: string, q: Quality): string {
   return src;
 }
 
-function buildSupabaseSrcSet(src: string, quality: number): string | undefined {
-  if (!src) return undefined;
-  const marker = "/storage/v1/object/public/";
-  if (!src.includes(marker)) return undefined;
-  const base = src.replace(marker, "/storage/v1/render/image/public/");
-  const widths = [320, 480, 640, 800, 1200];
-  return widths
-    .map((w) => {
-      const sep = base.includes("?") ? "&" : "?";
-      return `${base}${sep}width=${w}&quality=${quality}&format=webp&resize=cover ${w}w`;
-    })
-    .join(", ");
-}
-
 const AdaptiveImage = ({
   src,
   alt,
@@ -66,7 +51,6 @@ const AdaptiveImage = ({
 
   const q = pickQuality(effectiveType, saveData, isSlow);
   const finalSrc = transformSupabaseUrl(src, q);
-  const srcSet = buildSupabaseSrcSet(src, q.quality);
 
   if (errored && !online) {
     return (
@@ -82,8 +66,6 @@ const AdaptiveImage = ({
   return (
     <img
       src={finalSrc}
-      srcSet={srcSet}
-      sizes={rest.sizes ?? "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"}
       alt={alt}
       width={width}
       height={height}

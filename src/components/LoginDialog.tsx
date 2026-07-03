@@ -39,7 +39,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const isLogin = mode === "login"
   const isSignup = mode === "signup"
   const isRecovery = mode === "recovery"
-  const showForgot = isLogin && failedAttempts >= 3
+  const showForgot = isLogin && failedAttempts > 0
   const lockedOut = isLogin && failedAttempts >= MAX_ATTEMPTS
 
   const loginSchema = z.object({
@@ -255,7 +255,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
               </button>
             )}
           </div>
-          <DialogFooter className="flex flex-col gap-2 sm:flex-col sm:space-x-0 sm:items-stretch">
+          <DialogFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={submitting}>
               {isRecovery
                 ? t('login.recoverySubmit')

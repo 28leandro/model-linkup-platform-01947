@@ -18,7 +18,6 @@ const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const PagoparTest = lazy(() => import("./pages/PagoparTest"));
 const MyListings = lazy(() => import("./pages/MyListings"));
 const AccountSettings = lazy(() => import("./pages/AccountSettings"));
-const Unae = lazy(() => import("./pages/Unae"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -52,7 +51,6 @@ function App() {
             <Route path="/pagopar-test" element={<PagoparTest />} />
             <Route path="/my-listings" element={<MyListings />} />
             <Route path="/account" element={<AccountSettings />} />
-            <Route path="/unae" element={<Unae />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>

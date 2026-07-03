@@ -111,7 +111,7 @@ const MyListings = () => {
             <Card key={l.id} className="p-3 flex gap-3">
               <Link to={`/listing/${l.id}`} className="shrink-0">
                 {l.images && l.images[0] ? (
-                  <img src={l.images[0]} alt={l.title} loading="lazy" decoding="async" width={80} height={80} className="w-20 h-20 rounded object-cover" />
+                  <img src={l.images[0]} alt={l.title} className="w-20 h-20 rounded object-cover" />
                 ) : (
                   <div className="w-20 h-20 rounded bg-muted" />
                 )}

@@ -1,2 +1,0 @@
-REVOKE SELECT ON public.listings FROM anon, authenticated;
-GRANT SELECT (id, user_id, title, description, price, currency, category, subcategory, brand, model, year, condition, fuel_type, type, area, location, latitude, longitude, images, attributes, is_published, photos_unlocked, rating, created_at) ON public.listings TO anon, authenticated;
