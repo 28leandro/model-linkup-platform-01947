@@ -120,7 +120,9 @@ const ListingOverlay = ({ id, onClose }: Props) => {
 
       {/* Mobile: unified full-width carousel with all images */}
       <div className="sm:hidden relative w-full aspect-[4/3] bg-muted overflow-hidden">
-        {/* Embla with all images sits underneath */}
+        {/* Embla with all images sits underneath. First slide is hidden
+            while the shared element is still animating, to avoid a
+            duplicate image showing at the final size behind the growing one. */}
         <div ref={mobileEmblaRef} className="overflow-hidden h-full">
           <div className="flex touch-pan-y h-full">
             {allImages.map((src, i) => (
@@ -131,18 +133,19 @@ const ListingOverlay = ({ id, onClose }: Props) => {
                   loading={i === 0 ? "eager" : "lazy"}
                   decoding="async"
                   className="w-full h-full object-cover"
+                  style={i === 0 && !sharedDone ? { opacity: 0 } : undefined}
                   draggable={false}
                 />
               </div>
             ))}
           </div>
         </div>
-        {/* Back button (mobile) */}
+        {/* Back button (mobile) — above the shared image so it's clickable */}
         <button
           type="button"
           onClick={onClose}
           aria-label="Voltar"
-          className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full bg-black/45 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm"
+          className="absolute top-3 left-3 z-[120] w-10 h-10 rounded-full bg-black/45 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm"
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
@@ -160,15 +163,23 @@ const ListingOverlay = ({ id, onClose }: Props) => {
         )}
       </div>
 
-      {/* Desktop: shared cover image at top */}
-      <motion.div
+      {/* Desktop: reserve space for the image area (shared element sits above) */}
+      <div
         className="hidden sm:block relative w-full aspect-[16/9] bg-muted overflow-hidden"
+        style={!sharedDone ? undefined : undefined}
       >
-        <img src={cover} alt={listing?.title || ""} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-      </motion.div>
+        <img
+          src={cover}
+          alt={listing?.title || ""}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={!sharedDone ? { opacity: 0 } : undefined}
+          draggable={false}
+        />
+      </div>
 
-      {/* Shared element rendered at overlay root so it never gets clipped.
-          Sits absolute at the top matching the image area size (mobile 4/3, desktop 16/9). */}
+      {/* Single shared element rendered at overlay root so nothing clips it.
+          Once the expand animation finishes we hide it and reveal the
+          static/carousel image underneath, avoiding any duplicate render. */}
       {!sharedDone && (
         <motion.img
           layoutId={`listing-image-${id}`}
@@ -177,7 +188,7 @@ const ListingOverlay = ({ id, onClose }: Props) => {
           alt={listing?.title || ""}
           draggable={false}
           onLayoutAnimationComplete={() => setSharedDone(true)}
-          className="absolute top-0 left-0 w-full aspect-[4/3] sm:aspect-[16/9] object-cover pointer-events-none z-[105]"
+          className="absolute top-0 left-0 w-full aspect-[4/3] sm:aspect-[16/9] object-cover pointer-events-none z-[15]"
         />
       )}
 
