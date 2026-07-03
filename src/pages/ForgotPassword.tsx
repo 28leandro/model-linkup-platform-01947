@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { getPasswordResetRedirectUrl, rememberPasswordResetEmail } from "@/lib/passwordRecovery";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export default function ForgotPassword() {
 
     setSubmitting(true);
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: getPasswordResetRedirectUrl(),
     });
     setSubmitting(false);
 
@@ -48,11 +49,7 @@ export default function ForgotPassword() {
     }
 
     // Remember the email so /reset-password can offer a one-click resend.
-    try {
-      sessionStorage.setItem('passwordResetEmail', email);
-    } catch {
-      // ignore storage errors
-    }
+    rememberPasswordResetEmail(email);
 
     setSent(true);
     toast({

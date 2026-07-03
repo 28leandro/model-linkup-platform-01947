@@ -39,7 +39,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
   const isLogin = mode === "login"
   const isSignup = mode === "signup"
   const isRecovery = mode === "recovery"
-  const showForgot = isLogin
+  const showForgot = isLogin && failedAttempts >= 3
   const lockedOut = isLogin && failedAttempts >= MAX_ATTEMPTS
 
   const loginSchema = z.object({

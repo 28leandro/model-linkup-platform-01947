@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { MapPin, LocateFixed, X, Crosshair, Search } from "lucide-react";
+import { MapPin, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +35,6 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
   const { t } = useLanguage();
   const [query, setQuery] = useState(value.city ?? "");
   const [open, setOpen] = useState(false);
-  const [detecting, setDetecting] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const showSearch = typeof onSearch === "function";
 
@@ -63,40 +62,10 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
       city,
       lat: coords?.lat,
       lon: coords?.lon,
-      radiusKm: value.radiusKm || 20,
+      radiusKm: value.radiusKm || 0,
     });
     setQuery(city);
     setOpen(false);
-  };
-
-  const detect = () => {
-    if (!navigator.geolocation) return;
-    setDetecting(true);
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        let city = t("location.myLocation");
-        try {
-          const r = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=es`
-          );
-          const data = await r.json();
-          city =
-            data.address?.city ||
-            data.address?.town ||
-            data.address?.village ||
-            data.address?.state ||
-            city;
-        } catch {
-          /* ignore */
-        }
-        onChange({ city, lat: latitude, lon: longitude, radiusKm: value.radiusKm || 20 });
-        setQuery(city);
-        setDetecting(false);
-      },
-      () => setDetecting(false),
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 }
-    );
   };
 
   const clear = () => {
@@ -151,18 +120,6 @@ const LocationFilter = ({ value, onChange, searchQuery, onSearchQueryChange, onS
           )}
         </PopoverContent>
       </Popover>
-
-      <Button
-        type="button"
-        variant="outline"
-        size="icon"
-        onClick={detect}
-        disabled={detecting}
-        className="h-10 w-10 rounded-full shrink-0"
-        aria-label={t("location.detect")}
-      >
-        <Crosshair className="h-4 w-4" />
-      </Button>
 
       <Popover>
         <PopoverTrigger asChild>
