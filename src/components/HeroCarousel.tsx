@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import upapLogo from "@/assets/upap-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
 import upapBanner from "@/assets/upap-banner.jpg";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
 
 interface Slide {
   id: string;
@@ -47,8 +48,8 @@ const SLIDES: Slide[] = [
     cta_pt: "Conheça a UPAP",
     href: "https://www.upap.edu.py",
     accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
-    logo: upapLogo,
-    confetti: true,
+    bgImage: upapMedicinaBanner.url,
+    fullImage: true,
   },
   {
     id: "neura",
