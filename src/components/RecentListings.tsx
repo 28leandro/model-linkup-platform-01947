@@ -12,6 +12,7 @@ import { cn, getPublicCity } from "@/lib/utils";
 import { CATEGORIES, getCategoryById, getConditionMeta } from "@/lib/categories";
 import { getCheapestIds, priceClass } from "@/lib/cheapest";
 import { useListingOverlay } from "@/contexts/ListingOverlayContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const AREA_SUBS = ["terreno", "comercial", "quinta", "estancia", "oficina", "edificio"];
 
@@ -34,6 +35,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const overlay = useListingOverlay();
+  const isMobile = useIsMobile();
 
   const groups = useMemo(() => {
     return CATEGORIES.map((cat) => ({
@@ -66,6 +68,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
         onClick={(e) => {
           if (
             overlay &&
+            isMobile &&
             e.button === 0 &&
             !e.metaKey &&
             !e.ctrlKey &&
