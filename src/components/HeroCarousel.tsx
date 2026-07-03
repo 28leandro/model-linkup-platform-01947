@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapBanner from "@/assets/upap-banner.jpg";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
 import unaeBanner from "@/assets/unae-banner.jpg";
 
 interface Slide {
@@ -35,7 +35,7 @@ const SLIDES: Slide[] = [
     cta_pt: "",
     href: "https://www.upap.edu.py",
     accent: "",
-    bgImage: upapBanner,
+    bgImage: upapMedicinaBanner.url,
     fullImage: true,
   },
   {
@@ -130,7 +130,7 @@ const HeroCarousel = () => {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
-    link.href = upapBanner;
+    link.href = upapMedicinaBanner.url;
     // @ts-ignore - valid HTML attr
     link.fetchPriority = "high";
     document.head.appendChild(link);
