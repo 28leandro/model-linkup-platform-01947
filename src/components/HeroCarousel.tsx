@@ -390,7 +390,7 @@ const HeroCarousel = () => {
         <div
           className={cn(
             "absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-1.5 transition-opacity",
-            SLIDES[index]?.fullImage && "opacity-0 pointer-events-none"
+            SLIDES[index]?.id === "upap" && "opacity-0 pointer-events-none"
           )}
         >
           {SLIDES.map((_, i) => (
