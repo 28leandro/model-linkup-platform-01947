@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import heic2any from 'heic2any';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/components/ui/use-toast';
 
@@ -35,6 +34,9 @@ export const useImageUpload = () => {
   };
 
   const convertHeicToJpeg = async (file: File): Promise<Blob> => {
+    // Loaded on demand: heic2any pulls ~1.4MB of WASM, so only fetch it when
+    // the user actually picks a HEIC/HEIF photo (iPhone) instead of upfront.
+    const { default: heic2any } = await import('heic2any');
     const converted = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.82 });
     return Array.isArray(converted) ? converted[0] : converted;
   };
@@ -135,7 +137,6 @@ export const useImageUpload = () => {
         throw new Error('Você precisa estar logado para fazer upload de imagens.');
       }
 
-      // Validate original file size; upload is compressed below 5MB afterward.
       if (file.size > MAX_ORIGINAL_SIZE) {
         toast({
           title: "Arquivo muito grande",
