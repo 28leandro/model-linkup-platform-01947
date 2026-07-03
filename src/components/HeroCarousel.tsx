@@ -152,10 +152,10 @@ const HeroCarousel = () => {
   };
 
   return (
-    <section className="container mx-auto px-3 sm:px-4 pt-4">
+    <section className="w-full">
       <div
         ref={containerRef}
-        className="relative overflow-hidden rounded-2xl border shadow-sm select-none touch-pan-y"
+        className="relative overflow-hidden select-none touch-pan-y"
         style={{ maxHeight: 250 }}
         onMouseDown={(e) => handleDragStart(e.clientX)}
         onMouseMove={(e) => handleDragMove(e.clientX)}
