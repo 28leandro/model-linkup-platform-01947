@@ -196,7 +196,7 @@ const HeroCarousel = () => {
                   fetchpriority={slideIdx === 0 ? "high" : "low"}
                   className={cn(
                     "absolute inset-0 w-full h-full",
-                    s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : "object-cover"
+                    s.fullImage ? "object-cover object-center" : "object-cover"
                   )}
                 />
               )}
