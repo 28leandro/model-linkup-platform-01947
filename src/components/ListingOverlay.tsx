@@ -97,7 +97,7 @@ const ListingOverlay = ({ id, onClose }: Props) => {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[9999] bg-background overflow-y-auto overscroll-contain"
+      className="fixed inset-0 z-[100] bg-background overflow-y-auto overscroll-contain"
       initial={false}
     >
       {/* Dim backdrop that fades in during the expansion */}
@@ -108,14 +108,14 @@ const ListingOverlay = ({ id, onClose }: Props) => {
         transition={{ duration: 0.45, ease: "easeOut" }}
         className="fixed inset-0 -z-10 bg-black/60 backdrop-blur-sm pointer-events-none"
       />
-      {/* Translucent back arrow — only control allowed in the overlay */}
+      {/* Close button */}
       <button
         type="button"
         onClick={onClose}
-        aria-label="Voltar"
-        className="fixed top-3 left-3 z-[10000] w-10 h-10 rounded-full bg-black/40 hover:bg-black/55 text-white flex items-center justify-center backdrop-blur-sm"
+        aria-label="Cerrar"
+        className="hidden sm:flex fixed top-3 right-3 z-[110] w-10 h-10 rounded-full bg-black/55 hover:bg-black/70 text-white items-center justify-center backdrop-blur-sm"
       >
-        <ArrowLeft className="w-5 h-5" />
+        <X className="w-5 h-5" />
       </button>
 
       {/* Mobile: unified full-width carousel with all images */}
@@ -140,6 +140,15 @@ const ListingOverlay = ({ id, onClose }: Props) => {
             ))}
           </div>
         </div>
+        {/* Back button (mobile) — above the shared image so it's clickable */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Voltar"
+          className="absolute top-3 left-3 z-[120] w-10 h-10 rounded-full bg-black/45 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         {allImages.length > 1 && (
           <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm z-20">
             {allImages.map((_, i) => (
@@ -267,6 +276,12 @@ const ListingOverlay = ({ id, onClose }: Props) => {
                 {listing.description}
               </div>
             )}
+            <a
+              href={`/listing/${id}`}
+              className="inline-flex items-center justify-center rounded-lg bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium hover:opacity-90 transition-opacity"
+            >
+              {t('common.viewFull') || 'Ver página completa'}
+            </a>
           </>
         ) : (
           <p className="text-muted-foreground">{t('detail.notFound')}</p>
