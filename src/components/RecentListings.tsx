@@ -11,6 +11,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import { cn, getPublicCity } from "@/lib/utils";
 import { CATEGORIES, getCategoryById, getConditionMeta } from "@/lib/categories";
 import { getCheapestIds, priceClass } from "@/lib/cheapest";
+import { useListingOverlay } from "@/contexts/ListingOverlayContext";
 
 const AREA_SUBS = ["terreno", "comercial", "quinta", "estancia", "oficina", "edificio"];
 
@@ -32,6 +33,7 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
   const isPt = language === "pt";
   const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const overlay = useListingOverlay();
 
   const groups = useMemo(() => {
     return CATEGORIES.map((cat) => ({
@@ -58,7 +60,23 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
           priority={priority}
         />
       </div>
-      <Link to={`/listing/${listing.id}`} className="block">
+      <Link
+        to={`/listing/${listing.id}`}
+        className="block"
+        onClick={(e) => {
+          if (
+            overlay &&
+            e.button === 0 &&
+            !e.metaKey &&
+            !e.ctrlKey &&
+            !e.shiftKey &&
+            !e.altKey
+          ) {
+            e.preventDefault();
+            overlay.open(listing.id);
+          }
+        }}
+      >
         <div className="pt-px px-0.5 leading-tight">
           <div className="flex items-center gap-1 mb-0 flex-wrap min-h-[18px]">
             <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium opacity-0">—</span>

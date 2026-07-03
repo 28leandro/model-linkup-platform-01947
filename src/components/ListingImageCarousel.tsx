@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
+import { useListingOverlay } from "@/contexts/ListingOverlayContext";
 
 interface ListingImageCarouselProps {
   listingId: string;
@@ -28,6 +29,7 @@ const ListingImageCarousel = ({
 }: ListingImageCarouselProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(listingId);
+  const overlay = useListingOverlay();
 
   const hasImages = images && images.length > 0;
   const cover = hasImages ? images[0] : FALLBACK;
@@ -41,10 +43,29 @@ const ListingImageCarousel = ({
   return (
     <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
-        <Link to={href} className="absolute inset-0 block" draggable={false}>
+        <Link
+          to={href}
+          className="absolute inset-0 block"
+          draggable={false}
+          onClick={(e) => {
+            // Intercept plain left-clicks to open shared-element overlay.
+            // Preserve modifier clicks / middle-click for "open in new tab".
+            if (
+              overlay &&
+              e.button === 0 &&
+              !e.metaKey &&
+              !e.ctrlKey &&
+              !e.shiftKey &&
+              !e.altKey
+            ) {
+              e.preventDefault();
+              overlay.open(listingId);
+            }
+          }}
+        >
           <motion.img
             layoutId={`listing-image-${listingId}`}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
+            transition={{ type: "spring", stiffness: 260, damping: 30 }}
             src={cover}
             alt={title}
             width={600}
