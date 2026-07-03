@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import upapLogo from "@/assets/upap-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
 import upapBanner from "@/assets/upap-banner.jpg";
-import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
 
 interface Slide {
   id: string;
@@ -27,6 +26,19 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
+    id: "upap",
+    title_es: "UPAP",
+    title_pt: "UPAP",
+    subtitle_es: "Inscripciones abiertas. Formá tu futuro con nosotros.",
+    subtitle_pt: "Inscrições abertas. Construa seu futuro conosco.",
+    cta_es: "Conocé UPAP",
+    cta_pt: "Conheça a UPAP",
+    href: "https://www.upap.edu.py",
+    accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
+    logo: upapLogo,
+    confetti: true,
+  },
+  {
     id: "clinica-la",
     title_es: "Lipoplastia mínimamente invasiva",
     title_pt: "Lipoplastia minimamente invasiva",
@@ -37,19 +49,6 @@ const SLIDES: Slide[] = [
     href: "/category/services",
     accent: "from-[#0b1430] via-[#101a3d] to-[#070d22]",
     bgImage: clinicaLaBanner,
-  },
-  {
-    id: "upap",
-    title_es: "UPAP",
-    title_pt: "UPAP",
-    subtitle_es: "Inscripciones abiertas. Formá tu futuro con nosotros.",
-    subtitle_pt: "Inscrições abertas. Construa seu futuro conosco.",
-    cta_es: "Conocé UPAP",
-    cta_pt: "Conheça a UPAP",
-    href: "https://www.upap.edu.py",
-    accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
-    bgImage: upapMedicinaBanner.url,
-    fullImage: true,
   },
   {
     id: "neura",
