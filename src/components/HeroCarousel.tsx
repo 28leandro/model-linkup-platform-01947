@@ -118,6 +118,7 @@ const HeroCarousel = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [translateX, setTranslateX] = useState(0);
+  const dragRef = useRef({ x: 0, y: 0, moved: false });
 
   useEffect(() => {
     const t = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 6000);
@@ -146,6 +147,11 @@ const HeroCarousel = () => {
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
+    // If the user dragged, ignore the click so the carousel swipe works.
+    if (dragRef.current.moved) {
+      e.preventDefault();
+      return;
+    }
     e.stopPropagation();
     if (href.startsWith("http")) {
       // Safari/iOS can block or ignore blank-window taps on transformed,
@@ -155,16 +161,20 @@ const HeroCarousel = () => {
     }
   };
 
-  const handleDragStart = (clientX: number) => {
+  const handleDragStart = (clientX: number, clientY: number) => {
     setIsDragging(true);
     setStartX(clientX);
     setTranslateX(0);
+    dragRef.current = { x: clientX, y: clientY, moved: false };
   };
 
-  const handleDragMove = (clientX: number) => {
+  const handleDragMove = (clientX: number, clientY: number) => {
     if (!isDragging) return;
     const diff = clientX - startX;
     setTranslateX(diff);
+    if (Math.abs(diff) > 10 || Math.abs(clientY - dragRef.current.y) > 10) {
+      dragRef.current.moved = true;
+    }
   };
 
   const handleDragEnd = () => {
@@ -184,12 +194,12 @@ const HeroCarousel = () => {
         ref={containerRef}
         className="relative overflow-hidden select-none touch-pan-y"
         style={{ maxHeight: 250 }}
-        onMouseDown={(e) => handleDragStart(e.clientX)}
-        onMouseMove={(e) => handleDragMove(e.clientX)}
+        onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
+        onMouseMove={(e) => handleDragMove(e.clientX, e.clientY)}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
-        onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
-        onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
+        onTouchMove={(e) => handleDragMove(e.touches[0].clientX, e.touches[0].clientY)}
         onTouchEnd={handleDragEnd}
       >
         <div
@@ -275,17 +285,9 @@ const HeroCarousel = () => {
               {s.fullImage ? (
                 <a
                   href={s.href}
-                  target={undefined}
-                  rel={undefined}
                   aria-label={isPt ? s.title_pt : s.title_es}
                   className="absolute inset-0 z-10"
                   onClick={(e) => handleFullImageClick(e, s.href)}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
-                  onTouchMove={(e) => e.stopPropagation()}
-                  onTouchEnd={(e) => e.stopPropagation()}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onMouseMove={(e) => e.stopPropagation()}
                 />
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
