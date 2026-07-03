@@ -194,12 +194,12 @@ const HeroCarousel = () => {
         ref={containerRef}
         className="relative overflow-hidden select-none touch-pan-y"
         style={{ maxHeight: 250 }}
-        onMouseDown={(e) => handleDragStart(e.clientX)}
-        onMouseMove={(e) => handleDragMove(e.clientX)}
+        onMouseDown={(e) => handleDragStart(e.clientX, e.clientY)}
+        onMouseMove={(e) => handleDragMove(e.clientX, e.clientY)}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
-        onTouchStart={(e) => handleDragStart(e.touches[0].clientX)}
-        onTouchMove={(e) => handleDragMove(e.touches[0].clientX)}
+        onTouchStart={(e) => handleDragStart(e.touches[0].clientX, e.touches[0].clientY)}
+        onTouchMove={(e) => handleDragMove(e.touches[0].clientX, e.touches[0].clientY)}
         onTouchEnd={handleDragEnd}
       >
         <div
