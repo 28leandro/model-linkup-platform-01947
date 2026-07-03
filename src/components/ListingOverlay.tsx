@@ -15,7 +15,7 @@ interface Props {
   onClose: () => void;
 }
 
-const spring = { duration: 2, ease: "easeInOut" } as const;
+const spring = { type: "spring" as const, stiffness: 90, damping: 22, mass: 1.2 };
 
 const ListingOverlay = ({ id, onClose }: Props) => {
   const { t } = useLanguage();

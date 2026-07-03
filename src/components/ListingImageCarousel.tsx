@@ -68,7 +68,7 @@ const ListingImageCarousel = ({
         >
           <motion.img
             layoutId={`listing-image-${listingId}`}
-            transition={{ duration: 2, ease: "easeInOut" }}
+            transition={{ type: "spring", stiffness: 90, damping: 22, mass: 1.2 }}
             src={cover}
             alt={title}
             width={600}
