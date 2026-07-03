@@ -1,5 +1,6 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense } from "react";
+import { LayoutGroup, AnimatePresence } from "framer-motion";
 import Index from "./pages/Index";
 // Route-level code splitting: only the home route is eager.
 // All other pages are loaded on demand to shrink the initial JS bundle.
@@ -32,7 +33,24 @@ function App() {
       <AuthProvider>
         <div className="pb-16 md:pb-0">
           <Suspense fallback={<div className="min-h-screen" aria-hidden />}>
-          <Routes>
+          <LayoutGroup>
+          <AnimatedRoutes />
+          </LayoutGroup>
+          </Suspense>
+        </div>
+        <BottomNav />
+        <NetworkBanner />
+        <Toaster />
+      </AuthProvider>
+    </ErrorBoundary>
+  );
+}
+
+function AnimatedRoutes() {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="popLayout" initial={false}>
+      <Routes location={location} key={location.pathname}>
             <Route path="/" element={<Index />} />
             <Route path="/post-ad" element={<PostAd />} />
             <Route path="/post-ad/:id" element={<PostAd />} />
@@ -54,14 +72,8 @@ function App() {
             <Route path="/account" element={<AccountSettings />} />
             <Route path="/unae" element={<Unae />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-          </Suspense>
-        </div>
-        <BottomNav />
-        <NetworkBanner />
-        <Toaster />
-      </AuthProvider>
-    </ErrorBoundary>
+      </Routes>
+    </AnimatePresence>
   );
 }
 

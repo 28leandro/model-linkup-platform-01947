@@ -1,4 +1,5 @@
 import { useParams, useNavigate, Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -234,18 +235,35 @@ const ListingDetail = () => {
                     : ["https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"]
                   ).map((src, i) => (
                     <div key={i} className="relative min-w-0 flex-[0_0_100%] h-full">
-                      <img
-                        src={src}
-                        alt={`${listing.title} - Foto ${i + 1}`}
-                        loading={i === 0 ? "eager" : "lazy"}
-                        decoding="async"
-                        draggable={false}
-                        className="w-full h-full object-cover select-none"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
-                        }}
-                      />
+                      {i === 0 ? (
+                        <motion.img
+                          layoutId={`listing-image-${listing.id}`}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                          src={src}
+                          alt={`${listing.title} - Foto ${i + 1}`}
+                          loading="eager"
+                          decoding="async"
+                          draggable={false}
+                          className="w-full h-full object-cover select-none"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={src}
+                          alt={`${listing.title} - Foto ${i + 1}`}
+                          loading="lazy"
+                          decoding="async"
+                          draggable={false}
+                          className="w-full h-full object-cover select-none"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80';
+                          }}
+                        />
+                      )}
                     </div>
                   ))}
                 </div>

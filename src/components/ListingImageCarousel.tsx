@@ -1,8 +1,8 @@
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
-import AdaptiveImage from "@/components/AdaptiveImage";
 
 interface ListingImageCarouselProps {
   listingId: string;
@@ -42,12 +42,15 @@ const ListingImageCarousel = ({
     <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
         <Link to={href} className="absolute inset-0 block" draggable={false}>
-          <AdaptiveImage
+          <motion.img
+            layoutId={`listing-image-${listingId}`}
+            transition={{ duration: 0.5, ease: "easeInOut" }}
             src={cover}
             alt={title}
-            priority={priority}
             width={600}
             height={600}
+            loading={priority ? "eager" : "lazy"}
+            decoding="async"
             draggable={false}
             className="w-full h-full object-cover select-none transition-transform duration-500 ease-out group-hover:scale-110"
             onError={(e) => {
