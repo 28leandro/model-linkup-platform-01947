@@ -33,7 +33,7 @@ const SLIDES: Slide[] = [
     subtitle_pt: "",
     cta_es: "",
     cta_pt: "",
-    href: "https://www.upap.edu.py",
+    href: "https://upap.edu.py/",
     accent: "",
     bgImage: upapMedicinaBanner.url,
     fullImage: true,
