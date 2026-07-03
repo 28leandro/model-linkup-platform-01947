@@ -1,6 +1,7 @@
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useRef } from "react";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useListingOverlay } from "@/contexts/ListingOverlayContext";
@@ -42,6 +43,59 @@ const ListingImageCarousel = ({
     await toggleFavorite(listingId);
   };
 
+  // ---- Long-press handling (mobile only) ----
+  const pressTimer = useRef<number | null>(null);
+  const longPressFired = useRef(false);
+  const startPos = useRef<{ x: number; y: number } | null>(null);
+
+  const clearPress = () => {
+    if (pressTimer.current !== null) {
+      window.clearTimeout(pressTimer.current);
+      pressTimer.current = null;
+    }
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (!isMobile || !overlay) return;
+    if (e.pointerType === "mouse") return; // touch/pen only
+    longPressFired.current = false;
+    startPos.current = { x: e.clientX, y: e.clientY };
+    clearPress();
+    pressTimer.current = window.setTimeout(() => {
+      longPressFired.current = true;
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        try { (navigator as any).vibrate?.(15); } catch {}
+      }
+      overlay.open(listingId);
+    }, 500);
+  };
+
+  const onPointerMove = (e: React.PointerEvent) => {
+    if (!startPos.current) return;
+    const dx = Math.abs(e.clientX - startPos.current.x);
+    const dy = Math.abs(e.clientY - startPos.current.y);
+    if (dx > 10 || dy > 10) clearPress();
+  };
+
+  const onPointerEnd = () => {
+    clearPress();
+    startPos.current = null;
+  };
+
+  const suppressIfLongPress = (e: React.SyntheticEvent) => {
+    if (longPressFired.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      longPressFired.current = false;
+    }
+  };
+
+  const noCalloutStyle: React.CSSProperties = {
+    WebkitTouchCallout: "none" as any,
+    WebkitUserSelect: "none",
+    userSelect: "none",
+  };
+
   return (
     <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
@@ -50,21 +104,23 @@ const ListingImageCarousel = ({
           className="absolute inset-0 block"
           draggable={false}
           onClick={(e) => {
-            // Intercept plain left-clicks to open shared-element overlay.
-            // Preserve modifier clicks / middle-click for "open in new tab".
-            if (
-              overlay &&
-              isMobile &&
-              e.button === 0 &&
-              !e.metaKey &&
-              !e.ctrlKey &&
-              !e.shiftKey &&
-              !e.altKey
-            ) {
+            // On mobile: images do NOT open on tap — only on long-press (500ms).
+            // Suppress the synthetic click that fires after a long-press.
+            if (isMobile) {
               e.preventDefault();
-              overlay.open(listingId);
+              e.stopPropagation();
+              return;
             }
           }}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerEnd}
+          onPointerCancel={onPointerEnd}
+          onPointerLeave={onPointerEnd}
+          onContextMenu={(e) => {
+            if (isMobile) e.preventDefault();
+          }}
+          style={isMobile ? noCalloutStyle : undefined}
         >
           <motion.img
             layoutId={`listing-image-${listingId}`}
@@ -76,7 +132,8 @@ const ListingImageCarousel = ({
             loading={priority ? "eager" : "lazy"}
             decoding="async"
             draggable={false}
-            className="w-full h-full object-cover select-none [transition:none!important]"
+            className="w-full h-full object-cover select-none [transition:none!important] [-webkit-touch-callout:none] [-webkit-user-select:none]"
+            onContextMenu={(e) => { if (isMobile) e.preventDefault(); }}
             onError={(e) => {
               (e.target as HTMLImageElement).src = FALLBACK;
             }}
