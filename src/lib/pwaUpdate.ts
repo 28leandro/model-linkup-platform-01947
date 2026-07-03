@@ -11,6 +11,7 @@
 
 const SW_PATH = "/sw.js";
 const VERSION_KEY = "nemu-app-version";
+const SW_CLEANUP_VERSION_KEY = "nemu-sw-cleanup-version";
 
 function isBlockedEnvironment(): boolean {
   if (typeof window === "undefined") return true;
@@ -81,6 +82,7 @@ export function initPwaUpdate(): void {
       const stored = localStorage.getItem(VERSION_KEY);
       if (stored && stored !== current) {
         localStorage.setItem(VERSION_KEY, current);
+        localStorage.removeItem(SW_CLEANUP_VERSION_KEY);
         void (async () => {
           await unregisterExistingWorkers();
           await clearAllCaches();
@@ -94,12 +96,29 @@ export function initPwaUpdate(): void {
     }
   }
 
-  // 2. Register the kill-switch SW so any returning visitor that has an
-  //    old service worker / Workbox precache gets it wiped.
-  if ("serviceWorker" in navigator) {
+  // 2. Register the kill-switch SW once per deployed version so any returning
+  //    visitor with an old service worker / Workbox precache gets it wiped,
+  //    without causing Safari to reload on every visit.
+  let shouldRegisterCleanupWorker = Boolean(current);
+  try {
+    shouldRegisterCleanupWorker =
+      Boolean(current) && localStorage.getItem(SW_CLEANUP_VERSION_KEY) !== current;
+  } catch {
+    /* localStorage blocked — skip SW cleanup to avoid repeat reloads */
+    shouldRegisterCleanupWorker = false;
+  }
+
+  if (shouldRegisterCleanupWorker && "serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker
-        .register(SW_PATH, { scope: "/" })
+        .register(SW_PATH, { scope: "/", updateViaCache: "none" })
+        .then(() => {
+          try {
+            localStorage.setItem(SW_CLEANUP_VERSION_KEY, current!);
+          } catch {
+            /* ignore */
+          }
+        })
         .catch(() => {
           /* registration failed — non-fatal */
         });

@@ -142,6 +142,19 @@ const HeroCarousel = () => {
   const go = (dir: number) =>
     setIndex((i) => (i + dir + SLIDES.length) % SLIDES.length);
 
+  const handleFullImageClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.stopPropagation();
+    if (href.startsWith("http")) {
+      // Safari/iOS can block or ignore blank-window taps on transformed,
+      // full-slide anchors. Same-tab navigation is the most reliable path.
+      e.preventDefault();
+      window.location.assign(href);
+    }
+  };
+
   const handleDragStart = (clientX: number) => {
     setIsDragging(true);
     setStartX(clientX);
@@ -262,14 +275,17 @@ const HeroCarousel = () => {
               {s.fullImage ? (
                 <a
                   href={s.href}
-                  target={s.href.startsWith("http") ? "_blank" : undefined}
-                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  target={undefined}
+                  rel={undefined}
                   aria-label={isPt ? s.title_pt : s.title_es}
                   className="absolute inset-0 z-10"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => handleFullImageClick(e, s.href)}
+                  onPointerDown={(e) => e.stopPropagation()}
                   onTouchStart={(e) => e.stopPropagation()}
+                  onTouchMove={(e) => e.stopPropagation()}
                   onTouchEnd={(e) => e.stopPropagation()}
                   onMouseDown={(e) => e.stopPropagation()}
+                  onMouseMove={(e) => e.stopPropagation()}
                 />
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
