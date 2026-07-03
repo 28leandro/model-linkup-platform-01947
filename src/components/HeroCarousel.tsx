@@ -33,7 +33,7 @@ const SLIDES: Slide[] = [
     subtitle_pt: "",
     cta_es: "",
     cta_pt: "",
-    href: "https://www.upap.edu.py",
+    href: "https://upap.edu.py/",
     accent: "",
     bgImage: upapMedicinaBanner.url,
     fullImage: true,
@@ -265,7 +265,11 @@ const HeroCarousel = () => {
                   target={s.href.startsWith("http") ? "_blank" : undefined}
                   rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   aria-label={isPt ? s.title_pt : s.title_es}
-                  className="absolute inset-0"
+                  className="absolute inset-0 z-10"
+                  onClick={(e) => e.stopPropagation()}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onTouchEnd={(e) => e.stopPropagation()}
+                  onMouseDown={(e) => e.stopPropagation()}
                 />
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
