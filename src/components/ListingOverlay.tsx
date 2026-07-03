@@ -15,7 +15,7 @@ interface Props {
   onClose: () => void;
 }
 
-const spring = { type: "spring" as const, stiffness: 180, damping: 26, mass: 1 };
+const spring = { type: "spring" as const, stiffness: 90, damping: 22, mass: 1.2 };
 
 const ListingOverlay = ({ id, onClose }: Props) => {
   const { t } = useLanguage();
@@ -100,6 +100,14 @@ const ListingOverlay = ({ id, onClose }: Props) => {
       className="fixed inset-0 z-[100] bg-background overflow-y-auto overscroll-contain"
       initial={false}
     >
+      {/* Dim backdrop that fades in during the expansion */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.45, ease: "easeOut" }}
+        className="fixed inset-0 -z-10 bg-black/60 backdrop-blur-sm pointer-events-none"
+      />
       {/* Close button */}
       <button
         type="button"
@@ -129,19 +137,6 @@ const ListingOverlay = ({ id, onClose }: Props) => {
             ))}
           </div>
         </div>
-        {/* Shared element sits ON TOP, outside embla's transform. Hidden after the
-            animation finishes so the carousel can take over. */}
-        {!sharedDone && (
-          <motion.img
-            layoutId={`listing-image-${id}`}
-            transition={spring}
-            src={cover}
-            alt={listing?.title || ""}
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-            draggable={false}
-            onLayoutAnimationComplete={() => setSharedDone(true)}
-          />
-        )}
         {/* Back button (mobile) */}
         <button
           type="button"
@@ -170,18 +165,21 @@ const ListingOverlay = ({ id, onClose }: Props) => {
         className="hidden sm:block relative w-full aspect-[16/9] bg-muted overflow-hidden"
       >
         <img src={cover} alt={listing?.title || ""} className="absolute inset-0 w-full h-full object-cover" draggable={false} />
-        {!isMobile && !sharedDone && (
-          <motion.img
-            layoutId={`listing-image-${id}`}
-            transition={spring}
-            src={cover}
-            alt={listing?.title || ""}
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-            draggable={false}
-            onLayoutAnimationComplete={() => setSharedDone(true)}
-          />
-        )}
       </motion.div>
+
+      {/* Shared element rendered at overlay root so it never gets clipped.
+          Sits absolute at the top matching the image area size (mobile 4/3, desktop 16/9). */}
+      {!sharedDone && (
+        <motion.img
+          layoutId={`listing-image-${id}`}
+          transition={spring}
+          src={cover}
+          alt={listing?.title || ""}
+          draggable={false}
+          onLayoutAnimationComplete={() => setSharedDone(true)}
+          className="absolute top-0 left-0 w-full aspect-[4/3] sm:aspect-[16/9] object-cover pointer-events-none z-[105]"
+        />
+      )}
 
       {/* Rest of content fades/slides in after the shared transition */}
       <motion.div

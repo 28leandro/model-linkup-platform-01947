@@ -68,7 +68,7 @@ const ListingImageCarousel = ({
         >
           <motion.img
             layoutId={`listing-image-${listingId}`}
-            transition={{ type: "spring", stiffness: 260, damping: 30 }}
+            transition={{ type: "spring", stiffness: 90, damping: 22, mass: 1.2 }}
             src={cover}
             alt={title}
             width={600}
@@ -76,7 +76,7 @@ const ListingImageCarousel = ({
             loading={priority ? "eager" : "lazy"}
             decoding="async"
             draggable={false}
-            className="w-full h-full object-cover select-none transition-transform duration-500 ease-out group-hover:scale-110"
+            className="w-full h-full object-cover select-none [transition:none!important]"
             onError={(e) => {
               (e.target as HTMLImageElement).src = FALLBACK;
             }}
