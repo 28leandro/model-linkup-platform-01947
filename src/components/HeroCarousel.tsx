@@ -4,9 +4,8 @@ import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
-import upapLogo from "@/assets/upap-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapBanner from "@/assets/upap-banner.jpg";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
 
 interface Slide {
   id: string;
@@ -29,14 +28,14 @@ const SLIDES: Slide[] = [
     id: "upap",
     title_es: "UPAP",
     title_pt: "UPAP",
-    subtitle_es: "Inscripciones abiertas. Formá tu futuro con nosotros.",
-    subtitle_pt: "Inscrições abertas. Construa seu futuro conosco.",
-    cta_es: "Conocé UPAP",
-    cta_pt: "Conheça a UPAP",
+    subtitle_es: "",
+    subtitle_pt: "",
+    cta_es: "",
+    cta_pt: "",
     href: "https://www.upap.edu.py",
-    accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
-    logo: upapLogo,
-    confetti: true,
+    accent: "",
+    bgImage: upapMedicinaBanner.url,
+    fullImage: true,
   },
   {
     id: "clinica-la",
@@ -117,7 +116,7 @@ const HeroCarousel = () => {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
-    link.href = clinicaLaBanner;
+    link.href = upapMedicinaBanner.url;
     // @ts-ignore - valid HTML attr
     link.fetchPriority = "high";
     document.head.appendChild(link);
