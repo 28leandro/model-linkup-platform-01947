@@ -285,17 +285,9 @@ const HeroCarousel = () => {
               {s.fullImage ? (
                 <a
                   href={s.href}
-                  target={undefined}
-                  rel={undefined}
                   aria-label={isPt ? s.title_pt : s.title_es}
                   className="absolute inset-0 z-10"
                   onClick={(e) => handleFullImageClick(e, s.href)}
-                  onPointerDown={(e) => e.stopPropagation()}
-                  onTouchStart={(e) => e.stopPropagation()}
-                  onTouchMove={(e) => e.stopPropagation()}
-                  onTouchEnd={(e) => e.stopPropagation()}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  onMouseMove={(e) => e.stopPropagation()}
                 />
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
