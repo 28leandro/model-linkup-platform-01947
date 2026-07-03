@@ -24,11 +24,8 @@ import { CATEGORIES } from "@/lib/categories";
 import { trackSearch } from "@/lib/cheapest";
 import SEO from "@/components/SEO";
 import { useCachedListings } from "@/hooks/useCachedListings";
-import { LayoutGroup } from "framer-motion";
-import { ListingOverlayProvider, useListingOverlay } from "@/contexts/ListingOverlayContext";
-import ListingOverlayHost from "@/components/ListingOverlay";
 
-const IndexInner = () => {
+const Index = () => {
   const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
@@ -350,23 +347,8 @@ const IndexInner = () => {
       />
       <StoreBadgesBar />
       <Footer />
-      <OverlayHost />
     </div>
   );
 };
-
-function OverlayHost() {
-  const overlay = useListingOverlay();
-  if (!overlay) return null;
-  return <ListingOverlayHost openId={overlay.openId} onClose={overlay.close} />;
-}
-
-const Index = () => (
-  <ListingOverlayProvider>
-    <LayoutGroup id="home-listings">
-      <IndexInner />
-    </LayoutGroup>
-  </ListingOverlayProvider>
-);
 
 export default Index;

@@ -7,8 +7,6 @@ import { formatPrice } from "@/lib/formatPrice";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
 import DesktopListingCarousel from "@/components/DesktopListingCarousel";
 import { getCityFromLocation } from "@/lib/utils";
-import { useListingOverlay } from "@/contexts/ListingOverlayContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 // Robust city extractor: prefer last segment that doesn't look like a street,
 // fallback to the heuristic in getCityFromLocation.
@@ -30,8 +28,6 @@ const cityOnly = (loc?: string) => {
 const RecentlyViewedCarousel = () => {
   const { items, clear } = useRecentlyViewed();
   const { t } = useLanguage();
-  const overlay = useListingOverlay();
-  const isMobile = useIsMobile();
 
   if (items.length === 0) return null;
 
@@ -68,24 +64,7 @@ const RecentlyViewedCarousel = () => {
                 noImageLabel={t("listings.noImage")}
               />
             </div>
-            <Link
-              to={`/listing/${item.id}`}
-              className="block"
-              onClick={(e) => {
-                if (
-                  overlay &&
-                  isMobile &&
-                  e.button === 0 &&
-                  !e.metaKey &&
-                  !e.ctrlKey &&
-                  !e.shiftKey &&
-                  !e.altKey
-                ) {
-                  e.preventDefault();
-                  overlay.open(item.id);
-                }
-              }}
-            >
+            <Link to={`/listing/${item.id}`} className="block">
               <div className="pt-2 sm:pt-2.5 px-0.5">
                 <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
                   {item.title}

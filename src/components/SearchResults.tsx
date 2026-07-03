@@ -9,8 +9,6 @@ import { useMemo } from "react";
 import { getCheapestIds, priceClass } from "@/lib/cheapest";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
 import ListingRatingBadge from "@/components/ListingRatingBadge";
-import { useListingOverlay } from "@/contexts/ListingOverlayContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 const AREA_SUBS = ["terreno","comercial","quinta","estancia","oficina","edificio"];
 
@@ -44,8 +42,6 @@ interface SearchResultsProps {
 const SearchResults = ({ listings }: SearchResultsProps) => {
   const { t } = useLanguage();
   const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
-  const overlay = useListingOverlay();
-  const isMobile = useIsMobile();
 
   return (
     <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
@@ -64,24 +60,7 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                 noImageLabel={t('listings.noImage')}
               />
             </div>
-            <Link
-              to={`/listing/${listing.id}`}
-              className="block"
-              onClick={(e) => {
-                if (
-                  overlay &&
-                  isMobile &&
-                  e.button === 0 &&
-                  !e.metaKey &&
-                  !e.ctrlKey &&
-                  !e.shiftKey &&
-                  !e.altKey
-                ) {
-                  e.preventDefault();
-                  overlay.open(listing.id);
-                }
-              }}
-            >
+            <Link to={`/listing/${listing.id}`} className="block">
               <div className="pt-px px-0.5 leading-tight">
                 <div className="flex items-center gap-1.5 mb-0 min-h-[18px]">
                   {getCategoryIcon(listing.type) ? (

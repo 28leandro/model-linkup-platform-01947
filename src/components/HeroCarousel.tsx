@@ -34,7 +34,7 @@ const SLIDES: Slide[] = [
     cta_es: "Quiero ser médico",
     cta_pt: "Quero ser médico",
     href: "https://www.upap.edu.py",
-    accent: "from-[#7a0a1f] via-[#5a061f] to-[#3d0414]",
+    accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
     bgImage: upapMedicinaBanner,
   },
   {
@@ -201,20 +201,19 @@ const HeroCarousel = () => {
                   src={s.bgImage}
                   alt=""
                   aria-hidden
-                  width={1344}
+                  width={1200}
                   height={576}
                   loading={slideIdx === 0 ? "eager" : "lazy"}
                   decoding={slideIdx === 0 ? "sync" : "async"}
                   // @ts-ignore - fetchpriority is a valid HTML attribute
                   fetchpriority={slideIdx === 0 ? "high" : "low"}
-                    className={cn(
-                      "absolute inset-0 w-full h-full",
-                      s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : 
-                        s.id === "upap" ? "object-cover object-right sm:object-[center_top]" : "object-cover"
-                    )}
+                  className={cn(
+                    "absolute inset-0 w-full h-full",
+                    s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : "object-cover"
+                  )}
                 />
               )}
-              {!s.fullImage && s.id !== "upap" && (
+              {!s.fullImage && (
                 <div className={cn("absolute inset-0", s.bgImage ? "bg-black/40" : "bg-black/10")} aria-hidden />
               )}
               {s.confetti && (
@@ -298,13 +297,7 @@ const HeroCarousel = () => {
                 </>
               ) : s.id === "upap" ? (
                 <div className="relative h-full w-full">
-                  <div
-                    className="absolute inset-0"
-                    aria-hidden
-                    style={{
-                      background: "linear-gradient(to right, rgba(122,10,31,0.95) 0%, rgba(90,6,31,0.75) 18%, rgba(61,4,20,0.35) 28%, transparent 42%)",
-                    }}
-                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#5a061f] via-[#5a061f]/85 to-transparent" aria-hidden />
                   <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
                     <div className="inline-flex items-center gap-1.5 self-start mb-1.5 sm:mb-2 px-2.5 py-1 rounded-full bg-[#f5c542] text-[#5a061f] text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow">
                       <Stethoscope className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
@@ -329,9 +322,6 @@ const HeroCarousel = () => {
                     </div>
                   </div>
                 </div>
-
-
-
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
                   <h2 className="absolute top-1 sm:top-4 left-4 sm:left-10 right-4 sm:right-10 text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm max-w-md">

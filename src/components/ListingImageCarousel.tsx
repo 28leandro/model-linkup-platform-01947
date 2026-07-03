@@ -1,10 +1,8 @@
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
-import { useListingOverlay } from "@/contexts/ListingOverlayContext";
-import { useIsMobile } from "@/hooks/use-mobile";
+import AdaptiveImage from "@/components/AdaptiveImage";
 
 interface ListingImageCarouselProps {
   listingId: string;
@@ -30,8 +28,6 @@ const ListingImageCarousel = ({
 }: ListingImageCarouselProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(listingId);
-  const overlay = useListingOverlay();
-  const isMobile = useIsMobile();
 
   const hasImages = images && images.length > 0;
   const cover = hasImages ? images[0] : FALLBACK;
@@ -45,38 +41,15 @@ const ListingImageCarousel = ({
   return (
     <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
-        <Link
-          to={href}
-          className="absolute inset-0 block"
-          draggable={false}
-          onClick={(e) => {
-            // Intercept plain left-clicks to open shared-element overlay.
-            // Preserve modifier clicks / middle-click for "open in new tab".
-            if (
-              overlay &&
-              isMobile &&
-              e.button === 0 &&
-              !e.metaKey &&
-              !e.ctrlKey &&
-              !e.shiftKey &&
-              !e.altKey
-            ) {
-              e.preventDefault();
-              overlay.open(listingId);
-            }
-          }}
-        >
-          <motion.img
-            layoutId={`listing-image-${listingId}`}
-            transition={{ type: "spring", stiffness: 90, damping: 22, mass: 1.2 }}
+        <Link to={href} className="absolute inset-0 block" draggable={false}>
+          <AdaptiveImage
             src={cover}
             alt={title}
+            priority={priority}
             width={600}
             height={600}
-            loading={priority ? "eager" : "lazy"}
-            decoding="async"
             draggable={false}
-            className="w-full h-full object-cover select-none [transition:none!important]"
+            className="w-full h-full object-cover select-none transition-transform duration-500 ease-out group-hover:scale-110"
             onError={(e) => {
               (e.target as HTMLImageElement).src = FALLBACK;
             }}
