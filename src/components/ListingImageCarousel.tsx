@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useListingOverlay } from "@/contexts/ListingOverlayContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ListingImageCarouselProps {
   listingId: string;
@@ -30,6 +31,7 @@ const ListingImageCarousel = ({
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(listingId);
   const overlay = useListingOverlay();
+  const isMobile = useIsMobile();
 
   const hasImages = images && images.length > 0;
   const cover = hasImages ? images[0] : FALLBACK;
@@ -52,6 +54,7 @@ const ListingImageCarousel = ({
             // Preserve modifier clicks / middle-click for "open in new tab".
             if (
               overlay &&
+              isMobile &&
               e.button === 0 &&
               !e.metaKey &&
               !e.ctrlKey &&
