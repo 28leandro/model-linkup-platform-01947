@@ -147,6 +147,11 @@ const HeroCarousel = () => {
     e: React.MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
+    // If the user dragged, ignore the click so the carousel swipe works.
+    if (dragRef.current.moved) {
+      e.preventDefault();
+      return;
+    }
     e.stopPropagation();
     if (href.startsWith("http")) {
       // Safari/iOS can block or ignore blank-window taps on transformed,
@@ -156,16 +161,20 @@ const HeroCarousel = () => {
     }
   };
 
-  const handleDragStart = (clientX: number) => {
+  const handleDragStart = (clientX: number, clientY: number) => {
     setIsDragging(true);
     setStartX(clientX);
     setTranslateX(0);
+    dragRef.current = { x: clientX, y: clientY, moved: false };
   };
 
-  const handleDragMove = (clientX: number) => {
+  const handleDragMove = (clientX: number, clientY: number) => {
     if (!isDragging) return;
     const diff = clientX - startX;
     setTranslateX(diff);
+    if (Math.abs(diff) > 10 || Math.abs(clientY - dragRef.current.y) > 10) {
+      dragRef.current.moved = true;
+    }
   };
 
   const handleDragEnd = () => {
