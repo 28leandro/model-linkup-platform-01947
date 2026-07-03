@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useEmblaCarousel from "embla-carousel-react";
-import { X, MapPin, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, MapPin, ChevronLeft, ChevronRight, ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Listing } from "@/store/listingsStore";
 import { formatPrice } from "@/lib/formatPrice";
 import { getPublicCity } from "@/lib/utils";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { trackRecentlyViewed } from "@/hooks/useRecentlyViewed";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Props {
   id: string;
@@ -18,10 +19,13 @@ const spring = { type: "spring" as const, stiffness: 260, damping: 30 };
 
 const ListingOverlay = ({ id, onClose }: Props) => {
   const { t } = useLanguage();
+  const isMobile = useIsMobile();
   const [listing, setListing] = useState<Listing | null>(null);
   const [loading, setLoading] = useState(true);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [mobileEmblaRef, mobileEmblaApi] = useEmblaCarousel({ loop: true, align: "start" });
+  const [mobileIdx, setMobileIdx] = useState(0);
 
   useEffect(() => {
     let cancel = false;
@@ -66,6 +70,16 @@ const ListingOverlay = ({ id, onClose }: Props) => {
   }, [emblaApi]);
 
   useEffect(() => {
+    if (!mobileEmblaApi) return;
+    const onSelect = () => setMobileIdx(mobileEmblaApi.selectedScrollSnap());
+    mobileEmblaApi.on("select", onSelect);
+    onSelect();
+    return () => {
+      mobileEmblaApi.off("select", onSelect);
+    };
+  }, [mobileEmblaApi]);
+
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -78,6 +92,7 @@ const ListingOverlay = ({ id, onClose }: Props) => {
     images[0] ||
     "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1200&q=80";
   const extraImages = images.slice(1);
+  const allImages = images.length > 0 ? images : [cover];
 
   return (
     <motion.div
@@ -92,18 +107,72 @@ const ListingOverlay = ({ id, onClose }: Props) => {
         type="button"
         onClick={onClose}
         aria-label="Cerrar"
-        className="fixed top-3 right-3 z-[110] w-10 h-10 rounded-full bg-black/55 hover:bg-black/70 text-white flex items-center justify-center backdrop-blur-sm"
+        className="hidden sm:flex fixed top-3 right-3 z-[110] w-10 h-10 rounded-full bg-black/55 hover:bg-black/70 text-white items-center justify-center backdrop-blur-sm"
       >
         <X className="w-5 h-5" />
       </button>
 
-      {/* Shared cover image at top */}
+      {/* Mobile: unified full-width carousel with all images */}
+      <div className="sm:hidden relative w-full aspect-[4/3] bg-muted overflow-hidden">
+        <motion.div layout className="absolute inset-0">
+          <div ref={mobileEmblaRef} className="overflow-hidden h-full">
+            <div className="flex touch-pan-y h-full">
+              {allImages.map((src, i) => (
+                <div key={i} className="relative min-w-0 flex-[0_0_100%] h-full">
+                  {i === 0 ? (
+                    <motion.img
+                      layoutId={`listing-image-${id}`}
+                      transition={spring}
+                      src={src}
+                      alt={listing?.title || ""}
+                      className="w-full h-full object-cover"
+                      draggable={false}
+                    />
+                  ) : (
+                    <img
+                      src={src}
+                      alt={`${listing?.title || ""} - ${i + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      className="w-full h-full object-cover"
+                      draggable={false}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+        {/* Back button (mobile) */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Voltar"
+          className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full bg-black/45 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
+        {allImages.length > 1 && (
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm z-20">
+            {allImages.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all ${
+                  i === mobileIdx ? "w-4 bg-white" : "w-1.5 bg-white/60"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Desktop: shared cover image at top */}
       <motion.div
         layout
-        className="relative w-full aspect-[4/3] sm:aspect-[16/9] bg-muted overflow-hidden"
+        className="hidden sm:block relative w-full aspect-[16/9] bg-muted overflow-hidden"
       >
         <motion.img
-          layoutId={`listing-image-${id}`}
+          layoutId={isMobile ? undefined : `listing-image-${id}`}
           transition={spring}
           src={cover}
           alt={listing?.title || ""}
@@ -119,9 +188,9 @@ const ListingOverlay = ({ id, onClose }: Props) => {
         transition={{ duration: 0.35, delay: 0.2, ease: "easeOut" }}
         className="max-w-3xl mx-auto px-4 sm:px-6 py-5 sm:py-8"
       >
-        {/* Extra images carousel */}
+        {/* Extra images carousel (desktop only — mobile already unified above) */}
         {extraImages.length > 0 && (
-          <div className="relative mb-5 sm:mb-6 rounded-xl overflow-hidden bg-muted">
+          <div className="hidden sm:block relative mb-5 sm:mb-6 rounded-xl overflow-hidden bg-muted">
             <div ref={emblaRef} className="overflow-hidden">
               <div className="flex touch-pan-y">
                 {extraImages.map((src, i) => (
