@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Sparkles, ArrowRight, Stethoscope } from "lucide-react";
+import { ChevronLeft, ChevronRight, Sparkles, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
+import upapLogo from "@/assets/upap-logo.png";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapMedicinaBanner from "@/assets/upap-medicina-banner.jpg";
-import unaeBanner from "@/assets/unae-banner.jpg";
+import upapBanner from "@/assets/upap-banner.jpg";
 
 interface Slide {
   id: string;
@@ -26,18 +26,6 @@ interface Slide {
 
 const SLIDES: Slide[] = [
   {
-    id: "upap",
-    title_es: "Estudiá Medicina en la UPAP",
-    title_pt: "Estude Medicina na UPAP",
-    subtitle_es: "Formamos los médicos del futuro · Inscripciones abiertas",
-    subtitle_pt: "Formamos os médicos do futuro · Inscrições abertas",
-    cta_es: "Quiero ser médico",
-    cta_pt: "Quero ser médico",
-    href: "https://www.upap.edu.py",
-    accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
-    bgImage: upapMedicinaBanner,
-  },
-  {
     id: "clinica-la",
     title_es: "Lipoplastia mínimamente invasiva",
     title_pt: "Lipoplastia minimamente invasiva",
@@ -50,17 +38,17 @@ const SLIDES: Slide[] = [
     bgImage: clinicaLaBanner,
   },
   {
-    id: "unae",
-    title_es: "UNAE",
-    title_pt: "UNAE",
-    subtitle_es: "Universidad Autónoma de Encarnación",
-    subtitle_pt: "Universidade Autônoma de Encarnación",
-    cta_es: "Conocé la UNAE",
-    cta_pt: "Conheça a UNAE",
-    href: "/unae",
-    accent: "from-[#7a0a1f] via-[#5a061f] to-[#3d0414]",
-    bgImage: unaeBanner,
-    fullImage: true,
+    id: "upap",
+    title_es: "UPAP",
+    title_pt: "UPAP",
+    subtitle_es: "Inscripciones abiertas. Formá tu futuro con nosotros.",
+    subtitle_pt: "Inscrições abertas. Construa seu futuro conosco.",
+    cta_es: "Conocé UPAP",
+    cta_pt: "Conheça a UPAP",
+    href: "https://www.upap.edu.py",
+    accent: "from-[#7a0a2a] via-[#9b1c3d] to-[#5a061f]",
+    logo: upapLogo,
+    confetti: true,
   },
   {
     id: "neura",
@@ -129,7 +117,7 @@ const HeroCarousel = () => {
     const link = document.createElement("link");
     link.rel = "preload";
     link.as = "image";
-    link.href = upapMedicinaBanner;
+    link.href = clinicaLaBanner;
     // @ts-ignore - valid HTML attr
     link.fetchPriority = "high";
     document.head.appendChild(link);
@@ -169,7 +157,7 @@ const HeroCarousel = () => {
       <div
         ref={containerRef}
         className="relative overflow-hidden rounded-2xl border shadow-sm select-none touch-pan-y"
-        style={{ maxHeight: 300 }}
+        style={{ maxHeight: 250 }}
         onMouseDown={(e) => handleDragStart(e.clientX)}
         onMouseMove={(e) => handleDragMove(e.clientX)}
         onMouseUp={handleDragEnd}
@@ -192,7 +180,7 @@ const HeroCarousel = () => {
             <div
               key={s.id}
               className={cn(
-                "min-w-full h-[210px] sm:h-[260px] md:h-[300px] relative bg-gradient-to-br text-white",
+                "min-w-full h-[180px] sm:h-[220px] md:h-[250px] relative bg-gradient-to-br text-white",
                 s.accent
               )}
             >
@@ -202,7 +190,7 @@ const HeroCarousel = () => {
                   alt=""
                   aria-hidden
                   width={1200}
-                  height={576}
+                  height={500}
                   loading={slideIdx === 0 ? "eager" : "lazy"}
                   decoding={slideIdx === 0 ? "sync" : "async"}
                   // @ts-ignore - fetchpriority is a valid HTML attribute
@@ -259,69 +247,13 @@ const HeroCarousel = () => {
                 />
               )}
               {s.fullImage ? (
-                <>
-                  <a
-                    href={s.href}
-                    target={s.href.startsWith("http") ? "_blank" : undefined}
-                    rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    aria-label={isPt ? s.title_pt : s.title_es}
-                    className="absolute inset-0 z-10"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (s.href.startsWith("http")) {
-                        e.preventDefault();
-                        window.open(s.href, "_blank", "noopener,noreferrer");
-                      }
-                    }}
-                  />
-                  <div className="absolute bottom-3 sm:bottom-5 left-4 sm:left-8 z-20">
-                    <Button asChild variant="secondary" size="sm" className="bg-white text-[#7a0a1f] hover:bg-white/90 font-semibold text-xs sm:text-sm h-8 sm:h-9 shadow-lg">
-                      {s.href.startsWith("http") ? (
-                        <a
-                          href={s.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            window.open(s.href, "_blank", "noopener,noreferrer");
-                          }}
-                        >
-                          {isPt ? s.cta_pt : s.cta_es}
-                        </a>
-                      ) : (
-                        <Link to={s.href}>{isPt ? s.cta_pt : s.cta_es}</Link>
-                      )}
-                    </Button>
-                  </div>
-                </>
-              ) : s.id === "upap" ? (
-                <div className="relative h-full w-full">
-                  <div className="absolute inset-0 bg-gradient-to-r from-[#5a061f] via-[#5a061f]/85 to-transparent" aria-hidden />
-                  <div className="relative h-full w-full px-4 sm:px-10 flex flex-col justify-center max-w-[70%] sm:max-w-[60%]">
-                    <div className="inline-flex items-center gap-1.5 self-start mb-1.5 sm:mb-2 px-2.5 py-1 rounded-full bg-[#f5c542] text-[#5a061f] text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow">
-                      <Stethoscope className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                      {isPt ? "Faculdade de Medicina" : "Facultad de Medicina"}
-                    </div>
-                    <h2 className="text-lg sm:text-2xl md:text-4xl font-extrabold leading-tight drop-shadow-md">
-                      {isPt ? s.title_pt : s.title_es}
-                    </h2>
-                    <p className="mt-1 text-[11px] sm:text-sm text-white/95 max-w-md">
-                      {isPt ? s.subtitle_pt : s.subtitle_es}
-                    </p>
-                    <div className="mt-2 sm:mt-3">
-                      <a
-                        href={s.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 rounded-full bg-[#f5c542] text-[#5a061f] px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-bold hover:gap-3 hover:bg-[#ffd35a] transition-all shadow-md"
-                      >
-                        {isPt ? s.cta_pt : s.cta_es}
-                        <ArrowRight className="h-4 w-4" />
-                      </a>
-                    </div>
-                  </div>
-                </div>
+                <a
+                  href={s.href}
+                  target={s.href.startsWith("http") ? "_blank" : undefined}
+                  rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  aria-label={isPt ? s.title_pt : s.title_es}
+                  className="absolute inset-0"
+                />
               ) : s.id === "clinica-la" ? (
                 <div className="relative h-full w-full px-4 sm:px-10">
                   <h2 className="absolute top-1 sm:top-4 left-4 sm:left-10 right-4 sm:right-10 text-base sm:text-2xl md:text-4xl font-bold leading-tight drop-shadow-sm max-w-md">

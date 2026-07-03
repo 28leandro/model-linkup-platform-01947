@@ -3,12 +3,6 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@/components/ui/use-toast';
-import {
-  getPasswordResetRedirectUrl,
-  markPasswordRecoveryActive,
-  rememberPasswordResetEmail,
-  shouldTreatUrlAsPasswordRecovery,
-} from '@/lib/passwordRecovery';
 
 interface AuthContextType {
   user: User | null;
@@ -36,8 +30,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // consumes the hash so the dedicated page handles the flow.
     if (typeof window !== 'undefined' && window.location.pathname !== '/reset-password') {
       const { search, hash } = window.location;
-      if (shouldTreatUrlAsPasswordRecovery()) {
-        markPasswordRecoveryActive();
+      const sp = new URLSearchParams(search);
+      const hp = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+      const isRecovery =
+        sp.get('type') === 'recovery' ||
+        hp.get('type') === 'recovery' ||
+        (sp.has('code') && sp.get('type') === 'recovery');
+      if (isRecovery) {
         window.location.replace('/reset-password' + search + hash);
         return;
       }
@@ -63,9 +62,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // this event. Redirect to /reset-password — the page handles the
         // password update form.
         if (event === 'PASSWORD_RECOVERY') {
-          markPasswordRecoveryActive();
-          setSession(newSession);
-          setUser(newSession?.user ?? null);
           if (window.location.pathname !== '/reset-password') {
             window.location.replace('/reset-password');
           }
@@ -193,7 +189,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const resetPassword = async (email: string) => {
-    const redirectUrl = getPasswordResetRedirectUrl();
+    const redirectUrl = `${window.location.origin}/reset-password`;
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
     });
@@ -204,7 +200,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         variant: "destructive",
       });
     } else {
-      rememberPasswordResetEmail(email);
       toast({
         title: "Email enviado!",
         description: "Verifique sua caixa de entrada para redefinir sua senha.",

@@ -15,8 +15,7 @@ import StoreBadgesBar from "@/components/StoreBadgesBar";
 
 import ListingFilter, { SortOption, FilterOptions, FuelType } from "@/components/ListingFilter";
 import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter";
-import { CITY_COORDS } from "@/lib/cityCoords";
-import { listingMatchesLocationFilter } from "@/lib/locationFilters";
+import { distanceKm, CITY_COORDS } from "@/lib/cityCoords";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { supabase } from "@/integrations/supabase/client";
 import MobileSearchDialog from "@/components/MobileSearchDialog";
@@ -241,8 +240,15 @@ const Index = () => {
   const sortedListings = useMemo(() => {
     let listings = hasSearched ? filteredListings : allListings;
     
-    if (locationFilter.city || locationFilter.radiusKm > 0) {
-      listings = listings.filter((l) => listingMatchesLocationFilter(l, locationFilter));
+    // Apply location/radius filter
+    if (locationFilter.lat !== undefined && locationFilter.lon !== undefined && locationFilter.radiusKm > 0) {
+      listings = listings.filter((l) => {
+        if (!l.latitude || !l.longitude) return false;
+        return (
+          distanceKm(locationFilter.lat!, locationFilter.lon!, l.latitude, l.longitude) <=
+          locationFilter.radiusKm
+        );
+      });
     }
 
     // Apply price filter

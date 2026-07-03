@@ -9,10 +9,7 @@ import { useEffect, useState, useMemo } from "react";
 import type { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
 import ListingFilter, { SortOption, FilterOptions } from "@/components/ListingFilter";
-import LocationFilter, { LocationFilterValue } from "@/components/LocationFilter";
-import { CITY_COORDS } from "@/lib/cityCoords";
 import { getPublicCity } from "@/lib/utils";
-import { listingMatchesLocationFilter } from "@/lib/locationFilters";
 import { getCategoryById } from "@/lib/categories";
 import { Badge } from "@/components/ui/badge";
 import SEO from "@/components/SEO";
@@ -84,30 +81,6 @@ const CategoryPage = () => {
   const meta = getCategoryById(id || "");
   const [subFilter, setSubFilter] = useState<string>(searchParams.get("sub") || "all");
 
-  const [locationFilter, setLocationFilter] = useState<LocationFilterValue>(() => {
-    const city = searchParams.get("city") || undefined;
-    const lat = searchParams.get("lat");
-    const lon = searchParams.get("lon");
-    const radius = searchParams.get("radius");
-    const coords = city ? CITY_COORDS[city] : undefined;
-    return {
-      city,
-      lat: lat ? Number(lat) : coords?.lat,
-      lon: lon ? Number(lon) : coords?.lon,
-      radiusKm: radius ? Number(radius) : 0,
-    };
-  });
-
-  useEffect(() => {
-    const next = new URLSearchParams(searchParams);
-    if (locationFilter.city) next.set("city", locationFilter.city); else next.delete("city");
-    if (locationFilter.lat !== undefined) next.set("lat", String(locationFilter.lat)); else next.delete("lat");
-    if (locationFilter.lon !== undefined) next.set("lon", String(locationFilter.lon)); else next.delete("lon");
-    if (locationFilter.radiusKm) next.set("radius", String(locationFilter.radiusKm)); else next.delete("radius");
-    setSearchParams(next, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locationFilter]);
-
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
     if (subFilter && subFilter !== "all") next.set("sub", subFilter);
@@ -137,10 +110,6 @@ const CategoryPage = () => {
   // Apply filters and sort listings
   const sortedListings = useMemo(() => {
     let filtered = [...categoryListings];
-
-    if (locationFilter.city || locationFilter.radiusKm > 0) {
-      filtered = filtered.filter((l: any) => listingMatchesLocationFilter(l, locationFilter));
-    }
 
     if (meta?.subcategories && subFilter !== "all") {
       filtered = filtered.filter((l: any) => l.subcategory === subFilter);
@@ -225,7 +194,7 @@ const CategoryPage = () => {
       default:
         return filtered;
     }
-  }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type, subFilter, meta, locationFilter]);
+  }, [categoryListings, sortOption, filters, vehicleTypeFilter, propertyTypeFilter, serviceTypeFilter, category.type, subFilter, meta]);
 
   const seoEntry = CATEGORY_SEO[id || ""] ?? {
     title: "Categoría | NEMU.py",
@@ -254,9 +223,6 @@ const CategoryPage = () => {
       </header>
 
       <main className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
-        <div className="mb-4">
-          <LocationFilter value={locationFilter} onChange={setLocationFilter} />
-        </div>
         <div className="mb-4">
           <ListingFilter 
             sortOption={sortOption} 

@@ -9,19 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
 import { useLanguage } from "@/contexts/LanguageContext";
-import {
-  cleanPasswordRecoveryUrl,
-  clearPasswordRecoveryState,
-  getPasswordResetRedirectUrl,
-  getRecoveryUrlState,
-  getRememberedPasswordResetEmail,
-  isPasswordRecoveryActive,
-  markPasswordRecoveryActive,
-  rememberPasswordResetEmail,
-  shouldTreatUrlAsPasswordRecovery,
-} from "@/lib/passwordRecovery";
 
 type Status = "verifying" | "ready" | "invalid";
+
+const RESET_EMAIL_KEY = "passwordResetEmail";
 
 export default function ResetPassword() {
   const navigate = useNavigate();
@@ -44,15 +35,14 @@ export default function ResetPassword() {
     let cancelled = false;
 
     const verify = async () => {
-      const { code, tokenHash, type, hasHashTokens, hasAuthParams, error } = getRecoveryUrlState();
-      const recoveryLink = shouldTreatUrlAsPasswordRecovery() || Boolean(code || tokenHash || hasHashTokens);
-
-      if (recoveryLink) markPasswordRecoveryActive();
-
-      if (error) {
-        setStatus("invalid");
-        return;
-      }
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get("code");
+      const tokenHash = url.searchParams.get("token_hash");
+      const hashParams = new URLSearchParams(
+        url.hash.startsWith("#") ? url.hash.slice(1) : url.hash
+      );
+      const hashType = hashParams.get("type");
+      const hasHashTokens = hashParams.has("access_token");
 
       try {
         if (code) {
@@ -64,28 +54,20 @@ export default function ResetPassword() {
             type: "recovery",
           });
           if (error) throw error;
-        } else if (hasHashTokens && (type === "recovery" || recoveryLink)) {
+        } else if (hasHashTokens && hashType === "recovery") {
           // The SDK auto-parses the hash and fires PASSWORD_RECOVERY.
           // Wait briefly for the session to materialize.
-          await new Promise((r) => setTimeout(r, 800));
+          await new Promise((r) => setTimeout(r, 250));
         }
 
         const { data: { session } } = await supabase.auth.getSession();
         if (cancelled) return;
 
         // Clean the URL so the token isn't kept in history.
-        if (hasAuthParams) cleanPasswordRecoveryUrl();
-        setStatus(session && (recoveryLink || isPasswordRecoveryActive()) ? "ready" : "invalid");
+        window.history.replaceState({}, "", "/reset-password");
+        setStatus(session ? "ready" : "invalid");
       } catch (err) {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!cancelled) {
-          if (session && (recoveryLink || isPasswordRecoveryActive())) {
-            if (hasAuthParams) cleanPasswordRecoveryUrl();
-            setStatus("ready");
-          } else {
-            setStatus("invalid");
-          }
-        }
+        if (!cancelled) setStatus("invalid");
       }
     };
 
@@ -94,8 +76,7 @@ export default function ResetPassword() {
     // Catch PASSWORD_RECOVERY events fired after mount (implicit flow).
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY" && !cancelled) {
-        markPasswordRecoveryActive();
-        cleanPasswordRecoveryUrl();
+        window.history.replaceState({}, "", "/reset-password");
         setStatus("ready");
       }
     });
@@ -144,13 +125,18 @@ export default function ResetPassword() {
       title: t('resetPassword.successTitle'),
       description: t('resetPassword.successDesc'),
     });
-    clearPasswordRecoveryState();
     await supabase.auth.signOut();
     navigate("/", { replace: true });
   };
 
   const handleResend = async () => {
-    const email = getRememberedPasswordResetEmail();
+    const email = (() => {
+      try {
+        return sessionStorage.getItem(RESET_EMAIL_KEY);
+      } catch {
+        return null;
+      }
+    })();
 
     if (!email) {
       navigate("/forgot-password", { replace: true });
@@ -159,7 +145,7 @@ export default function ResetPassword() {
 
     setResending(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: getPasswordResetRedirectUrl(),
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     setResending(false);
 
@@ -172,7 +158,6 @@ export default function ResetPassword() {
       return;
     }
 
-    rememberPasswordResetEmail(email);
     toast({
       title: t('resetPassword.resendSuccess') || t('forgotPassword.successTitle'),
       description: t('resetPassword.resendDesc') || t('forgotPassword.successDesc'),
