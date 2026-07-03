@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import clinicaLaBanner from "@/assets/clinica-la-banner.jpg";
-import upapMedicinaBanner from "@/assets/upap-medicina-banner.png.asset.json";
+import upapMedicinaBanner from "@/assets/upap-medicina-banner.jpg.asset.json";
 import unaeBanner from "@/assets/unae-banner.jpg";
 
 interface Slide {
