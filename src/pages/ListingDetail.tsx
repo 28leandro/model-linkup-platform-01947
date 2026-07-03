@@ -214,11 +214,76 @@ const ListingDetail = () => {
         ogImage={seoImage}
         structuredData={productLd}
       />
-      <Header onLoginClick={() => setShowLoginDialog(true)} />
+      <div className="hidden sm:block">
+        <Header onLoginClick={() => setShowLoginDialog(true)} />
+      </div>
       <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
       <div className="min-h-screen bg-background">
+        {/* Mobile: full-bleed carousel at top with translucent back button */}
+        <div className="sm:hidden relative w-full aspect-[4/3] bg-muted overflow-hidden">
+          <div className="overflow-hidden h-full" ref={emblaRef}>
+            <div className="flex h-full touch-pan-y">
+              {(listing.images && listing.images.length > 0
+                ? listing.images
+                : ["https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=800&q=80"]
+              ).map((src, i) => (
+                <div key={i} className="relative min-w-0 flex-[0_0_100%] h-full">
+                  {i === 0 ? (
+                    <motion.img
+                      layoutId={`listing-image-${listing.id}`}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
+                      src={src}
+                      alt={`${listing.title} - Foto ${i + 1}`}
+                      loading="eager"
+                      decoding="async"
+                      draggable={false}
+                      className="w-full h-full object-cover select-none"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80";
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={src}
+                      alt={`${listing.title} - Foto ${i + 1}`}
+                      loading="lazy"
+                      decoding="async"
+                      draggable={false}
+                      className="w-full h-full object-cover select-none"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80";
+                      }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <Link
+            to="/"
+            aria-label={t('common.backToHome')}
+            className="absolute top-3 left-3 z-20 w-10 h-10 rounded-full bg-black/45 hover:bg-black/60 text-white flex items-center justify-center backdrop-blur-sm"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </Link>
+          {listing.images && listing.images.length > 1 && (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1.5 px-2 py-1 rounded-full bg-black/40 backdrop-blur-sm z-20">
+              {listing.images.map((_, i) => (
+                <span
+                  key={i}
+                  className={`h-1.5 rounded-full transition-all ${
+                    i === currentImageIndex ? "w-4 bg-white" : "w-1.5 bg-white/60"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
         <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
-          <Button asChild variant="ghost" size="sm" className="mb-4">
+          <Button asChild variant="ghost" size="sm" className="mb-4 hidden sm:inline-flex">
             <Link to="/" className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
               {t('common.backToHome')}
@@ -226,8 +291,8 @@ const ListingDetail = () => {
           </Button>
         <Card>
           <CardContent className="p-3 sm:p-6">
-            {/* Galeria de Fotos — carrossel com swipe e dots */}
-            <div className="relative aspect-[4/3] sm:aspect-[16/10] max-h-[260px] sm:max-h-[220px] md:max-h-[260px] lg:max-h-[300px] max-w-md sm:max-w-lg mx-auto bg-muted rounded-lg mb-2 overflow-hidden">
+            {/* Galeria de Fotos — desktop apenas (mobile já tem o carrossel full-bleed acima) */}
+            <div className="hidden sm:block relative aspect-[16/10] max-h-[220px] md:max-h-[260px] lg:max-h-[300px] max-w-lg mx-auto bg-muted rounded-lg mb-2 overflow-hidden">
               <div className="overflow-hidden h-full" ref={emblaRef}>
                 <div className="flex h-full touch-pan-y">
                   {(listing.images && listing.images.length > 0
@@ -237,7 +302,7 @@ const ListingDetail = () => {
                     <div key={i} className="relative min-w-0 flex-[0_0_100%] h-full">
                       {i === 0 ? (
                         <motion.img
-                          layoutId={`listing-image-${listing.id}`}
+                          layoutId={`listing-image-desktop-${listing.id}`}
                           transition={{ duration: 0.5, ease: "easeInOut" }}
                           src={src}
                           alt={`${listing.title} - Foto ${i + 1}`}
@@ -309,9 +374,9 @@ const ListingDetail = () => {
               )}
             </div>
 
-            {/* Miniaturas */}
+            {/* Miniaturas — desktop apenas */}
             {listing.images && listing.images.length > 1 && (
-              <div className="grid grid-cols-4 xs:grid-cols-5 gap-1.5 sm:gap-2 mb-2 sm:mb-3 max-w-md sm:max-w-lg mx-auto">
+              <div className="hidden sm:grid grid-cols-5 gap-2 mb-3 max-w-lg mx-auto">
                 {listing.images.map((image, index) => (
                   <button
                     key={index}
