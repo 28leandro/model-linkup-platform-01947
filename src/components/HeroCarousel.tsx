@@ -117,6 +117,7 @@ const HeroCarousel = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [translateX, setTranslateX] = useState(0);
+  const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     const t = setInterval(() => setIndex((i) => (i + 1) % SLIDES.length), 6000);
@@ -196,7 +197,7 @@ const HeroCarousel = () => {
                 s.accent
               )}
             >
-              {s.bgImage && (
+              {s.bgImage && !failedImages[s.id] && (
                 <img
                   src={s.bgImage}
                   alt=""
@@ -207,11 +208,14 @@ const HeroCarousel = () => {
                   decoding={slideIdx === 0 ? "sync" : "async"}
                   // @ts-ignore - fetchpriority is a valid HTML attribute
                   fetchpriority={slideIdx === 0 ? "high" : "low"}
-                    className={cn(
-                      "absolute inset-0 w-full h-full",
-                      s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" : 
-                        s.id === "upap" ? "object-cover object-right sm:object-center" : "object-cover"
-                    )}
+                  onError={() => {
+                    setFailedImages((current) => ({ ...current, [s.id]: true }));
+                  }}
+                  className={cn(
+                    "absolute inset-0 w-full h-full",
+                    s.fullImage ? "object-contain sm:object-cover object-center sm:object-top" :
+                      s.id === "upap" ? "object-cover object-right sm:object-center" : "object-cover"
+                  )}
                 />
               )}
               {!s.fullImage && s.id !== "upap" && (
