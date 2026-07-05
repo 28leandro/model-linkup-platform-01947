@@ -34,7 +34,10 @@ const SLIDES: Slide[] = [
     cta_es: "Quiero ser médico",
     cta_pt: "Quero ser médico",
     href: "https://www.upap.edu.py",
-    accent: "from-[#8a0a2a] via-[#a41739] to-[#6a0820]",
+    // Neutral dark accent — the actual image already carries the maroon
+    // gradient on its left side, so we avoid any red "flash" underneath
+    // that could look like a duplicate empty slide before the image loads.
+    accent: "from-[#2a1418] via-[#1a0d10] to-[#0f0708]",
     bgImage: upapMedicinaBanner,
   },
   {
@@ -209,7 +212,13 @@ const HeroCarousel = () => {
                   // @ts-ignore - fetchpriority is a valid HTML attribute
                   fetchpriority={slideIdx === 0 ? "high" : "low"}
                   onError={() => {
-                    setFailedImages((current) => ({ ...current, [s.id]: true }));
+                    // Do NOT permanently hide the bundled Vite image on a
+                    // transient error — that leaves the UPAP slide as a bare
+                    // red gradient that looks like a duplicate/broken slide.
+                    // The <img> will retry naturally on re-render.
+                    if (import.meta.env.DEV) {
+                      console.warn("[HeroCarousel] image failed to load:", s.id);
+                    }
                   }}
                   className={cn(
                     "absolute inset-0 w-full h-full",
