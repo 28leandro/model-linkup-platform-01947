@@ -25,12 +25,14 @@ import WhatsAppContactButton from "@/components/WhatsAppContactButton";
 import SimilarListings from "@/components/SimilarListings";
 import SEO from "@/components/SEO";
 import { RatingSystem } from "@/components/RatingSystem";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ListingDetail = () => {
   const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [listing, setListing] = useState<Listing | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -213,20 +215,51 @@ const ListingDetail = () => {
         ogImage={seoImage}
         structuredData={productLd}
       />
-      <Header onLoginClick={() => setShowLoginDialog(true)} />
+      {!isMobile && <Header onLoginClick={() => setShowLoginDialog(true)} />}
       <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-3 sm:px-4 py-4 sm:py-8 max-w-4xl">
-          <Button asChild variant="ghost" size="sm" className="mb-4">
-            <Link to="/" className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              {t('common.backToHome')}
-            </Link>
-          </Button>
-        <Card>
-          <CardContent className="p-3 sm:p-6">
+        {/* Mobile: full-bleed immersive gallery at the top of the viewport
+            with a floating back arrow overlayed on the photos. Desktop keeps
+            the previous constrained layout with a top back button. */}
+        {!isMobile && (
+          <div className="container mx-auto px-3 sm:px-4 pt-4 sm:pt-8 max-w-4xl">
+            <Button asChild variant="ghost" size="sm" className="mb-4">
+              <Link to="/" className="flex items-center gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                {t('common.backToHome')}
+              </Link>
+            </Button>
+          </div>
+        )}
+        <div
+          className={
+            isMobile
+              ? "pb-4"
+              : "container mx-auto px-3 sm:px-4 pb-8 max-w-4xl"
+          }
+        >
+        <Card className={isMobile ? "rounded-none border-0 shadow-none bg-transparent" : undefined}>
+          <CardContent className={isMobile ? "p-0" : "p-3 sm:p-6"}>
             {/* Galeria de Fotos — carrossel com swipe e dots */}
-            <div className="relative aspect-[4/3] sm:aspect-[16/10] max-h-[260px] sm:max-h-[220px] md:max-h-[260px] lg:max-h-[300px] max-w-md sm:max-w-lg mx-auto bg-muted rounded-lg mb-2 overflow-hidden">
+            <div
+              className={
+                isMobile
+                  ? "relative w-full aspect-[4/5] bg-muted overflow-hidden"
+                  : "relative aspect-[4/3] sm:aspect-[16/10] max-h-[260px] sm:max-h-[220px] md:max-h-[260px] lg:max-h-[300px] max-w-md sm:max-w-lg mx-auto bg-muted rounded-lg mb-2 overflow-hidden"
+              }
+            >
+              {/* Floating back arrow — mobile only, sits over the photo */}
+              {isMobile && (
+                <button
+                  type="button"
+                  onClick={() => navigate(-1)}
+                  aria-label={t('common.backToHome')}
+                  className="absolute top-3 left-3 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 text-white backdrop-blur-sm transition-colors"
+                  style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
+              )}
               <div className="overflow-hidden h-full" ref={emblaRef}>
                 <div className="flex h-full touch-pan-y">
                   {(listing.images && listing.images.length > 0
@@ -293,7 +326,10 @@ const ListingDetail = () => {
 
             {/* Miniaturas */}
             {listing.images && listing.images.length > 1 && (
-              <div className="grid grid-cols-4 xs:grid-cols-5 gap-1.5 sm:gap-2 mb-2 sm:mb-3 max-w-md sm:max-w-lg mx-auto">
+              <div className={isMobile
+                ? "hidden"
+                : "grid grid-cols-4 xs:grid-cols-5 gap-1.5 sm:gap-2 mb-2 sm:mb-3 max-w-md sm:max-w-lg mx-auto"
+              }>
                 {listing.images.map((image, index) => (
                   <button
                     key={index}
@@ -314,6 +350,7 @@ const ListingDetail = () => {
               </div>
             )}
 
+            <div className={isMobile ? "px-4 pt-4" : undefined}>
             <h1 className="text-xl sm:text-2xl font-bold mb-2">
               <EditableField
                 value={listing.title}
@@ -492,6 +529,7 @@ const ListingDetail = () => {
                   />
                 </div>
               )}
+            </div>
             </div>
           </CardContent>
         </Card>

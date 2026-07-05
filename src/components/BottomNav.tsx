@@ -18,6 +18,12 @@ const BottomNav = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const unreadCount = useUnreadMessages();
 
+  // Immersive listing detail on mobile: the detail page becomes full-screen
+  // with photos taking the top of the viewport, so we hide the bottom nav
+  // there to give the media room to breathe.
+  const isListingDetail = /^\/listing\/[^/]+/.test(location.pathname);
+  if (isListingDetail) return null;
+
   // If we're viewing a listing, focus the map on that listing
   const listingMatch = location.pathname.match(/^\/listing\/([^/]+)/);
   const mapHref = listingMatch ? `/map?focus=${listingMatch[1]}` : "/map";
