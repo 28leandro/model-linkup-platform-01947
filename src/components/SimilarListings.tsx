@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useListingCardClick } from "@/hooks/useListingCardClick";
 import { MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -211,6 +212,7 @@ const SimilarListings = ({
   year,
 }: SimilarListingsProps) => {
   const { t } = useLanguage();
+  const makeCardClick = useListingCardClick();
   const [items, setItems] = useState<SimilarItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -436,12 +438,13 @@ const SimilarListings = ({
                   title={item.title}
                   href={`/listing/${item.id}`}
                   noImageLabel={t("listings.noImage")}
-                  linkState={{ preview: item }}
+                  listing={item as any}
                 />
               </div>
               <Link
                 to={`/listing/${item.id}`}
                 state={{ preview: item }}
+                onClick={makeCardClick(item as any)}
                 className="block"
               >
                 <div className="pt-2 sm:pt-2.5 px-0.5">

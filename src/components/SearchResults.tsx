@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useListingCardClick } from "@/hooks/useListingCardClick";
 import VehicleInfo from "@/components/VehicleInfo";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -41,8 +42,8 @@ interface SearchResultsProps {
 
 const SearchResults = ({ listings }: SearchResultsProps) => {
   const { t } = useLanguage();
-  const location = useLocation();
   const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
+  const makeCardClick = useListingCardClick();
 
   return (
     <div className="container mx-auto px-3 sm:px-4 py-6 sm:py-8">
@@ -59,12 +60,13 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                 title={listing.title}
                 href={`/listing/${listing.id}`}
                 noImageLabel={t('listings.noImage')}
-                linkState={{ preview: listing, background: location }}
+                listing={listing}
               />
             </div>
             <Link
               to={`/listing/${listing.id}`}
-              state={{ preview: listing, background: location }}
+              state={{ preview: listing }}
+              onClick={makeCardClick(listing)}
               className="block"
             >
               <div className="pt-px px-0.5 leading-tight">

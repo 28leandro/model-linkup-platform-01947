@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useListingCardClick } from "@/hooks/useListingCardClick";
 import { Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -28,7 +29,7 @@ const cityOnly = (loc?: string) => {
 const RecentlyViewedCarousel = () => {
   const { items, clear } = useRecentlyViewed();
   const { t } = useLanguage();
-  const location = useLocation();
+  const makeCardClick = useListingCardClick();
 
   if (items.length === 0) return null;
 
@@ -63,12 +64,13 @@ const RecentlyViewedCarousel = () => {
                 title={item.title}
                 href={`/listing/${item.id}`}
                 noImageLabel={t("listings.noImage")}
-                linkState={{ preview: { id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price }, background: location }}
+                listing={{ id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price } as any}
               />
             </div>
             <Link
               to={`/listing/${item.id}`}
-              state={{ preview: { id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price }, background: location }}
+              state={{ preview: { id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price } }}
+              onClick={makeCardClick({ id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price } as any)}
               className="block"
             >
               <div className="pt-2 sm:pt-2.5 px-0.5">

@@ -29,20 +29,26 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ListingDetailProps {
   onClose?: () => void;
+  /** When rendered inside the modal, this is the listing snapshot passed
+   *  in by the context so the detail renders instantly without any fetch. */
+  initialListing?: Listing | null;
 }
 
-const ListingDetail = ({ onClose }: ListingDetailProps = {}) => {
+const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => {
   const { t } = useLanguage();
-  const { id } = useParams();
+  const params = useParams();
   const navigate = useNavigate();
   const location = useLocation();
-  const preview = (location.state as { preview?: Listing } | null)?.preview ?? null;
+  // In modal mode we don't have URL params — use the injected listing's id.
+  const id = params.id ?? initialListing?.id;
+  const previewFromState = (location.state as { preview?: Listing } | null)?.preview ?? null;
+  const seed = initialListing ?? previewFromState;
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [listing, setListing] = useState<Listing | null>(preview);
+  const [listing, setListing] = useState<Listing | null>(seed);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(!preview);
+  const [isLoading, setIsLoading] = useState(!seed);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
 
   useEffect(() => {

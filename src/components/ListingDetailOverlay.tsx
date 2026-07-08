@@ -1,43 +1,42 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 
 /**
- * Full-screen overlay wrapper for a listing detail. Rendered on top of the
- * previous page (Instagram-style modal routing) as an in-app modal.
+ * In-app modal that opens when the user taps a listing card.
  *
- * Critical correctness invariants:
- *   1. The overlay is portaled into `document.body` — never a scrollable
- *      ancestor — so `position: fixed` really anchors to the viewport,
- *      even if some intermediate wrapper uses `transform` or `filter`.
- *   2. Body scroll is locked using the iOS-safe fixed-position technique.
- *      Plain `overflow: hidden` does not stop touch scrolling on iOS.
- *   3. The inner scroll container is forced to `scrollTop = 0` before the
- *      first paint, so the detail always opens at the top.
- *   4. Uses `100dvh` so the modal fills the true visible viewport on
- *      mobile browsers (accounting for the URL bar).
- *
- * Closing the overlay plays the exit animation and then pops the router
- * stack, which unmounts the overlay and restores the background page.
+ * Key properties:
+ *   - Rendered via a portal into document.body — no scrollable ancestor
+ *     can trap it and `position: fixed` anchors to the real viewport.
+ *   - Uses framer-motion `layoutId` for the shared-element zoom from
+ *     the tapped card image to the hero image inside the modal.
+ *   - Closing calls `close()` (local state), never touches history.
+ *     Chrome/Brave back button therefore stays out of the picture.
+ *   - iOS-safe body scroll lock: freezes the underlying page with
+ *     position: fixed at a negative top so the listing stays exactly
+ *     where the user left it when the modal closes.
+ *   - Forces scrollTop = 0 on the inner scroll container before paint,
+ *     so the detail always opens from the top of the page.
  */
 const ListingDetailOverlay = () => {
-  const navigate = useNavigate();
-  const rootRef = useRef<HTMLDivElement | null>(null);
-  const [closing, setClosing] = useState(false);
+  const { listing, close } = useListingModal();
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const isOpen = listing !== null;
 
-  // Reset scroll before paint. `useLayoutEffect` runs after DOM mutations
-  // but before the browser paints, so the user never sees an intermediate
-  // scrolled state.
+  // Reset the modal's scroll to top before the first paint. Runs on every
+  // open — if the user opens two listings in a row, the second one still
+  // starts at the top.
   useLayoutEffect(() => {
-    if (rootRef.current) rootRef.current.scrollTop = 0;
-  }, []);
+    if (isOpen && scrollRef.current) scrollRef.current.scrollTop = 0;
+  }, [isOpen, listing?.id]);
 
-  // iOS-safe body scroll lock. `overflow: hidden` alone is not enough on
-  // iOS Safari — the page can still be swiped. Freezing the body with
-  // `position: fixed` at a negative top offset preserves the scroll
-  // position without allowing any movement.
+  // Lock the background page while the modal is open. `overflow: hidden`
+  // alone is not enough on iOS; freezing the body with position: fixed at
+  // a negative top offset is the reliable technique across browsers.
   useEffect(() => {
+    if (!isOpen) return;
     const scrollY = window.scrollY || window.pageYOffset || 0;
     const body = document.body;
     const prev = {
@@ -61,58 +60,89 @@ const ListingDetailOverlay = () => {
       body.style.right = prev.right;
       body.style.width = prev.width;
       body.style.overflow = prev.overflow;
-      // Restore the exact scroll position the user was on before opening.
+      // Restore the exact scroll position the user was on.
       window.scrollTo(0, scrollY);
     };
-  }, []);
-
-  const close = () => {
-    if (closing) return;
-    setClosing(true);
-    const el = rootRef.current;
-    const done = () => navigate(-1);
-    if (!el) {
-      done();
-      return;
-    }
-    const onEnd = () => {
-      el.removeEventListener("animationend", onEnd);
-      done();
-    };
-    el.addEventListener("animationend", onEnd);
-    // Safety net in case animationend never fires (e.g. reduced motion).
-    window.setTimeout(done, 260);
-  };
+  }, [isOpen]);
 
   // ESC closes on desktop.
   useEffect(() => {
+    if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isOpen, close]);
 
   if (typeof document === "undefined") return null;
 
   return createPortal(
-    <>
-      <div
-        className="listing-overlay-backdrop"
-        aria-hidden="true"
-        onClick={close}
-      />
-      <div
-        ref={rootRef}
-        className="listing-overlay"
-        data-closing={closing || undefined}
-        role="dialog"
-        aria-modal="true"
-      >
-        <ListingDetail onClose={close} />
-      </div>
-    </>,
+    <AnimatePresence>
+      {isOpen && listing && (
+        <>
+          <motion.div
+            key="listing-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            onClick={close}
+            aria-hidden="true"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: "rgba(0, 0, 0, 0.35)",
+              zIndex: 999,
+            }}
+          />
+          <motion.div
+            key="listing-modal"
+            layoutId={`listing-card-${listing.id}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              layout: { type: "spring", stiffness: 300, damping: 32 },
+              opacity: { duration: 0.18 },
+            }}
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "100dvh",
+              zIndex: 1000,
+              background: "hsl(var(--background))",
+              borderRadius: 0,
+              overflow: "hidden",
+              willChange: "transform, opacity",
+            }}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              ref={scrollRef}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                overflowY: "auto",
+                WebkitOverflowScrolling: "touch",
+                overscrollBehavior: "contain",
+              }}
+            >
+              <ListingDetail onClose={close} initialListing={listing} />
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>,
     document.body
   );
 };

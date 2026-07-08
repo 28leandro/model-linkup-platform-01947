@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { useListingCardClick } from "@/hooks/useListingCardClick";
 import { useMemo, useState } from "react";
 import { Ruler, Plus, ArrowRight } from "lucide-react";
 import VehicleInfo from "@/components/VehicleInfo";
@@ -29,9 +30,9 @@ interface RecentListingsProps {
 
 const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: RecentListingsProps) => {
   const { t, language } = useLanguage();
-  const location = useLocation();
   const isPt = language === "pt";
   const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
+  const makeCardClick = useListingCardClick();
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   const groups = useMemo(() => {
@@ -57,12 +58,13 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
           href={`/listing/${listing.id}`}
           noImageLabel={t('listings.noImage')}
           priority={priority}
-          linkState={{ preview: listing, background: location }}
+          listing={listing}
         />
       </div>
       <Link
         to={`/listing/${listing.id}`}
-        state={{ preview: listing, background: location }}
+        state={{ preview: listing }}
+        onClick={makeCardClick(listing)}
         className="block"
       >
         <div className="pt-px px-0.5 leading-tight">
