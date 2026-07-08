@@ -4,7 +4,7 @@ import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
-const ENTER_MS = 380;
+const ENTER_MS = 520;
 // El exit conserva el mismo perfil (mismo transform-origin, easing
 // espejo) pero más corto — cerrar debería sentirse ágil.
 const EXIT_MS = 240;
