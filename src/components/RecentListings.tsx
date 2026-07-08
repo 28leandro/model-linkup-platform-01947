@@ -56,9 +56,15 @@ const RecentListings = ({ listings, initialLimit = 8, expandMode = "inline" }: R
           href={`/listing/${listing.id}`}
           noImageLabel={t('listings.noImage')}
           priority={priority}
+          linkState={{ preview: listing }}
         />
       </div>
-      <Link to={`/listing/${listing.id}`} className="block">
+      <Link
+        to={`/listing/${listing.id}`}
+        state={{ preview: listing }}
+        unstable_viewTransition
+        className="block"
+      >
         <div className="pt-px px-0.5 leading-tight">
           <div className="flex items-center gap-1 mb-0 flex-wrap min-h-[18px]">
             <span className="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] sm:text-[11px] font-medium opacity-0">—</span>

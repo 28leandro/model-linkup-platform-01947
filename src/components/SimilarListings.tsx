@@ -436,9 +436,15 @@ const SimilarListings = ({
                   title={item.title}
                   href={`/listing/${item.id}`}
                   noImageLabel={t("listings.noImage")}
+                  linkState={{ preview: item }}
                 />
               </div>
-              <Link to={`/listing/${item.id}`} className="block">
+              <Link
+                to={`/listing/${item.id}`}
+                state={{ preview: item }}
+                unstable_viewTransition
+                className="block"
+              >
                 <div className="pt-2 sm:pt-2.5 px-0.5">
                   <h3 className="font-normal text-sm sm:text-base mb-0.5 line-clamp-1 text-foreground">
                     {item.title}

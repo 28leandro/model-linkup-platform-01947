@@ -12,6 +12,7 @@ interface ListingImageCarouselProps {
   aspectClassName?: string;
   noImageLabel: string;
   priority?: boolean;
+  linkState?: unknown;
 }
 
 const FALLBACK =
@@ -25,6 +26,7 @@ const ListingImageCarousel = ({
   aspectClassName = "aspect-square lg:aspect-[3/4]",
   noImageLabel,
   priority = false,
+  linkState,
 }: ListingImageCarouselProps) => {
   const { isFavorite, toggleFavorite } = useFavorites();
   const favorite = isFavorite(listingId);
@@ -39,9 +41,18 @@ const ListingImageCarousel = ({
   };
 
   return (
-    <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
+    <div
+      className={cn("relative overflow-hidden bg-muted group", aspectClassName)}
+      style={{ viewTransitionName: `listing-image-${listingId}` } as React.CSSProperties}
+    >
       {hasImages ? (
-        <Link to={href} className="absolute inset-0 block" draggable={false}>
+        <Link
+          to={href}
+          state={linkState}
+          unstable_viewTransition
+          className="absolute inset-0 block"
+          draggable={false}
+        >
           <AdaptiveImage
             src={cover}
             alt={title}
@@ -56,7 +67,12 @@ const ListingImageCarousel = ({
           />
         </Link>
       ) : (
-        <Link to={href} className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs">
+        <Link
+          to={href}
+          state={linkState}
+          unstable_viewTransition
+          className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs"
+        >
           {noImageLabel}
         </Link>
       )}

@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,12 +31,14 @@ const ListingDetail = () => {
   const { t } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const preview = (location.state as { preview?: Listing } | null)?.preview ?? null;
   const { user } = useAuth();
   const isMobile = useIsMobile();
   const [showLoginDialog, setShowLoginDialog] = useState(false);
-  const [listing, setListing] = useState<Listing | null>(null);
+  const [listing, setListing] = useState<Listing | null>(preview);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!preview);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: "start" });
 
   useEffect(() => {
@@ -224,7 +226,7 @@ const ListingDetail = () => {
         {!isMobile && (
           <div className="container mx-auto px-3 sm:px-4 pt-4 sm:pt-8 max-w-4xl">
             <Button asChild variant="ghost" size="sm" className="mb-4">
-              <Link to="/" className="flex items-center gap-2">
+              <Link to="/" unstable_viewTransition className="flex items-center gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 {t('common.backToHome')}
               </Link>
@@ -247,12 +249,13 @@ const ListingDetail = () => {
                   ? "relative w-full aspect-[4/5] bg-muted overflow-hidden"
                   : "relative aspect-[4/3] sm:aspect-[16/10] max-h-[260px] sm:max-h-[220px] md:max-h-[260px] lg:max-h-[300px] max-w-md sm:max-w-lg mx-auto bg-muted rounded-lg mb-2 overflow-hidden"
               }
+              style={{ viewTransitionName: id ? `listing-image-${id}` : undefined } as React.CSSProperties}
             >
               {/* Floating back arrow — mobile only, sits over the photo */}
               {isMobile && (
                 <button
                   type="button"
-                  onClick={() => navigate(-1)}
+                  onClick={() => navigate(-1, { unstable_viewTransition: true } as any)}
                   aria-label={t('common.backToHome')}
                   className="absolute top-3 left-3 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-black/35 hover:bg-black/55 text-white backdrop-blur-sm transition-colors"
                   style={{ top: "calc(env(safe-area-inset-top, 0px) + 12px)" }}

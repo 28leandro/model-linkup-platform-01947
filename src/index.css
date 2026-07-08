@@ -114,3 +114,23 @@
     height: auto;
   }
 }
+
+/* View Transitions API — shared-element transition entre card y detalle. */
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 220ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  ::view-transition-group(*) {
+    animation-duration: 320ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

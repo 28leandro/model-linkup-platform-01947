@@ -58,9 +58,15 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                 title={listing.title}
                 href={`/listing/${listing.id}`}
                 noImageLabel={t('listings.noImage')}
+                linkState={{ preview: listing }}
               />
             </div>
-            <Link to={`/listing/${listing.id}`} className="block">
+            <Link
+              to={`/listing/${listing.id}`}
+              state={{ preview: listing }}
+              unstable_viewTransition
+              className="block"
+            >
               <div className="pt-px px-0.5 leading-tight">
                 <div className="flex items-center gap-1.5 mb-0 min-h-[18px]">
                   {getCategoryIcon(listing.type) ? (
