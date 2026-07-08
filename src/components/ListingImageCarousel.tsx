@@ -1,6 +1,5 @@
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useFavorites } from "@/hooks/useFavorites";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -60,10 +59,7 @@ const ListingImageCarousel = ({
   };
 
   return (
-    <motion.div
-      layoutId={listing ? `listing-card-${listingId}` : undefined}
-      className={cn("relative overflow-hidden bg-muted group", aspectClassName)}
-    >
+    <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
         <Link
           to={href}
@@ -111,7 +107,7 @@ const ListingImageCarousel = ({
           strokeWidth={2}
         />
       </button>
-    </motion.div>
+    </div>
   );
 };
 
