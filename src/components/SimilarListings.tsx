@@ -442,7 +442,6 @@ const SimilarListings = ({
               <Link
                 to={`/listing/${item.id}`}
                 state={{ preview: item }}
-                unstable_viewTransition
                 className="block"
               >
                 <div className="pt-2 sm:pt-2.5 px-0.5">

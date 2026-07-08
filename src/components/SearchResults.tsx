@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import VehicleInfo from "@/components/VehicleInfo";
 import { Listing } from "@/store/listingsStore";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -41,6 +41,7 @@ interface SearchResultsProps {
 
 const SearchResults = ({ listings }: SearchResultsProps) => {
   const { t } = useLanguage();
+  const location = useLocation();
   const cheapestIds = useMemo(() => getCheapestIds(listings as any[]), [listings]);
 
   return (
@@ -58,13 +59,12 @@ const SearchResults = ({ listings }: SearchResultsProps) => {
                 title={listing.title}
                 href={`/listing/${listing.id}`}
                 noImageLabel={t('listings.noImage')}
-                linkState={{ preview: listing }}
+                linkState={{ preview: listing, background: location }}
               />
             </div>
             <Link
               to={`/listing/${listing.id}`}
-              state={{ preview: listing }}
-              unstable_viewTransition
+              state={{ preview: listing, background: location }}
               className="block"
             >
               <div className="pt-px px-0.5 leading-tight">

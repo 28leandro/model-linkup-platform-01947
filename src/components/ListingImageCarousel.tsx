@@ -41,15 +41,11 @@ const ListingImageCarousel = ({
   };
 
   return (
-    <div
-      className={cn("relative overflow-hidden bg-muted group", aspectClassName)}
-      style={{ viewTransitionName: `listing-image-${listingId}` } as React.CSSProperties}
-    >
+    <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
       {hasImages ? (
         <Link
           to={href}
           state={linkState}
-          unstable_viewTransition
           className="absolute inset-0 block"
           draggable={false}
         >
@@ -70,7 +66,6 @@ const ListingImageCarousel = ({
         <Link
           to={href}
           state={linkState}
-          unstable_viewTransition
           className="absolute inset-0 flex items-center justify-center text-muted-foreground text-xs"
         >
           {noImageLabel}

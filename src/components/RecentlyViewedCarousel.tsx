@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Clock, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRecentlyViewed } from "@/hooks/useRecentlyViewed";
@@ -28,6 +28,7 @@ const cityOnly = (loc?: string) => {
 const RecentlyViewedCarousel = () => {
   const { items, clear } = useRecentlyViewed();
   const { t } = useLanguage();
+  const location = useLocation();
 
   if (items.length === 0) return null;
 
@@ -62,13 +63,12 @@ const RecentlyViewedCarousel = () => {
                 title={item.title}
                 href={`/listing/${item.id}`}
                 noImageLabel={t("listings.noImage")}
-                linkState={{ preview: { id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price } }}
+                linkState={{ preview: { id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price }, background: location }}
               />
             </div>
             <Link
               to={`/listing/${item.id}`}
-              state={{ preview: { id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price } }}
-              unstable_viewTransition
+              state={{ preview: { id: item.id, title: item.title, images: item.image ? [item.image] : [], price: item.price }, background: location }}
               className="block"
             >
               <div className="pt-2 sm:pt-2.5 px-0.5">
