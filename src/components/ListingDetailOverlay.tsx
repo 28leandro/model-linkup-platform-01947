@@ -59,11 +59,14 @@ const ListingDetailOverlay = () => {
   // one frame lands the initial styles, the next triggers the transition.
   useLayoutEffect(() => {
     if (!rendered || exiting) return;
+    let raf2 = 0;
     const raf1 = requestAnimationFrame(() => {
-      const raf2 = requestAnimationFrame(() => setEntered(true));
-      (raf1 as unknown as { _raf2?: number })._raf2 = raf2;
+      raf2 = requestAnimationFrame(() => setEntered(true));
     });
-    return () => cancelAnimationFrame(raf1);
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2) cancelAnimationFrame(raf2);
+    };
   }, [rendered?.id, exiting]);
 
   // Force scrollTop=0 before paint so the detail always opens from top.
