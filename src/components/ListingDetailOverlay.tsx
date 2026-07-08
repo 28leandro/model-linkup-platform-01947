@@ -7,9 +7,13 @@ import type { Listing } from "@/store/listingsStore";
 const ENTER_MS = 520;
 // El exit conserva el mismo perfil (mismo transform-origin, easing
 // espejo) pero más corto — cerrar debería sentirse ágil.
-const EXIT_MS = 240;
-const ENTER_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
-const EXIT_EASING = "cubic-bezier(0.7, 0, 0.84, 0)";
+const EXIT_MS = 260;
+// Curva usada por iOS/Apple para animaciones de sistema — arranque
+// muy suave y desaceleración larga. Se percibe más "orgánica" que
+// la curva anterior (0.16, 1, 0.3, 1), que era demasiado seca.
+const ENTER_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
+// Espejo temporal del enter — arranque lento, aceleración final.
+const EXIT_EASING = "cubic-bezier(0.32, 0, 0.67, 0)";
 
 const releaseBodyLock = () => {
   const b = document.body;
