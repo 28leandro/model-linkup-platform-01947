@@ -4,9 +4,10 @@ import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
-const ENTER_MS = 320;
-const EXIT_MS = 200;
-const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
+const ENTER_MS = 420;
+const EXIT_MS = 260;
+const ENTER_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
+const EXIT_EASING = "cubic-bezier(0.4, 0, 1, 1)";
 
 const releaseBodyLock = () => {
   const b = document.body;
@@ -97,47 +98,71 @@ const ListingDetailOverlay = () => {
   // completes; `forwards` on the exit animation freezes it at the last
   // frame until React unmounts the element.
   const animation = exiting
-    ? `airbnbDetailExit ${EXIT_MS}ms ${EASING} forwards`
-    : `airbnbDetailEnter ${ENTER_MS}ms ${EASING} both`;
+    ? `airbnbDetailExit ${EXIT_MS}ms ${EXIT_EASING} forwards`
+    : `airbnbDetailEnter ${ENTER_MS}ms ${ENTER_EASING} both`;
+
+  // Backdrop entra 2x más rápido que el modal para tapar la página
+  // de fondo antes de que se note el slide-up.
+  const backdropAnim = exiting
+    ? `airbnbBackdropExit ${EXIT_MS}ms ${EXIT_EASING} forwards`
+    : `airbnbBackdropEnter 160ms ease-out both`;
 
   return createPortal(
-    <div
-      role="dialog"
-      aria-modal="true"
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        height: "100dvh",
-        zIndex: 9999,
-        background: "hsl(var(--background))",
-        overflow: "hidden",
-        animation,
-        transformOrigin: "center top",
-        willChange: "transform, opacity",
-        backfaceVisibility: "hidden",
-        WebkitBackfaceVisibility: "hidden",
-        WebkitFontSmoothing: "antialiased",
-        MozOsxFontSmoothing: "grayscale",
-      }}
-    >
+    <>
+      {/* Backdrop opaco del mismo color que el modal — aparece
+          instantáneamente para tapar la página de fondo mientras
+          el modal aún está subiendo desde abajo. */}
       <div
-        ref={scrollRef}
+        aria-hidden="true"
         style={{
-          position: "absolute",
+          position: "fixed",
           top: 0,
           left: 0,
           right: 0,
           bottom: 0,
-          overflowY: "auto",
-          WebkitOverflowScrolling: "touch",
-          overscrollBehavior: "contain",
+          zIndex: 9998,
+          background: "hsl(var(--background))",
+          animation: backdropAnim,
+          willChange: "opacity",
+        }}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: "100dvh",
+          zIndex: 9999,
+          background: "hsl(var(--background))",
+          overflow: "hidden",
+          animation,
+          willChange: "transform",
+          backfaceVisibility: "hidden",
+          WebkitBackfaceVisibility: "hidden",
+          WebkitFontSmoothing: "antialiased",
+          MozOsxFontSmoothing: "grayscale",
         }}
       >
-        <ListingDetail onClose={close} initialListing={rendered} />
+        <div
+          ref={scrollRef}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch",
+            overscrollBehavior: "contain",
+          }}
+        >
+          <ListingDetail onClose={close} initialListing={rendered} />
+        </div>
       </div>
-    </div>,
+    </>,
     document.body
   );
 };
