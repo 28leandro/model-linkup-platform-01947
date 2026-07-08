@@ -21,60 +21,40 @@ const releaseBodyLock = () => {
 /**
  * Fullscreen modal for a listing detail.
  *
- * Animation is driven by inline styles + CSS transitions. Two ticks
- * of requestAnimationFrame between mount-with-initial-style and
- * flip-to-final-style guarantee the browser paints the initial frame
- * first, so the transition actually runs. This bypasses any external
- * CSS conflict — the transition is right on the element.
+ * Animation: pure CSS @keyframes referenced via inline `animation`.
+ * Keyframes run automatically when the element mounts, so we don't
+ * depend on React repainting an "initial pose" before flipping to
+ * "final pose" (which React 18 concurrent rendering can silently
+ * skip, causing the modal to appear instantly instead of animating).
  */
 const ListingDetailOverlay = () => {
   const { listing, close } = useListingModal();
   const [rendered, setRendered] = useState<Listing | null>(null);
-  const [entered, setEntered] = useState(false);
   const [exiting, setExiting] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const savedScrollRef = useRef(0);
   const isVisible = rendered !== null;
 
-  // Sync context.listing → local render state, with delayed unmount so
-  // the exit animation has time to play.
+  // Sync context.listing → local render state. Keep the modal in the
+  // DOM during the exit animation, then unmount.
   useEffect(() => {
     if (listing) {
       setRendered(listing);
       setExiting(false);
-      setEntered(false); // start from the "enter" initial pose
     } else if (rendered) {
       setExiting(true);
       const t = window.setTimeout(() => {
         setRendered(null);
         setExiting(false);
-        setEntered(false);
       }, EXIT_MS);
       return () => window.clearTimeout(t);
     }
   }, [listing]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // After the initial paint with the "enter" pose, flip to the final
-  // pose on the next animation frame. The double rAF is critical:
-  // one frame lands the initial styles, the next triggers the transition.
-  useLayoutEffect(() => {
-    if (!rendered || exiting) return;
-    let raf2 = 0;
-    const raf1 = requestAnimationFrame(() => {
-      raf2 = requestAnimationFrame(() => setEntered(true));
-    });
-    return () => {
-      cancelAnimationFrame(raf1);
-      if (raf2) cancelAnimationFrame(raf2);
-    };
-  }, [rendered?.id, exiting]);
-
-  // Force scrollTop=0 before paint so the detail always opens from top.
   useLayoutEffect(() => {
     if (isVisible && scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [isVisible, rendered?.id]);
 
-  // Body scroll-lock (iOS-safe).
   useEffect(() => {
     if (!isVisible) return;
     const scrollY = window.scrollY || window.pageYOffset || 0;
@@ -92,7 +72,6 @@ const ListingDetailOverlay = () => {
     };
   }, [isVisible]);
 
-  // Safety net.
   useEffect(() => {
     const onHide = () => releaseBodyLock();
     window.addEventListener("pagehide", onHide);
@@ -102,7 +81,6 @@ const ListingDetailOverlay = () => {
     };
   }, []);
 
-  // ESC closes on desktop.
   useEffect(() => {
     if (!isVisible) return;
     const onKey = (e: KeyboardEvent) => {
@@ -114,14 +92,13 @@ const ListingDetailOverlay = () => {
 
   if (typeof document === "undefined" || !rendered) return null;
 
-  // Compute the visual pose. "Enter initial" and "exit final" share the
-  // same shrunken look; "entered" is the fully open pose.
-  // Elegant Airbnb-style pose: subtle scale + short lift, main effect is
-  // the fade + gentle upward glide.
-  const opacity = exiting ? 0 : entered ? 1 : 0;
-  const scale = exiting ? 0.98 : entered ? 1 : 0.96;
-  const translateY = exiting ? 8 : entered ? 0 : 16;
-  const durationMs = exiting ? EXIT_MS : ENTER_MS;
+  // Inline `animation` references the @keyframes defined in index.css.
+  // Using `both` fill-mode keeps the final pose after the animation
+  // completes; `forwards` on the exit animation freezes it at the last
+  // frame until React unmounts the element.
+  const animation = exiting
+    ? `airbnbDetailExit ${EXIT_MS}ms ${EASING} forwards`
+    : `airbnbDetailEnter ${ENTER_MS}ms ${EASING} both`;
 
   return createPortal(
     <div
@@ -136,12 +113,8 @@ const ListingDetailOverlay = () => {
         zIndex: 9999,
         background: "hsl(var(--background))",
         overflow: "hidden",
-        opacity,
-        // translateZ(0) forces a compositor layer so the transform is
-        // GPU-accelerated on mobile → smoother 60fps animation.
-        transform: `translateZ(0) scale(${scale}) translateY(${translateY}px)`,
+        animation,
         transformOrigin: "center top",
-        transition: `opacity ${durationMs}ms ${EASING}, transform ${durationMs}ms ${EASING}`,
         willChange: "transform, opacity",
         backfaceVisibility: "hidden",
         WebkitBackfaceVisibility: "hidden",
