@@ -5,8 +5,9 @@ import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
 const ENTER_MS = 380;
-// El exit es el reverso del enter: misma duración, easing espejo.
-const EXIT_MS = 380;
+// El exit conserva el mismo perfil (mismo transform-origin, easing
+// espejo) pero más corto — cerrar debería sentirse ágil.
+const EXIT_MS = 240;
 const ENTER_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
 const EXIT_EASING = "cubic-bezier(0.7, 0, 0.84, 0)";
 
