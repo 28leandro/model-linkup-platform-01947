@@ -157,14 +157,17 @@
   }
 }
 
-@keyframes airbnbDetailZoomOut {
+/* Salida limpia: fade + leve scale down desde el centro. Se prefiere
+   sobre un zoom-out al punto de origen porque colapsar hacia una
+   esquina se percibe como "la página se cae" en vez de disolverse. */
+@keyframes airbnbDetailFadeOut {
   from {
     opacity: 1;
     transform: scale(1);
   }
   to {
     opacity: 0;
-    transform: scale(0);
+    transform: scale(0.96);
   }
 }
 

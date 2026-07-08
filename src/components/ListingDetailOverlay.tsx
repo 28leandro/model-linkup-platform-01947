@@ -4,10 +4,10 @@ import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
-const ENTER_MS = 420;
-const EXIT_MS = 260;
+const ENTER_MS = 520;
+const EXIT_MS = 240;
 const ENTER_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
-const EXIT_EASING = "cubic-bezier(0.4, 0, 1, 1)";
+const EXIT_EASING = "cubic-bezier(0.4, 0, 0.2, 1)";
 
 const releaseBodyLock = () => {
   const b = document.body;
@@ -100,20 +100,24 @@ const ListingDetailOverlay = () => {
   // Using `both` fill-mode keeps the final pose after the animation
   // completes; `forwards` on the exit animation freezes it at the last
   // frame until React unmounts the element.
-  // If we captured the tap position, zoom in/out from that point.
-  // Otherwise fall back to slide-up/down.
+  // Entrada: si tenemos la posición del tap, zoom desde ese punto
+  // (efecto Airbnb). Sin origen: slide-up de fallback.
+  // Salida: SIEMPRE fade + scale sutil desde el centro. Colapsar hacia
+  // la esquina de origen se veía como "la página se cae hacia un punto"
+  // y sentía sucio.
   const hasOrigin = renderedOrigin !== null;
   const animation = exiting
-    ? hasOrigin
-      ? `airbnbDetailZoomOut ${EXIT_MS}ms ${EXIT_EASING} forwards`
-      : `airbnbDetailExit ${EXIT_MS}ms ${EXIT_EASING} forwards`
+    ? `airbnbDetailFadeOut ${EXIT_MS}ms ${EXIT_EASING} forwards`
     : hasOrigin
       ? `airbnbDetailZoomIn ${ENTER_MS}ms ${ENTER_EASING} both`
       : `airbnbDetailEnter ${ENTER_MS}ms ${ENTER_EASING} both`;
 
-  const transformOrigin = hasOrigin
-    ? `${renderedOrigin.x}px ${renderedOrigin.y}px`
-    : "center center";
+  // El origen solo aplica en el enter. En el exit usamos el centro
+  // para que el fade sea homogéneo.
+  const transformOrigin =
+    !exiting && hasOrigin
+      ? `${renderedOrigin.x}px ${renderedOrigin.y}px`
+      : "center center";
 
   // Backdrop entra 2x más rápido que el modal para tapar la página
   // de fondo antes de que se note el slide-up.
