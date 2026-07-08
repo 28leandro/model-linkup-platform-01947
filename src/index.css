@@ -150,8 +150,14 @@
 }
 .listing-overlay {
   position: fixed;
-  inset: 0;
-  z-index: 60;
+  top: 0;
+  left: 0;
+  right: 0;
+  /* 100dvh reflects the real visible viewport on mobile (respects the URL
+     bar). Fallback to 100vh for older browsers. */
+  height: 100vh;
+  height: 100dvh;
+  z-index: 1000;
   background: hsl(var(--background));
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -159,14 +165,20 @@
   animation: listing-overlay-enter 260ms cubic-bezier(0.22, 1, 0.36, 1);
   transform-origin: center center;
   will-change: transform, opacity;
+  /* Always render from the top; the ref also forces scrollTop = 0. */
+  scroll-behavior: auto;
 }
 .listing-overlay[data-closing="true"] {
   animation: listing-overlay-exit 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 .listing-overlay-backdrop {
   position: fixed;
-  inset: 0;
-  z-index: 59;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100vh;
+  height: 100dvh;
+  z-index: 999;
   background: rgba(0, 0, 0, 0.35);
   animation: listing-overlay-backdrop-in 220ms ease-out;
 }
