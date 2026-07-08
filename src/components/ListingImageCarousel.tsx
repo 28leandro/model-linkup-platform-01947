@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -15,8 +16,6 @@ interface ListingImageCarouselProps {
   aspectClassName?: string;
   noImageLabel: string;
   priority?: boolean;
-  /** Full listing snapshot; when provided AND on mobile, tapping the
-   *  card opens the in-app modal instead of navigating to a new page. */
   listing?: Listing | null;
 }
 
@@ -37,6 +36,7 @@ const ListingImageCarousel = ({
   const isMobile = useIsMobile();
   const { open } = useListingModal();
   const favorite = isFavorite(listingId);
+  const cardRef = useRef<HTMLDivElement | null>(null);
 
   const hasImages = images && images.length > 0;
   const cover = hasImages ? images[0] : FALLBACK;
@@ -47,19 +47,34 @@ const ListingImageCarousel = ({
     await toggleFavorite(listingId);
   };
 
-  // On mobile: intercept the click, open the modal via local state.
-  // On desktop or when we don't have the full listing: fall through to
-  // Link navigation (works for deep-linking and back/forward buttons).
   const handleNavigate = (e: React.MouseEvent) => {
-    if (isMobile && listing) {
-      e.preventDefault();
-      e.stopPropagation();
-      open(listing);
+    if (!isMobile || !listing) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // eslint-disable-next-line no-console
+    console.log("OPEN LISTING ANIMATION START", listing.id);
+    // Tap-feedback CSS animation on the card. The .is-opening class is
+    // added synchronously so the animation starts on this same frame.
+    const el = cardRef.current;
+    if (el) {
+      el.classList.add("is-opening");
+      // Remove the class after the CSS animation ends so a second tap
+      // can replay it. 320ms > 180ms animation duration + margin.
+      window.setTimeout(() => el.classList.remove("is-opening"), 320);
     }
+    // Delay the modal open a hair so the tap-feedback is visible before
+    // the detail cover the card.
+    window.setTimeout(() => open(listing), 140);
   };
 
   return (
-    <div className={cn("relative overflow-hidden bg-muted group", aspectClassName)}>
+    <div
+      ref={cardRef}
+      className={cn(
+        "listing-card relative overflow-hidden bg-muted group",
+        aspectClassName
+      )}
+    >
       {hasImages ? (
         <Link
           to={href}
@@ -90,7 +105,6 @@ const ListingImageCarousel = ({
         </Link>
       )}
 
-      {/* Floating heart, no container */}
       <button
         type="button"
         onClick={handleHeart}
