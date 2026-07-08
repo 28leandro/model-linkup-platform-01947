@@ -4,12 +4,9 @@ import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
-const ENTER_MS = 520;
+const ENTER_MS = 380;
 // El exit es el reverso del enter: misma duración, easing espejo.
-// ease-out (0.16, 1, 0.3, 1) invertido en el tiempo es "ease-in" con
-// perfil cubic-bezier(0.7, 0, 0.84, 0) — arranca lento, acelera al
-// final. Visualmente el usuario percibe la entrada rebobinándose.
-const EXIT_MS = 520;
+const EXIT_MS = 380;
 const ENTER_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
 const EXIT_EASING = "cubic-bezier(0.7, 0, 0.84, 0)";
 
@@ -170,6 +167,11 @@ const ListingDetailOverlay = () => {
           zIndex: 9999,
           background: "hsl(var(--background))",
           overflow: "hidden",
+          // Bordes redondeados visibles durante la animación de zoom
+          // (el modal aparece a scale bajo → esquinas prominentes).
+          // En el estado final el modal ocupa 100vw × 100dvh, así que
+          // las esquinas quedan justo fuera del viewport y no se ven.
+          borderRadius: 28,
           animation,
           transformOrigin,
           willChange: "transform",
