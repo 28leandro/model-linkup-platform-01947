@@ -4,7 +4,9 @@ import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
+const ENTER_MS = 280;
 const EXIT_MS = 180;
+const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const releaseBodyLock = () => {
   const b = document.body;
@@ -19,48 +21,63 @@ const releaseBodyLock = () => {
 /**
  * Fullscreen modal for a listing detail.
  *
- * Animation is pure CSS via .detail-enter / .detail-exit classes so
- * nothing inline (like framer-motion) can override the transform.
- *
- * Two states we juggle:
- *   - `listing` (from context) — is the modal "supposed to be" open?
- *   - `rendered` (local)       — what are we actually rendering right now?
- *
- * When the user closes, context.listing becomes null but we keep
- * `rendered` around for EXIT_MS so the exit animation can play, then
- * we unmount.
+ * Animation is driven by inline styles + CSS transitions. Two ticks
+ * of requestAnimationFrame between mount-with-initial-style and
+ * flip-to-final-style guarantee the browser paints the initial frame
+ * first, so the transition actually runs. This bypasses any external
+ * CSS conflict — the transition is right on the element.
  */
 const ListingDetailOverlay = () => {
   const { listing, close } = useListingModal();
   const [rendered, setRendered] = useState<Listing | null>(null);
-  const [phase, setPhase] = useState<"in" | "out">("in");
+  const [entered, setEntered] = useState(false);
+  const [exiting, setExiting] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const savedScrollRef = useRef(0);
   const isVisible = rendered !== null;
 
-  // React to context.listing changes.
+  // Sync context.listing → local render state, with delayed unmount so
+  // the exit animation has time to play.
   useEffect(() => {
     if (listing) {
-      setRendered(listing);
-      setPhase("in");
       // eslint-disable-next-line no-console
       console.log("DETAIL ANIMATION MOUNTED", listing.id);
-      return;
-    }
-    if (rendered) {
-      setPhase("out");
-      const t = window.setTimeout(() => setRendered(null), EXIT_MS);
+      setRendered(listing);
+      setExiting(false);
+      setEntered(false); // start from the "enter" initial pose
+    } else if (rendered) {
+      setExiting(true);
+      const t = window.setTimeout(() => {
+        setRendered(null);
+        setExiting(false);
+        setEntered(false);
+      }, EXIT_MS);
       return () => window.clearTimeout(t);
     }
   }, [listing]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Force scrollTop=0 on the inner scroll container before paint so the
-  // detail always opens from the top.
+  // After the initial paint with the "enter" pose, flip to the final
+  // pose on the next animation frame. The double rAF is critical:
+  // one frame lands the initial styles, the next triggers the transition.
+  useLayoutEffect(() => {
+    if (!rendered || exiting) return;
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => {
+        // eslint-disable-next-line no-console
+        console.log("DETAIL TRANSITION START");
+        setEntered(true);
+      });
+      (raf1 as unknown as { _raf2?: number })._raf2 = raf2;
+    });
+    return () => cancelAnimationFrame(raf1);
+  }, [rendered?.id, exiting]);
+
+  // Force scrollTop=0 before paint so the detail always opens from top.
   useLayoutEffect(() => {
     if (isVisible && scrollRef.current) scrollRef.current.scrollTop = 0;
   }, [isVisible, rendered?.id]);
 
-  // Body scroll-lock (iOS-safe) while the modal is visible.
+  // Body scroll-lock (iOS-safe).
   useEffect(() => {
     if (!isVisible) return;
     const scrollY = window.scrollY || window.pageYOffset || 0;
@@ -78,7 +95,7 @@ const ListingDetailOverlay = () => {
     };
   }, [isVisible]);
 
-  // Safety nets: always restore body on any exit path.
+  // Safety net.
   useEffect(() => {
     const onHide = () => releaseBodyLock();
     window.addEventListener("pagehide", onHide);
@@ -88,7 +105,7 @@ const ListingDetailOverlay = () => {
     };
   }, []);
 
-  // ESC to close.
+  // ESC closes on desktop.
   useEffect(() => {
     if (!isVisible) return;
     const onKey = (e: KeyboardEvent) => {
@@ -100,9 +117,15 @@ const ListingDetailOverlay = () => {
 
   if (typeof document === "undefined" || !rendered) return null;
 
+  // Compute the visual pose. "Enter initial" and "exit final" share the
+  // same shrunken look; "entered" is the fully open pose.
+  const opacity = exiting ? 0 : entered ? 1 : 0;
+  const scale = exiting ? 0.98 : entered ? 1 : 0.94;
+  const translateY = exiting ? 12 : entered ? 0 : 24;
+  const durationMs = exiting ? EXIT_MS : ENTER_MS;
+
   return createPortal(
     <div
-      className={phase === "in" ? "detail-enter" : "detail-exit"}
       role="dialog"
       aria-modal="true"
       style={{
@@ -114,6 +137,10 @@ const ListingDetailOverlay = () => {
         zIndex: 9999,
         background: "hsl(var(--background))",
         overflow: "hidden",
+        opacity,
+        transform: `scale(${scale}) translateY(${translateY}px)`,
+        transformOrigin: "center top",
+        transition: `opacity ${durationMs}ms ${EASING}, transform ${durationMs}ms ${EASING}`,
         willChange: "transform, opacity",
       }}
     >
