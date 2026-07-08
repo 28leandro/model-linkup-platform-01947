@@ -51,20 +51,14 @@ const ListingImageCarousel = ({
     if (!isMobile || !listing) return;
     e.preventDefault();
     e.stopPropagation();
-    // eslint-disable-next-line no-console
-    console.log("OPEN LISTING ANIMATION START", listing.id);
-    // Tap-feedback CSS animation on the card. The .is-opening class is
-    // added synchronously so the animation starts on this same frame.
+    // Brief tap-feedback CSS animation on the card. Modal opens on the
+    // same frame so the tap feels instant (no perceptible lag).
     const el = cardRef.current;
     if (el) {
       el.classList.add("is-opening");
-      // Remove the class after the CSS animation ends so a second tap
-      // can replay it. 320ms > 180ms animation duration + margin.
-      window.setTimeout(() => el.classList.remove("is-opening"), 320);
+      window.setTimeout(() => el.classList.remove("is-opening"), 200);
     }
-    // Delay the modal open a hair so the tap-feedback is visible before
-    // the detail cover the card.
-    window.setTimeout(() => open(listing), 140);
+    open(listing);
   };
 
   return (

@@ -4,11 +4,8 @@ import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
-// Durations tuned to be OBVIOUSLY visible while we finish the QA loop.
-// Once the animation is confirmed in the wild we can dial these back to
-// the previous 280/180 values.
-const ENTER_MS = 400;
-const EXIT_MS = 220;
+const ENTER_MS = 320;
+const EXIT_MS = 200;
 const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const releaseBodyLock = () => {
@@ -43,8 +40,6 @@ const ListingDetailOverlay = () => {
   // the exit animation has time to play.
   useEffect(() => {
     if (listing) {
-      // eslint-disable-next-line no-console
-      console.log("DETAIL ANIMATION MOUNTED", listing.id);
       setRendered(listing);
       setExiting(false);
       setEntered(false); // start from the "enter" initial pose
@@ -65,11 +60,7 @@ const ListingDetailOverlay = () => {
   useLayoutEffect(() => {
     if (!rendered || exiting) return;
     const raf1 = requestAnimationFrame(() => {
-      const raf2 = requestAnimationFrame(() => {
-        // eslint-disable-next-line no-console
-        console.log("DETAIL TRANSITION START");
-        setEntered(true);
-      });
+      const raf2 = requestAnimationFrame(() => setEntered(true));
       (raf1 as unknown as { _raf2?: number })._raf2 = raf2;
     });
     return () => cancelAnimationFrame(raf1);
@@ -122,11 +113,11 @@ const ListingDetailOverlay = () => {
 
   // Compute the visual pose. "Enter initial" and "exit final" share the
   // same shrunken look; "entered" is the fully open pose.
-  // Poses intentionally dramatic (scale 0.7, translateY 60) so the
-  // animation is impossible to miss during verification.
+  // Elegant Airbnb-style pose: subtle scale + short lift, main effect is
+  // the fade + gentle upward glide.
   const opacity = exiting ? 0 : entered ? 1 : 0;
-  const scale = exiting ? 0.9 : entered ? 1 : 0.7;
-  const translateY = exiting ? 40 : entered ? 0 : 60;
+  const scale = exiting ? 0.98 : entered ? 1 : 0.96;
+  const translateY = exiting ? 8 : entered ? 0 : 16;
   const durationMs = exiting ? EXIT_MS : ENTER_MS;
 
   return createPortal(
@@ -143,10 +134,16 @@ const ListingDetailOverlay = () => {
         background: "hsl(var(--background))",
         overflow: "hidden",
         opacity,
-        transform: `scale(${scale}) translateY(${translateY}px)`,
+        // translateZ(0) forces a compositor layer so the transform is
+        // GPU-accelerated on mobile → smoother 60fps animation.
+        transform: `translateZ(0) scale(${scale}) translateY(${translateY}px)`,
         transformOrigin: "center top",
         transition: `opacity ${durationMs}ms ${EASING}, transform ${durationMs}ms ${EASING}`,
         willChange: "transform, opacity",
+        backfaceVisibility: "hidden",
+        WebkitBackfaceVisibility: "hidden",
+        WebkitFontSmoothing: "antialiased",
+        MozOsxFontSmoothing: "grayscale",
       }}
     >
       <div
