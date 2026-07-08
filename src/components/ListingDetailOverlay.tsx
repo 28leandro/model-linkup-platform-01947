@@ -71,8 +71,20 @@ const ListingDetailOverlay = () => {
     b.style.right = "0";
     b.style.width = "100%";
     return () => {
+      // "scroll-behavior: smooth" global en <html> hace que scrollTo
+      // anime desde 0 hasta la posición guardada — el usuario ve la
+      // página "volver al top y bajar". Forzamos scroll-behavior: auto
+      // durante la restauración y lo devolvemos después.
+      const html = document.documentElement;
+      const prev = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
       releaseBodyLock();
-      window.scrollTo(0, savedScrollRef.current);
+      try {
+        window.scrollTo({ top: savedScrollRef.current, left: 0, behavior: "instant" as ScrollBehavior });
+      } catch {
+        window.scrollTo(0, savedScrollRef.current);
+      }
+      html.style.scrollBehavior = prev;
     };
   }, [isVisible]);
 
