@@ -4,8 +4,11 @@ import { useListingModal } from "@/contexts/ListingModalContext";
 import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
-const ENTER_MS = 280;
-const EXIT_MS = 180;
+// Durations tuned to be OBVIOUSLY visible while we finish the QA loop.
+// Once the animation is confirmed in the wild we can dial these back to
+// the previous 280/180 values.
+const ENTER_MS = 400;
+const EXIT_MS = 220;
 const EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const releaseBodyLock = () => {
@@ -119,9 +122,11 @@ const ListingDetailOverlay = () => {
 
   // Compute the visual pose. "Enter initial" and "exit final" share the
   // same shrunken look; "entered" is the fully open pose.
+  // Poses intentionally dramatic (scale 0.7, translateY 60) so the
+  // animation is impossible to miss during verification.
   const opacity = exiting ? 0 : entered ? 1 : 0;
-  const scale = exiting ? 0.98 : entered ? 1 : 0.94;
-  const translateY = exiting ? 12 : entered ? 0 : 24;
+  const scale = exiting ? 0.9 : entered ? 1 : 0.7;
+  const translateY = exiting ? 40 : entered ? 0 : 60;
   const durationMs = exiting ? EXIT_MS : ENTER_MS;
 
   return createPortal(
