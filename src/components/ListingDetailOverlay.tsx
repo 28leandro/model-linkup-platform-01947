@@ -29,8 +29,9 @@ const releaseBodyLock = () => {
  * skip, causing the modal to appear instantly instead of animating).
  */
 const ListingDetailOverlay = () => {
-  const { listing, close } = useListingModal();
+  const { listing, origin, close } = useListingModal();
   const [rendered, setRendered] = useState<Listing | null>(null);
+  const [renderedOrigin, setRenderedOrigin] = useState<{ x: number; y: number } | null>(null);
   const [exiting, setExiting] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const savedScrollRef = useRef(0);
@@ -41,11 +42,13 @@ const ListingDetailOverlay = () => {
   useEffect(() => {
     if (listing) {
       setRendered(listing);
+      setRenderedOrigin(origin);
       setExiting(false);
     } else if (rendered) {
       setExiting(true);
       const t = window.setTimeout(() => {
         setRendered(null);
+        setRenderedOrigin(null);
         setExiting(false);
       }, EXIT_MS);
       return () => window.clearTimeout(t);
@@ -97,9 +100,20 @@ const ListingDetailOverlay = () => {
   // Using `both` fill-mode keeps the final pose after the animation
   // completes; `forwards` on the exit animation freezes it at the last
   // frame until React unmounts the element.
+  // If we captured the tap position, zoom in/out from that point.
+  // Otherwise fall back to slide-up/down.
+  const hasOrigin = renderedOrigin !== null;
   const animation = exiting
-    ? `airbnbDetailExit ${EXIT_MS}ms ${EXIT_EASING} forwards`
-    : `airbnbDetailEnter ${ENTER_MS}ms ${ENTER_EASING} both`;
+    ? hasOrigin
+      ? `airbnbDetailZoomOut ${EXIT_MS}ms ${EXIT_EASING} forwards`
+      : `airbnbDetailExit ${EXIT_MS}ms ${EXIT_EASING} forwards`
+    : hasOrigin
+      ? `airbnbDetailZoomIn ${ENTER_MS}ms ${ENTER_EASING} both`
+      : `airbnbDetailEnter ${ENTER_MS}ms ${ENTER_EASING} both`;
+
+  const transformOrigin = hasOrigin
+    ? `${renderedOrigin.x}px ${renderedOrigin.y}px`
+    : "center center";
 
   // Backdrop entra 2x más rápido que el modal para tapar la página
   // de fondo antes de que se note el slide-up.
@@ -139,6 +153,7 @@ const ListingDetailOverlay = () => {
           background: "hsl(var(--background))",
           overflow: "hidden",
           animation,
+          transformOrigin,
           willChange: "transform",
           backfaceVisibility: "hidden",
           WebkitBackfaceVisibility: "hidden",

@@ -51,14 +51,17 @@ const ListingImageCarousel = ({
     if (!isMobile || !listing) return;
     e.preventDefault();
     e.stopPropagation();
-    // Brief tap-feedback CSS animation on the card. Modal opens on the
-    // same frame so the tap feels instant (no perceptible lag).
+    // Capture the card's viewport-space center — the modal will use it
+    // as its transform-origin so it appears to grow from this card.
     const el = cardRef.current;
+    let origin: { x: number; y: number } | null = null;
     if (el) {
+      const rect = el.getBoundingClientRect();
+      origin = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
       el.classList.add("is-opening");
       window.setTimeout(() => el.classList.remove("is-opening"), 200);
     }
-    open(listing);
+    open(listing, origin);
   };
 
   return (
