@@ -1,11 +1,13 @@
 import { Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
+// NOT lazy: the overlay must be mounted before the first tap so the
+// animation starts on the same frame the user taps a card.
+import ListingDetailOverlay from "./components/ListingDetailOverlay";
 // Route-level code splitting: only the home route is eager.
 // All other pages are loaded on demand to shrink the initial JS bundle.
 const PostAd = lazy(() => import("./pages/PostAd"));
 const ListingDetail = lazy(() => import("./pages/ListingDetail"));
-const ListingDetailOverlay = lazy(() => import("./components/ListingDetailOverlay"));
 const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 const FavoriteThings = lazy(() => import("./pages/FavoriteThings"));
 const MapView = lazy(() => import("./pages/MapView"));
@@ -63,9 +65,7 @@ function App() {
           {/* Global in-app modal for listing details. Portals to <body>,
               driven by local state (never history) so browser back always
               stays inside the site. */}
-          <Suspense fallback={null}>
-            <ListingDetailOverlay />
-          </Suspense>
+          <ListingDetailOverlay />
           <BottomNav />
           <NetworkBanner />
           <Toaster />

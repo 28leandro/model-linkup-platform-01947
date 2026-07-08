@@ -125,26 +125,25 @@
   to   { transform: scale(0.97); }
 }
 
-/* Detalle: entra con fade + scale + slide up. */
+/* Detalle: entra con scale + slide up. NO usa fade de opacity —
+   así el modal es OPACO desde el primer frame y no se ve la página
+   de fondo a través del contenido durante la animación. */
 .detail-enter {
-  animation: airbnbDetailEnter 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation: airbnbDetailEnter 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-origin: center top;
 }
 @keyframes airbnbDetailEnter {
   from {
-    opacity: 0;
-    transform: scale(0.94) translateY(24px);
+    transform: scale(0.88) translateY(32px);
   }
   to {
-    opacity: 1;
     transform: scale(1) translateY(0);
   }
 }
 
-/* Detalle: sale con fade + scale + slide down. `forwards` conserva
-   el estado final durante los 180ms hasta que React lo desmonte. */
+/* Detalle: sale con scale + slide down. */
 .detail-exit {
-  animation: airbnbDetailExit 180ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: airbnbDetailExit 200ms cubic-bezier(0.4, 0, 1, 1) forwards;
   transform-origin: center top;
 }
 @keyframes airbnbDetailExit {
@@ -154,7 +153,7 @@
   }
   to {
     opacity: 0;
-    transform: scale(0.98) translateY(12px);
+    transform: scale(0.96) translateY(16px);
   }
 }
 
