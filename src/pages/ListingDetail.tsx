@@ -79,14 +79,19 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
   };
   
   useEffect(() => {
+    // Only flip the loading state when we DON'T already have seed data.
+    // Without this guard, opening the modal with a preview would flash
+    // real content → skeleton → real content as the background fetch
+    // toggled isLoading.
+    const haveSeed = listing !== null;
     const fetchListing = async () => {
-      setIsLoading(true);
+      if (!haveSeed) setIsLoading(true);
       const { data, error } = await supabase
         .from('listings_public')
         .select('*')
         .eq('id', id)
         .maybeSingle();
-      
+
       if (!error && data) {
         setListing(data as Listing);
         try {
@@ -108,9 +113,9 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
           /* tracking is best-effort */
         }
       }
-      setIsLoading(false);
+      if (!haveSeed) setIsLoading(false);
     };
-    
+
     fetchListing();
   }, [id]);
   
