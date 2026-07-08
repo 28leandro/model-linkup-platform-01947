@@ -157,17 +157,18 @@
   }
 }
 
-/* Salida limpia: fade + leve scale down desde el centro. Se prefiere
-   sobre un zoom-out al punto de origen porque colapsar hacia una
-   esquina se percibe como "la página se cae" en vez de disolverse. */
-@keyframes airbnbDetailFadeOut {
+/* Salida: reverso exacto del ZoomIn. scale 1 → 0 hacia el mismo
+   transform-origin que la entrada → el modal se colapsa de vuelta
+   al punto donde apareció, como si el usuario estuviera rebobinando
+   la apertura. */
+@keyframes airbnbDetailZoomOut {
   from {
     opacity: 1;
     transform: scale(1);
   }
   to {
     opacity: 0;
-    transform: scale(0.96);
+    transform: scale(0);
   }
 }
 

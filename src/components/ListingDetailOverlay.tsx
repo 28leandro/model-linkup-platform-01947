@@ -5,9 +5,13 @@ import ListingDetail from "@/pages/ListingDetail";
 import type { Listing } from "@/store/listingsStore";
 
 const ENTER_MS = 520;
-const EXIT_MS = 240;
+// El exit es el reverso del enter: misma duración, easing espejo.
+// ease-out (0.16, 1, 0.3, 1) invertido en el tiempo es "ease-in" con
+// perfil cubic-bezier(0.7, 0, 0.84, 0) — arranca lento, acelera al
+// final. Visualmente el usuario percibe la entrada rebobinándose.
+const EXIT_MS = 520;
 const ENTER_EASING = "cubic-bezier(0.16, 1, 0.3, 1)";
-const EXIT_EASING = "cubic-bezier(0.4, 0, 0.2, 1)";
+const EXIT_EASING = "cubic-bezier(0.7, 0, 0.84, 0)";
 
 const releaseBodyLock = () => {
   const b = document.body;
@@ -112,24 +116,22 @@ const ListingDetailOverlay = () => {
   // Using `both` fill-mode keeps the final pose after the animation
   // completes; `forwards` on the exit animation freezes it at the last
   // frame until React unmounts the element.
-  // Entrada: si tenemos la posición del tap, zoom desde ese punto
-  // (efecto Airbnb). Sin origen: slide-up de fallback.
-  // Salida: SIEMPRE fade + scale sutil desde el centro. Colapsar hacia
-  // la esquina de origen se veía como "la página se cae hacia un punto"
-  // y sentía sucio.
+  // Salida = reverso exacto de la entrada: zoom-out AL mismo punto
+  // desde el que el modal creció. Mismo transform-origin, keyframe
+  // simétrica, duración y easing espejo → se ve como el usuario
+  // rebobinando la apertura.
   const hasOrigin = renderedOrigin !== null;
   const animation = exiting
-    ? `airbnbDetailFadeOut ${EXIT_MS}ms ${EXIT_EASING} forwards`
+    ? hasOrigin
+      ? `airbnbDetailZoomOut ${EXIT_MS}ms ${EXIT_EASING} forwards`
+      : `airbnbDetailExit ${EXIT_MS}ms ${EXIT_EASING} forwards`
     : hasOrigin
       ? `airbnbDetailZoomIn ${ENTER_MS}ms ${ENTER_EASING} both`
       : `airbnbDetailEnter ${ENTER_MS}ms ${ENTER_EASING} both`;
 
-  // El origen solo aplica en el enter. En el exit usamos el centro
-  // para que el fade sea homogéneo.
-  const transformOrigin =
-    !exiting && hasOrigin
-      ? `${renderedOrigin.x}px ${renderedOrigin.y}px`
-      : "center center";
+  const transformOrigin = hasOrigin
+    ? `${renderedOrigin.x}px ${renderedOrigin.y}px`
+    : "center center";
 
   // Backdrop entra 2x más rápido que el modal para tapar la página
   // de fondo antes de que se note el slide-up.
