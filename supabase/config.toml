@@ -1,13 +1,13 @@
 project_id = "aepadtqxkvptcknytfxn"
 
-[functions.pagopar-create-order]
-verify_jwt = true
-
-[functions.pagopar-webhook]
-verify_jwt = false
-
-[functions.pagopar-check-config]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.pagopar-check-config]
+    verify_jwt = false
+  [functions.pagopar-create-order]
+    verify_jwt = true
+  [functions.pagopar-webhook]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
