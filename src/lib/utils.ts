@@ -18,13 +18,18 @@ export function getCityFromLocation(location?: string | null): string {
   const parts = location.split(",").map((p) => p.trim()).filter(Boolean);
   if (parts.length === 0) return "";
   if (parts.length === 1) return parts[0];
-  // Heuristic: if first part looks like a street (contains digits or common
-  // address keywords), skip it and use the next segment as the city.
-  const first = parts[0];
-  const looksLikeStreet =
-    /\d/.test(first) ||
-    /\b(av|avda|avenida|calle|rua|r\.|ruta|km|n[ºo°]|esq|esquina)\b/i.test(first);
-  return looksLikeStreet && parts[1] ? parts[1] : first;
+  // Never expose exact address. Drop any segment that looks like a street
+  // (contains digits or address keywords). From the remaining segments,
+  // return the city (second-to-last) if present, otherwise the department
+  // (last segment). Never return a street-like segment.
+  const looksLikeStreet = (s: string) =>
+    /\d/.test(s) ||
+    /\b(av|avda|avenida|calle|rua|r\.|ruta|km|n[ºo°]|esq|esquina|barrio|bº|b°)\b/i.test(s);
+  const clean = parts.filter((p) => !looksLikeStreet(p));
+  if (clean.length === 0) return "";
+  if (clean.length === 1) return clean[0];
+  // city is typically second-to-last, department is last
+  return clean[clean.length - 2] || clean[clean.length - 1];
 }
 
 /**
@@ -35,5 +40,10 @@ export function getCityFromLocation(location?: string | null): string {
 export function getPublicCity(listing: any): string {
   const explicit = listing?.attributes?.city;
   if (typeof explicit === "string" && explicit.trim()) return explicit.trim();
-  return getCityFromLocation(listing?.location);
+  const fromLoc = getCityFromLocation(listing?.location);
+  if (fromLoc) return fromLoc;
+  // Last resort: department attribute if seller provided it
+  const dept = listing?.attributes?.department ?? listing?.attributes?.state;
+  if (typeof dept === "string" && dept.trim()) return dept.trim();
+  return "";
 }
