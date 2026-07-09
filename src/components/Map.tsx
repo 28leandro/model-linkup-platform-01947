@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Listing } from '@/store/listingsStore';
+import { getPublicCity } from '@/lib/utils';
 
 // Default Paraguay
 const DEFAULT_CENTER: [number, number] = [-23.4425, -58.4438];
