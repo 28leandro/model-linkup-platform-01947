@@ -39,7 +39,9 @@ const createPopupContent = (listing: Listing) => {
   const location = document.createElement('div');
   location.style.fontSize = '12px';
   location.style.color = 'hsl(var(--muted-foreground))';
-  location.textContent = listing.location || '';
+  // Never expose exact address in map popups — city/department only.
+  const publicCity = getPublicCity(listing as any);
+  location.textContent = publicCity || '';
   content.appendChild(location);
 
   if (listing.price) {
