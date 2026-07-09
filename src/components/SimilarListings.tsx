@@ -457,10 +457,10 @@ const SimilarListings = ({
                       {formatPrice(item.price, item.currency || undefined)}
                     </p>
                   )}
-                  {item.location && (
+                  {getPublicCity(item as any) && (
                     <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 line-clamp-1 font-light flex items-center gap-1">
                       <MapPin className="w-3 h-3 shrink-0" />
-                      <span className="truncate">{item.location}</span>
+                      <span className="truncate">{getPublicCity(item as any)}</span>
                     </p>
                   )}
                   <p className="text-[10px] text-muted-foreground mt-0.5 font-light">
