@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Listing } from '@/store/listingsStore';
+import { getPublicCity } from '@/lib/utils';
 
 // Default Paraguay
 const DEFAULT_CENTER: [number, number] = [-23.4425, -58.4438];
@@ -39,7 +40,9 @@ const createPopupContent = (listing: Listing) => {
   const location = document.createElement('div');
   location.style.fontSize = '12px';
   location.style.color = 'hsl(var(--muted-foreground))';
-  location.textContent = listing.location || '';
+  // Never expose exact address in map popups — city/department only.
+  const publicCity = getPublicCity(listing as any);
+  location.textContent = publicCity || '';
   content.appendChild(location);
 
   if (listing.price) {
