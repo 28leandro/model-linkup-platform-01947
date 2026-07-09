@@ -8,6 +8,7 @@ import { formatPrice } from "@/lib/formatPrice";
 import ListingImageCarousel from "@/components/ListingImageCarousel";
 import ListingRatingBadge from "@/components/ListingRatingBadge";
 import { getCheapestIds, priceClass } from "@/lib/cheapest";
+import { getPublicCity } from "@/lib/utils";
 import { CATEGORIES } from "@/lib/categories";
 
 interface SimilarListingsProps {
