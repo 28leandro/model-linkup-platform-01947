@@ -17,15 +17,16 @@ export function getCityFromLocation(location?: string | null): string {
   if (!location) return "";
   const parts = location.split(",").map((p) => p.trim()).filter(Boolean);
   if (parts.length === 0) return "";
-  if (parts.length === 1) return parts[0];
   // Never expose exact address. Drop any segment that looks like a street
   // (contains digits or address keywords). From the remaining segments,
   // return the city (second-to-last) if present, otherwise the department
   // (last segment). Never return a street-like segment.
   const looksLikeStreet = (s: string) =>
     /\d/.test(s) ||
-    /\b(av|avda|avenida|calle|rua|r\.|ruta|km|n[ºo°]|esq|esquina|barrio|bº|b°)\b/i.test(s);
-  const clean = parts.filter((p) => !looksLikeStreet(p));
+    /\b(av|avda|avenida|calle|rua|r\.|ruta|km|n[ºo°]|esq|esquina|barrio|b[ºo°]|distrito|zona|manzana|mza|lote|piso|depto|dpto|casa|edificio|edif)\b/i.test(s);
+  // Country names we treat as non-city (department fallback last).
+  const isCountry = (s: string) => /^(paraguay|py|brasil|brazil|argentina|uruguay|bolivia|chile)$/i.test(s.trim());
+  const clean = parts.filter((p) => !looksLikeStreet(p) && !isCountry(p));
   if (clean.length === 0) return "";
   if (clean.length === 1) return clean[0];
   // city is typically second-to-last, department is last
