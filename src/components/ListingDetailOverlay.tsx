@@ -51,6 +51,24 @@ const ListingDetailOverlay = () => {
       setRenderedOrigin(origin);
       setExiting(false);
     } else if (rendered) {
+      // Libero el body scroll-lock AL COMIENZO del exit, no al final.
+      // Antes, esperar a que la animación termine para liberar el body
+      // provocaba un layout-shift perceptible entre "modal desapareció"
+      // y "página subyacente vuelve a scroll normal". Ahora el body ya
+      // está en su posición final mientras el modal sigue animándose
+      // encima → cuando el modal termina de desaparecer, la página
+      // subyacente ya está exactamente donde debe estar.
+      const html = document.documentElement;
+      const prevBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      releaseBodyLock();
+      try {
+        window.scrollTo({ top: savedScrollRef.current, left: 0, behavior: "instant" as ScrollBehavior });
+      } catch {
+        window.scrollTo(0, savedScrollRef.current);
+      }
+      html.style.scrollBehavior = prevBehavior;
+
       setExiting(true);
       const t = window.setTimeout(() => {
         setRendered(null);
@@ -76,21 +94,19 @@ const ListingDetailOverlay = () => {
     b.style.left = "0";
     b.style.right = "0";
     b.style.width = "100%";
+    // El body se libera dentro del handler de exit (más arriba) para
+    // evitar layout-shift al terminar el modal. Este cleanup solo
+    // sirve como safety net si el componente se desmonta abruptamente
+    // (hot reload, navegación externa, error).
     return () => {
-      // "scroll-behavior: smooth" global en <html> hace que scrollTo
-      // anime desde 0 hasta la posición guardada — el usuario ve la
-      // página "volver al top y bajar". Forzamos scroll-behavior: auto
-      // durante la restauración y lo devolvemos después.
-      const html = document.documentElement;
-      const prev = html.style.scrollBehavior;
-      html.style.scrollBehavior = "auto";
-      releaseBodyLock();
-      try {
-        window.scrollTo({ top: savedScrollRef.current, left: 0, behavior: "instant" as ScrollBehavior });
-      } catch {
-        window.scrollTo(0, savedScrollRef.current);
+      if (document.body.style.position === "fixed") {
+        releaseBodyLock();
+        try {
+          window.scrollTo({ top: savedScrollRef.current, left: 0, behavior: "instant" as ScrollBehavior });
+        } catch {
+          window.scrollTo(0, savedScrollRef.current);
+        }
       }
-      html.style.scrollBehavior = prev;
     };
   }, [isVisible]);
 

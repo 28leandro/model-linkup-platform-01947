@@ -145,15 +145,18 @@
 
 /* Zoom desde un punto: el modal crece desde la posición exacta de la
    card tocada. transformOrigin se aplica inline en el elemento con
-   las coordenadas capturadas al momento del tap. */
+   las coordenadas capturadas al momento del tap.
+   translate3d(0,0,0) fuerza al navegador a promover el elemento a
+   una capa GPU (compositor) → animación a 60fps sin repintados en
+   el hilo principal. */
 @keyframes airbnbDetailZoomIn {
   from {
     opacity: 0;
-    transform: scale(0);
+    transform: translate3d(0, 0, 0) scale(0);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
@@ -164,11 +167,11 @@
 @keyframes airbnbDetailZoomOut {
   from {
     opacity: 1;
-    transform: scale(1);
+    transform: translate3d(0, 0, 0) scale(1);
   }
   to {
     opacity: 0;
-    transform: scale(0);
+    transform: translate3d(0, 0, 0) scale(0);
   }
 }
 
