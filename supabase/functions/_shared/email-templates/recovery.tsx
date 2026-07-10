@@ -26,10 +26,6 @@ export const RecoveryEmail = ({
     <Head>
       <style>{`
         @media (prefers-color-scheme: dark) {
-          .nemu-btn {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-          }
           .nemu-h1 { color: #ffffff !important; }
           .nemu-text { color: #cccccc !important; }
         }
@@ -73,11 +69,13 @@ const text = {
   margin: '0 0 25px',
 }
 const button = {
-  backgroundColor: 'hsl(262, 83%, 58%)',
-  color: 'hsl(0, 0%, 100%)',
+  backgroundColor: '#7c3aed',
+  color: '#ffffff',
   fontSize: '14px',
-  borderRadius: '12px',
-  padding: '12px 20px',
+  borderRadius: '10px',
+  padding: '14px 24px',
   textDecoration: 'none',
+  display: 'inline-block',
+  fontWeight: '600',
 }
 const footer = { fontSize: '12px', color: '#999999', margin: '30px 0 0' }
