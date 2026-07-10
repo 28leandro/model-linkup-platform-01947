@@ -22,24 +22,35 @@ export const RecoveryEmail = ({
   siteName,
   confirmationUrl,
 }: RecoveryEmailProps) => (
-  <Html lang="en" dir="ltr">
-    <Head />
+  <Html lang="es" dir="ltr">
+    <Head>
+      <style>{`
+        @media (prefers-color-scheme: dark) {
+          .nemu-btn {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+          }
+          .nemu-h1 { color: #ffffff !important; }
+          .nemu-text { color: #cccccc !important; }
+        }
+      `}</style>
+    </Head>
     <Preview>Restablecé tu contraseña en {siteName}</Preview>
     <Body style={main}>
       <Container style={container}>
-        <Heading style={h1}>Restablecé tu contraseña</Heading>
-        <Text style={text}>
+        <Heading style={h1} className="nemu-h1">Restablecé tu contraseña</Heading>
+        <Text style={text} className="nemu-text">
           Recibimos una solicitud para restablecer tu contraseña en {siteName}.
           Hacé clic en el botón de abajo para elegir una nueva contraseña.
         </Text>
-        <Button style={button} href={confirmationUrl}>
+        <Button style={button} href={confirmationUrl} className="nemu-btn">
           Restablecer contraseña
         </Button>
-        <Text style={footer}>
+        <Text style={footer} className="nemu-text">
           Si no solicitaste restablecer tu contraseña, podés ignorar este
           correo. Tu contraseña no será modificada.
         </Text>
-        <Text style={footer}>Equipo de Nemu</Text>
+        <Text style={footer} className="nemu-text">Equipo de Nemu</Text>
       </Container>
     </Body>
   </Html>
