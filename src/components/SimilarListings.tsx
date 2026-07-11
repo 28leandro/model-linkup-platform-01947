@@ -431,7 +431,7 @@ const SimilarListings = ({
       <div className="flex lg:grid lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 overflow-x-auto lg:overflow-visible snap-x snap-mandatory lg:snap-none scroll-smooth -mx-2 sm:-mx-3 px-2 sm:px-3 lg:mx-0 lg:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {items.map((item) => {
           return (
-            <div key={item.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink lg:max-w-[280px]">
+            <div key={item.id} className="group relative bg-transparent rounded-xl overflow-hidden shrink-0 w-[44%] sm:w-[38%] md:w-[30%] snap-start lg:w-auto lg:shrink">
               <div className="rounded-xl overflow-hidden">
                 <ListingImageCarousel
                   listingId={item.id}
@@ -440,7 +440,7 @@ const SimilarListings = ({
                   href={`/listing/${item.id}`}
                   noImageLabel={t("listings.noImage")}
                   listing={item as any}
-                  aspectClassName="aspect-[3/4] lg:aspect-square"
+                  aspectClassName="aspect-[3/4] lg:aspect-[3/4]"
                 />
               </div>
               <Link

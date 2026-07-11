@@ -274,7 +274,7 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
               className={
                 isMobile
                   ? "relative w-full aspect-[16/15] bg-muted overflow-hidden"
-                  : "relative aspect-[4/3] sm:aspect-[16/10] max-h-[270px] sm:max-h-[293px] md:max-h-[338px] lg:max-h-[383px] max-w-xl sm:max-w-2xl mx-auto bg-muted rounded-lg mb-3 overflow-hidden"
+                  : "relative aspect-[4/3] sm:aspect-[16/10] max-h-[270px] sm:max-h-[293px] md:max-h-[338px] lg:max-h-[440px] max-w-xl sm:max-w-2xl lg:max-w-3xl mx-auto bg-muted rounded-lg mb-3 overflow-hidden"
               }
             >
               {/* Floating back arrow — mobile only, sits over the photo */}
