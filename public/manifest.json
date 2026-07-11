@@ -1,6 +1,6 @@
 {
-  "name": "nemu",
-  "short_name": "nemu",
+  "name": "nemu.py",
+  "short_name": "nemu.py",
   "description": "Marketplace de vehículos, inmuebles y servicios en Paraguay.",
   "start_url": "/",
   "scope": "/",
