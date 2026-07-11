@@ -273,8 +273,8 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
             <div
               className={
                 isMobile
-                  ? "relative w-full aspect-[4/5] bg-muted overflow-hidden"
-                  : "relative aspect-[4/3] sm:aspect-[16/10] max-h-[360px] sm:max-h-[390px] md:max-h-[450px] lg:max-h-[510px] max-w-xl sm:max-w-2xl mx-auto bg-muted rounded-lg mb-3 overflow-hidden"
+                  ? "relative w-full aspect-[16/15] bg-muted overflow-hidden"
+                  : "relative aspect-[4/3] sm:aspect-[16/10] max-h-[270px] sm:max-h-[293px] md:max-h-[338px] lg:max-h-[383px] max-w-xl sm:max-w-2xl mx-auto bg-muted rounded-lg mb-3 overflow-hidden"
               }
             >
               {/* Floating back arrow — mobile only, sits over the photo */}
@@ -357,7 +357,7 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
             {listing.images && listing.images.length > 1 && (
               <div className={isMobile
                 ? "hidden"
-                : "grid grid-cols-5 gap-2 mb-3"
+                : "grid grid-cols-5 gap-2 mb-3 max-w-xl sm:max-w-2xl mx-auto"
               }>
                 {listing.images.map((image, index) => (
                   <button
