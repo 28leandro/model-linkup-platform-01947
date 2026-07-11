@@ -440,7 +440,7 @@ const SimilarListings = ({
                   href={`/listing/${item.id}`}
                   noImageLabel={t("listings.noImage")}
                   listing={item as any}
-                  aspectClassName="aspect-square"
+                  aspectClassName="aspect-[3/4] lg:aspect-square"
                 />
               </div>
               <Link
