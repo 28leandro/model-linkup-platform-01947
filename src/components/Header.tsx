@@ -1,11 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard, Search, User, Settings, MessageSquare } from "lucide-react";
+import { Plus, LogIn, LogOut, Heart, MapPin, LayoutDashboard, Search, User, Settings, MessageSquare, Bell, ShieldCheck } from "lucide-react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import Logo from "@/components/Logo";
 import LanguageSelector from "@/components/LanguageSelector";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 import { useState, useEffect, useRef } from "react";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,6 +25,7 @@ const Header = ({ onLoginClick }: HeaderProps) => {
   const { t } = useLanguage();
   const { user, signOut } = useAuth();
   const unreadCount = useUnreadMessages();
+  const { isAdmin } = useIsAdmin();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -176,6 +178,16 @@ const Header = ({ onLoginClick }: HeaderProps) => {
                   <Settings className="w-4 h-4 mr-2" />
                   Mi Cuenta
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/notifications")}>
+                  <Bell className="w-4 h-4 mr-2" />
+                  Avisos
+                </DropdownMenuItem>
+                {isAdmin && (
+                  <DropdownMenuItem onClick={() => navigate("/admin/moderation")}>
+                    <ShieldCheck className="w-4 h-4 mr-2" />
+                    Moderación
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>
                   <LogOut className="w-4 h-4 mr-2" />
