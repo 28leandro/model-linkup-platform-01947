@@ -22,6 +22,8 @@ const PagoparTest = lazy(() => import("./pages/PagoparTest"));
 const MyListings = lazy(() => import("./pages/MyListings"));
 const AccountSettings = lazy(() => import("./pages/AccountSettings"));
 const Unae = lazy(() => import("./pages/Unae"));
+const AdminModeration = lazy(() => import("./pages/AdminModeration"));
+const Notifications = lazy(() => import("./pages/Notifications"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -58,6 +60,9 @@ function App() {
                 <Route path="/my-listings" element={<MyListings />} />
                 <Route path="/account" element={<AccountSettings />} />
                 <Route path="/unae" element={<Unae />} />
+                <Route path="/admin" element={<AdminModeration />} />
+                <Route path="/admin/moderation" element={<AdminModeration />} />
+                <Route path="/notifications" element={<Notifications />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
