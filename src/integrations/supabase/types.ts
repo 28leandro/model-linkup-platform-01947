@@ -179,10 +179,13 @@ export type Database = {
           location: string | null
           longitude: number | null
           model: string | null
+          moderated_at: string | null
+          moderation_status: string
           phone: string | null
           photos_unlocked: boolean
           price: number | null
           rating: number | null
+          rejection_reason: string | null
           subcategory: string | null
           title: string
           type: string | null
@@ -206,10 +209,13 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           model?: string | null
+          moderated_at?: string | null
+          moderation_status?: string
           phone?: string | null
           photos_unlocked?: boolean
           price?: number | null
           rating?: number | null
+          rejection_reason?: string | null
           subcategory?: string | null
           title: string
           type?: string | null
@@ -233,10 +239,13 @@ export type Database = {
           location?: string | null
           longitude?: number | null
           model?: string | null
+          moderated_at?: string | null
+          moderation_status?: string
           phone?: string | null
           photos_unlocked?: boolean
           price?: number | null
           rating?: number | null
+          rejection_reason?: string | null
           subcategory?: string | null
           title?: string
           type?: string | null
@@ -280,6 +289,54 @@ export type Database = {
           sender_id?: string | null
         }
         Relationships: []
+      }
+      notifications: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          listing_id: string | null
+          read_at: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          read_at?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          read_at?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings_public"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_orders: {
         Row: {
