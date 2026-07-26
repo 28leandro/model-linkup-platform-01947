@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Search, Plus, MessageCircle, Menu, FolderOpen, Settings } from "lucide-react";
+import { Home, Search, Plus, MessageCircle, Menu, FolderOpen, Settings, Bell, ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
@@ -9,6 +9,7 @@ import { LogIn, LogOut, Heart, MapPin } from "lucide-react";
 import LanguageSelector from "@/components/LanguageSelector";
 import { LoginDialog } from "@/components/LoginDialog";
 import { useUnreadMessages } from "@/hooks/useUnreadMessages";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const BottomNav = () => {
   const { t } = useLanguage();
@@ -17,6 +18,7 @@ const BottomNav = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const unreadCount = useUnreadMessages();
+  const { isAdmin } = useIsAdmin();
 
   // Immersive listing detail on mobile: the detail page becomes full-screen
   // with photos taking the top of the viewport, so we hide the bottom nav
@@ -139,6 +141,20 @@ const BottomNav = () => {
                         {t("nav.accountSettings")}
                       </Link>
                     </Button>
+                    <Button asChild variant="ghost" size="lg" className="w-full justify-start">
+                      <Link to="/notifications" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
+                        <Bell className="w-4 h-4" />
+                        Avisos
+                      </Link>
+                    </Button>
+                    {isAdmin && (
+                      <Button asChild variant="ghost" size="lg" className="w-full justify-start">
+                        <Link to="/admin/moderation" onClick={() => setMenuOpen(false)} className="flex items-center gap-2">
+                          <ShieldCheck className="w-4 h-4" />
+                          Moderación
+                        </Link>
+                      </Button>
+                    )}
                   </>
                 )}
                 {user ? (
