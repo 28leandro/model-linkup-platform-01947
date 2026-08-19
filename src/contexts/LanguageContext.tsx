@@ -494,6 +494,10 @@ const translations = {
     'favorites.loginRequired': 'Inicie sesión para guardar favoritos',
     'favorites.browse': 'Explorar anuncios',
     
+    // WhatsApp
+    'whatsapp.loginRequired': 'Inicie sesión para contactar por WhatsApp.',
+    'whatsapp.login': 'Ingresar',
+    
     // Common
     'common.backToHome': 'Volver al inicio',
     'common.noListingsInCategory': 'No se encontraron anuncios en esta categoría.',
