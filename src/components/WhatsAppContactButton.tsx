@@ -3,7 +3,7 @@ import { MessageCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "@/components/ui/use-toast";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useNavigate } from "react-router-dom";
 
 interface Props {
@@ -14,7 +14,9 @@ interface Props {
 
 const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }: Props) => {
   const [phone, setPhone] = useState<string | null>(null);
+  const [showLoginMessage, setShowLoginMessage] = useState(false);
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,6 +37,13 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
       active = false;
     };
   }, [listingId, user]);
+
+  // Auto-hide the login message after 5s
+  useEffect(() => {
+    if (!showLoginMessage) return;
+    const timer = setTimeout(() => setShowLoginMessage(false), 5000);
+    return () => clearTimeout(timer);
+  }, [showLoginMessage]);
 
   // Normalize phone for wa.me — must be full international number, digits only.
   // Paraguay default: numbers stored locally (e.g. "0982 123-456" / "982123456")
@@ -89,16 +98,82 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
   const handleBlocked = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    toast({
-      title: "Inicia sesión para continuar",
-      description: "Necesitas estar logueado para contactar al vendedor por WhatsApp.",
-      variant: "destructive",
-    });
-    navigate("/?auth=login");
+    setShowLoginMessage(true);
   };
+
+  const loginMessage = (
+    <div className="bg-popover text-popover-foreground text-xs rounded-lg border border-border shadow-lg p-2.5 z-50 animate-in fade-in zoom-in-95 duration-200">
+      <p className="leading-snug">{t('whatsapp.loginRequired')}</p>
+      <button
+        type="button"
+        onClick={() => navigate("/?auth=login")}
+        className="mt-1.5 text-primary font-medium underline hover:text-primary/80 focus:outline-none focus:ring-2 focus:ring-ring rounded"
+      >
+        {t('whatsapp.login')}
+      </button>
+    </div>
+  );
 
   if (variant === "inline") {
     return (
+      <div className="relative inline-flex items-center">
+        <Button
+          asChild
+          className={`rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0`}
+        >
+          <a
+            href={isReady ? url : "#"}
+            onClick={isReady ? (() => trackContact()) : handleBlocked}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contactar por WhatsApp"
+            title="Contactar por WhatsApp"
+          >
+            <MessageCircle className="w-6 h-6 text-white" />
+          </a>
+        </Button>
+        {showLoginMessage && (
+          <div className="absolute right-full top-1/2 -translate-y-1/2 mr-2 w-44 sm:w-48">
+            {loginMessage}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (variant === "compact") {
+    return (
+      <div className="relative inline-flex items-center">
+        <Button
+          asChild
+          size="icon"
+          className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-green-500 hover:bg-green-600 p-0`}
+          title="Contactar por WhatsApp"
+        >
+          <a
+            href={isReady ? url : "#"}
+            onClick={isReady ? (() => trackContact()) : handleBlocked}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contactar por WhatsApp"
+          >
+            <MessageCircle className="w-4 h-4 text-white" />
+          </a>
+        </Button>
+        {showLoginMessage && (
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-44 sm:w-48">
+            {loginMessage}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="fixed bottom-24 right-4 sm:bottom-6 sm:right-6 z-50 flex items-center gap-2">
+      {showLoginMessage && (
+        <div className="w-44 sm:w-48">{loginMessage}</div>
+      )}
       <Button
         asChild
         className={`rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center transition-transform hover:scale-110 p-0`}
@@ -114,46 +189,7 @@ const WhatsAppContactButton = ({ listingId, listingTitle, variant = "floating" }
           <MessageCircle className="w-6 h-6 text-white" />
         </a>
       </Button>
-    );
-  }
-
-  if (variant === "compact") {
-    return (
-      <Button
-        asChild
-        size="icon"
-        className={`h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-green-500 hover:bg-green-600 p-0`}
-        title="Contactar por WhatsApp"
-      >
-        <a
-          href={isReady ? url : "#"}
-          onClick={isReady ? (() => trackContact()) : handleBlocked}
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Contactar por WhatsApp"
-        >
-          <MessageCircle className="w-4 h-4 text-white" />
-        </a>
-      </Button>
-    );
-  }
-
-  return (
-    <Button
-      asChild
-        className={`fixed bottom-24 right-4 sm:bottom-6 sm:right-6 rounded-full w-14 h-14 bg-green-500 hover:bg-green-600 shadow-lg flex items-center justify-center z-50 transition-transform hover:scale-110 p-0`}
-    >
-      <a
-        href={isReady ? url : "#"}
-        onClick={isReady ? (() => trackContact()) : handleBlocked}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Contactar por WhatsApp"
-        title="Contactar por WhatsApp"
-      >
-          <MessageCircle className="w-6 h-6 text-white" />
-      </a>
-    </Button>
+    </div>
   );
 };
 

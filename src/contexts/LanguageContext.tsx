@@ -192,6 +192,10 @@ const translations = {
     'favorites.loginRequired': 'Faça login para salvar favoritos',
     'favorites.browse': 'Explorar anúncios',
     
+    // WhatsApp
+    'whatsapp.loginRequired': 'Inicie sessão para contactar pelo WhatsApp.',
+    'whatsapp.login': 'Entrar',
+    
     // Common
     'common.backToHome': 'Voltar ao início',
     'common.noListingsInCategory': 'Nenhum anúncio encontrado nesta categoria.',
@@ -489,6 +493,10 @@ const translations = {
     'favorites.removed': 'Eliminado de favoritos',
     'favorites.loginRequired': 'Inicie sesión para guardar favoritos',
     'favorites.browse': 'Explorar anuncios',
+    
+    // WhatsApp
+    'whatsapp.loginRequired': 'Inicie sesión para contactar por WhatsApp.',
+    'whatsapp.login': 'Ingresar',
     
     // Common
     'common.backToHome': 'Volver al inicio',
