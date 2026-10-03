@@ -13,6 +13,7 @@ import {
   Gamepad2,
   Watch,
   Keyboard,
+  CircuitBoard,
   Cpu,
   Shirt,
   Baby,
@@ -201,6 +202,7 @@ export const CATEGORIES: Category[] = [
       { id: "consolas",      label_es: "Consolas y Videojuegos",  label_pt: "Consoles e Videogames",  icon: Gamepad2,   brands: ["PS5", "Xbox Series", "Nintendo Switch", "PC Gamer"] },
       { id: "iot",           label_es: "Objetos Conectados (IoT)", label_pt: "Objetos Conectados (IoT)", icon: Watch,    brands: ["Apple", "Samsung", "Google", "Amazon", "Xiaomi"], examples: ["Smartwatches", "Alexa", "Google Home", "Cámaras Wi-Fi"] },
       { id: "accesorios",    label_es: "Accesorios",              label_pt: "Acessórios",              icon: Keyboard,   examples: ["Teclados","Mouses","Cables","Fundas"], brands: ["Logitech","Genius","HP","Microsoft","Razer","Redragon","Kingston","JBL"] },
+      { id: "electronicos-general", label_es: "Electrónicos en General", label_pt: "Eletrônicos em Geral", icon: CircuitBoard, examples: ["Cámaras","Audio","Drones","Otros Electrónicos"] },
     ],
   },
   {
