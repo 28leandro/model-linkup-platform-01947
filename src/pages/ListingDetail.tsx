@@ -483,7 +483,7 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
             })()}
 
             <div className="flex flex-wrap items-center gap-2 mb-4">
-              <ShareButtons title={listing.title} />
+              <ShareButtons title={listing.title} url={`${window.location.origin}/listing/${listing.id}`} />
               {!isOwner && (
                 <WhatsAppContactButton
                   listingId={listing.id}
