@@ -19,8 +19,11 @@ const ShareButtons = ({ title, url }: ShareButtonsProps) => {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
   
-  // Always share via the canonical brand domain so previews show "nemu.com.py"
-  const CANONICAL_HOST = "https://www.nemu.com.py";
+  // Share via the live site. The custom domain isn't active yet, so links to it break.
+  // Use the current origin on the live site; fall back to the published URL from preview/localhost.
+  const origin = window.location.origin;
+  const isPreview = /localhost|id-preview--|lovableproject\.com/.test(origin);
+  const CANONICAL_HOST = isPreview ? "https://nemu-com-py.lovable.app" : origin;
   const rawUrl = url || window.location.href;
   let shareUrl = rawUrl;
   try {
