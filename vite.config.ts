@@ -30,8 +30,8 @@ export default defineConfig(({ mode }) => ({
         navigateFallback: null,
         runtimeCaching: [
           {
-            urlPattern: ({ request, url }) => request.mode === 'navigate' &&
-              url.origin === self.location.origin && !/^\/\~oauth(?:\/|$)/.test(url.pathname) &&
+            urlPattern: ({ request, url, sameOrigin }) => request.mode === 'navigate' &&
+              sameOrigin && !/^\/\~oauth(?:\/|$)/.test(url.pathname) &&
               !/^\/(?:reset-password|forgot-password|auth)(?:\/|$)/.test(url.pathname) &&
               !url.searchParams.has('code') && !url.searchParams.has('token_hash'),
             handler: 'NetworkFirst',
@@ -43,7 +43,7 @@ export default defineConfig(({ mode }) => ({
             },
           },
           {
-            urlPattern: ({ url }) => url.origin === self.location.origin &&
+            urlPattern: ({ url, sameOrigin }) => sameOrigin &&
               /\/assets\/[^/]+-[a-zA-Z0-9_-]{8,}\.(?:js|css|woff2?)$/.test(url.pathname),
             handler: 'CacheFirst',
             options: {

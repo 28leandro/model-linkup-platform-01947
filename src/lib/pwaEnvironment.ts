@@ -1,7 +1,7 @@
 /** Only app-shell workers are managed here; messaging workers remain untouched. */
 export function isAppWorker(scriptURL: string, origin: string): boolean {
   const url = new URL(scriptURL, origin);
-  return url.origin === origin && url.pathname === '/sw.js';
+  return url.origin === origin && ['/sw.js', '/service-worker.js'].includes(url.pathname);
 }
 
 export function shouldDisablePwa({ production, iframe, hostname, search }: {
