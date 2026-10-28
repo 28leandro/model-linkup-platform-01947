@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
+import { VitePWA } from "vite-plugin-pwa";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -11,6 +12,49 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
+    VitePWA({
+      strategies: 'generateSW',
+      filename: 'sw.js',
+      registerType: 'autoUpdate',
+      injectRegister: null,
+      devOptions: { enabled: false },
+      // Preserve the existing manifest URL, identity, icons, and standalone mode.
+      manifest: false,
+      workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
+        cleanupOutdatedCaches: true,
+        // HTML must come from the network first, never from a precached shell.
+        globPatterns: ['assets/**/*.{js,css,woff,woff2}'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+        navigateFallback: null,
+        runtimeCaching: [
+          {
+            urlPattern: ({ request, url, sameOrigin }) => request.mode === 'navigate' &&
+              sameOrigin && !/^\/\~oauth(?:\/|$)/.test(url.pathname) &&
+              !/^\/(?:reset-password|forgot-password|auth)(?:\/|$)/.test(url.pathname) &&
+              !url.searchParams.has('code') && !url.searchParams.has('token_hash'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'nemu-navigations',
+              networkTimeoutSeconds: 5,
+              expiration: { maxEntries: 30, maxAgeSeconds: 86400 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+          {
+            urlPattern: ({ url, sameOrigin }) => sameOrigin &&
+              /\/assets\/[^/]+-[a-zA-Z0-9_-]{8,}\.(?:js|css|woff2?)$/.test(url.pathname),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'nemu-assets',
+              expiration: { maxEntries: 150, maxAgeSeconds: 31536000 },
+              cacheableResponse: { statuses: [200] },
+            },
+          },
+        ],
+      },
+    }),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
