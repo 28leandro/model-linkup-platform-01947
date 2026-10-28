@@ -10,9 +10,12 @@ import { initPwaUpdate } from './lib/pwaUpdate'
 
 const queryClient = new QueryClient()
 
-initPwaUpdate()
+void initPwaUpdate()
 
-createRoot(document.getElementById("root")!).render(
+const root = document.getElementById('root')
+if (!root) throw new Error('Application root is missing')
+
+createRoot(root).render(
   <HelmetProvider>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
