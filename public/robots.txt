@@ -13,4 +13,4 @@ Disallow: /payment-success
 Disallow: /photo-paywall
 Disallow: /pagopar-test
 
-Sitemap: https://nemu.com.py/sitemap.xml
+Sitemap: https://nemu-com-py.lovable.app/sitemap.xml
