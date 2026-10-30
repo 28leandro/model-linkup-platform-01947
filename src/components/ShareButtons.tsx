@@ -3,6 +3,7 @@ import { Share2, Facebook, Twitter, Link2, Check } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { toast } from "@/hooks/use-toast";
+import { getSiteUrl } from "@/lib/siteUrl";
 import {
   DropdownMenu,
   DropdownMenuContent,

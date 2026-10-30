@@ -26,6 +26,7 @@ import SimilarListings from "@/components/SimilarListings";
 import SEO from "@/components/SEO";
 import { RatingSystem } from "@/components/RatingSystem";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 interface ListingDetailProps {
   onClose?: () => void;
