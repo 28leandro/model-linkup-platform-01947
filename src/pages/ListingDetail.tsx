@@ -26,6 +26,7 @@ import SimilarListings from "@/components/SimilarListings";
 import SEO from "@/components/SEO";
 import { RatingSystem } from "@/components/RatingSystem";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { getSiteUrl } from "@/lib/siteUrl";
 
 interface ListingDetailProps {
   onClose?: () => void;
@@ -217,7 +218,7 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
           price: listing.price,
           priceCurrency: (listing as any).currency || "PYG",
           availability: "https://schema.org/InStock",
-          url: `https://nemu.com.py/listing/${id}`,
+          url: `${getSiteUrl()}/listing/${id}`,
         }
       : undefined,
   };
