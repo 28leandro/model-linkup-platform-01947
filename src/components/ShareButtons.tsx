@@ -20,10 +20,7 @@ const ShareButtons = ({ title, url }: ShareButtonsProps) => {
   const [copied, setCopied] = useState(false);
   
   // Share via the live site. The custom domain isn't active yet, so links to it break.
-  // Use the current origin on the live site; fall back to the published URL from preview/localhost.
-  const origin = window.location.origin;
-  const isPreview = /localhost|id-preview--|lovableproject\.com/.test(origin);
-  const CANONICAL_HOST = isPreview ? "https://nemu-com-py.lovable.app" : origin;
+  const CANONICAL_HOST = getSiteUrl();
   const rawUrl = url || window.location.href;
   let shareUrl = rawUrl;
   try {

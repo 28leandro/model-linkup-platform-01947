@@ -217,7 +217,7 @@ const ListingDetail = ({ onClose, initialListing }: ListingDetailProps = {}) => 
           price: listing.price,
           priceCurrency: (listing as any).currency || "PYG",
           availability: "https://schema.org/InStock",
-          url: `https://nemu.com.py/listing/${id}`,
+          url: `${getSiteUrl()}/listing/${id}`,
         }
       : undefined,
   };
